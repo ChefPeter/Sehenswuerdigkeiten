@@ -14,8 +14,8 @@ function App() {
       <Link to="/start">Start</Link>
       <Button variant="contained">Hello World</Button>;
       <Button variant="contained" endIcon={<DeleteIcon/>}>
-  Send
-</Button>
+        Send
+      </Button>
     </div>
   );
 }

@@ -11,7 +11,7 @@ import {
 } from "react-router-dom";
 import Start from "./routes/start";
 import Login from "./routes/login";
-
+import Register from "./routes/register"
 
 const rootElement = document.getElementById("root");
 render(
@@ -21,6 +21,7 @@ render(
       <Route path="/" element={<Login/>} />
       <Route path="app" element={<App />} />
       <Route path="start" element={<Start />} />
+      <Route path="register" element={<Register />} />
 
     </Routes>
 

@@ -1,0 +1,16 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+#textfeld{
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#hintergrund{
+    background-image: url(../../public/images/leading-er.jpeg);
+    background-size: cover;
+    opacity: 0.5;
+}

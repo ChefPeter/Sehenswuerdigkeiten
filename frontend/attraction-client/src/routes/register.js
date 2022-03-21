@@ -7,17 +7,19 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 function Login() {
   return (
-    <div>
-        <TextField id="filled-basic" label="Benutzername" variant="filled" />
-        <br></br>
-        <TextField id="filled-basic" label="Email" variant="filled" />
-        <br></br>
-        <TextField id="filled-basic" label="Passwort" variant="filled" />
-        <br></br>
-        <TextField id="filled-basic" label="Passwort Wiederholen" variant="filled" />
-        <br></br>
-        <Button variant="text">Registrieren</Button>
-    </div>    
+    <div id='hintergrund'>
+        <div id='eingaben'>
+            <TextField id="filled-basic" label="Benutzername" variant="filled" />
+            <br></br>
+            <TextField id="filled-basic" label="Email" variant="filled" />
+            <br></br>
+            <TextField id="filled-basic" label="Passwort" variant="filled" />
+            <br></br>
+            <TextField id="filled-basic" label="Passwort Wiederholen" variant="filled" />
+            <br></br>
+            <Button variant="text">Registrieren</Button>
+        </div>    
+    </div>
   );
 }
 

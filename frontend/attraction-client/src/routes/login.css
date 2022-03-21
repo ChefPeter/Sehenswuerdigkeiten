@@ -6,11 +6,18 @@
     height: 100vh;
     display: flex;
     align-items: center;
+    flex-direction: column;
     justify-content: center;
 }
 
 #hintergrund{
-    background-image: url(../../public/images/leading-er.jpeg);
+    background-image: url(../../public/images/leading-er.png);
     background-size: cover;
-    opacity: 0.5;
+} 
+
+#titel{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
 }

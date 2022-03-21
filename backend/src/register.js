@@ -1,6 +1,7 @@
 const mysql = require("mysql");
 const util = require("util");
 const crypto = require("crypto");
+const Mailer = require("./mailer");
 require("dotenv").config();
 
 async function register(params) {
@@ -95,6 +96,7 @@ async function insertUser(params) {
             database: process.env.DB_DATABASE
         });
         const query = util.promisify(conn.query).bind(conn);
+        const token = crypto.randomBytes(500).toString('base64').replace(/\W/g, '');
         const result = await query(
             `INSERT INTO users
             (
@@ -114,9 +116,10 @@ async function insertUser(params) {
                 NOW(),
                 NOW(),
                 false,
-                '${crypto.randomBytes(500).toString('base64').replace(/\W/g, '')}'
+                '${token}'
             )`
         );
+        Mailer.sendRegisterEmail(params.username, params.email, token);
         return true;
     } catch(e) {
         console.error(e);

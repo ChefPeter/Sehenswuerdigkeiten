@@ -76,6 +76,13 @@ app.get("/", async(req, res) => {
         console.error(e);
     }
 
-})
+});
+
+app.get("/debug", (req, res) => {
+    const mailer = require("./mailer");
+    const m = new mailer();
+    m.sendRegisterEmail();
+    res.send(200);
+});
 
 app.listen(3000, () => console.log("Server running on http://localhost:3000"));

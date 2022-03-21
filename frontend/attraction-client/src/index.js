@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { render } from "react-dom";
 import './index.css';
-import App from './App';
+import App from './routes/App';
 import reportWebVitals from './reportWebVitals';
 import {
   BrowserRouter,
@@ -10,6 +10,7 @@ import {
   Route,
 } from "react-router-dom";
 import Start from "./routes/start";
+import Login from "./routes/login";
 
 
 const rootElement = document.getElementById("root");
@@ -17,7 +18,8 @@ render(
   <BrowserRouter>
     <Routes>
     
-      <Route path="/" element={<App />} />
+      <Route path="/" element={<Login/>} />
+      <Route path="app" element={<App />} />
       <Route path="start" element={<Start />} />
 
     </Routes>

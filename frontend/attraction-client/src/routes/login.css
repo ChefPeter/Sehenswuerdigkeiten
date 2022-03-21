@@ -3,7 +3,6 @@
     padding: 0;
 }
 #textfeld{
-    height: 100vh;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -11,11 +10,13 @@
 }
 
 #hintergrund{
+    height: 100vh;
     background-image: url(../../public/images/leading-er.png);
     background-size: cover;
 } 
 
 #titel{
+    padding: 17vh;
     display: flex;
     align-items: center;
     flex-direction: column;

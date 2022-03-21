@@ -22,7 +22,11 @@ CREATE TABLE IF NOT EXISTS users (
     date_created date,
 	last_time_active date,
     user_desc VARCHAR(2000),
-    profile_picture VARCHAR(200)
+    profile_picture VARCHAR(200),
+    approved boolean,
+    approved_token VARCHAR(1000),
+    reset_token VARCHAR(1000),
+    reset_time date
 );
 
 CREATE TABLE IF NOT EXISTS friends (

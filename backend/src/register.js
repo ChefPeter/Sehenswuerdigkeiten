@@ -5,7 +5,7 @@ require("dotenv").config();
 
 async function register(params) {
     // Schauen, ob alle Pflichtfelder ausgefüllt sind
-    if (!checkMandatoryField(params)) return "Nicht alle Pflichtfelder sind ausgefüllt!";
+    if (!checkMandatoryFields(params)) return "Nicht alle Pflichtfelder sind ausgefüllt!";
 
     // email und benutzername auf lowercase
     params.email = params.email.toLowerCase();
@@ -27,24 +27,19 @@ async function register(params) {
     if (!(await checkAvailableEmail(params.email))) return "Die Email-Adresse ist schon vergeben!";
 
     // Den Benutzer eintragen
-    if (!insertUser(params)) return "Fehler mit der Datenbank!";
+    if (!(await insertUser(params))) return "Fehler mit der Datenbank!";
 
     return null;
 }
 
-function checkMandatoryField(params) {
+function checkMandatoryFields(params) {
     const fields = [
         "username",
         "email",
         "password",
         "repeat-password"
     ];
-    console.log(params);
-    return fields.every(field => {
-        if (!params[field]) console.log(field);
-        
-        return params[field]
-    });
+    return fields.every(field => params[field]);
 }
 
 function securePassword(password) {
@@ -108,7 +103,8 @@ async function insertUser(params) {
                 password,
                 date_created,
                 last_time_active,
-                approved
+                approved,
+                approved_token
             )
             values
             (
@@ -117,7 +113,8 @@ async function insertUser(params) {
                 '${crypto.createHash("sha256").update(params.password).digest("hex")}',
                 NOW(),
                 NOW(),
-                false
+                false,
+                '${crypto.randomBytes(500).toString('base64').replace(/\W/g, '')}'
             )`
         );
         return true;

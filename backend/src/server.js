@@ -1,5 +1,6 @@
 const register = require("./register");
 const login = require("./login");
+const approveUser = require("./approve");
 
 const express = require("express");
 const session = require("express-session");
@@ -41,12 +42,17 @@ function sendResponse(error, res) {
 }
 
 app.post("/login", async(req, res) => {
-    const error = await login(req.body);
+    const error = await login(req);
     sendResponse(error, res);
 });
 
 app.post("/register", async(req, res) => {
     const error = await register(req.body);
+    sendResponse(error, res);
+});
+
+app.post("/approve", async(req, res) => {
+    const error = await approveUser(req.body);
     sendResponse(error, res);
 });
 

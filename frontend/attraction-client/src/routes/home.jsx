@@ -7,8 +7,8 @@ import { color, palette } from "@mui/system";
 import { useEffect } from "react";
 import { Provider } from 'react-redux';
 import { connect } from "react-redux";
-import rootReducer from "../reducers/rootReducer";
-import {store} from "../index"
+import { store } from "../index";
+
 
 // Define theme settings
 const light = {
@@ -28,11 +28,8 @@ const dark = {
 function Home(props) {
  
     return (
-      <ThemeProvider theme={createTheme(dark)}>
-         
-        
+      <ThemeProvider theme={createTheme(props.theme === "dark" ? dark : light)}>
         <Header></Header>
-        <p>hallo { props.theme }</p>
          <Paper square elevation="1">
         <Typography variant="body1" component="h4">
           Du befindest dich auf der Startseite.
@@ -47,20 +44,25 @@ function Home(props) {
   
 }
 
+const initState = {
+  theme: "light",
+  language: "de"
+}
 
-const mapStatesToProps = (state) => {
+const mapStatesToProps = (state = initState) => {
+
   return {
-    posts: state.posts,
-    theme: state.theme
+    theme: state.theme,
+    language: state.language
   }
+
 }
 
 function handleClick() {
-  console.log("xd")
-  console.log(store.getState())
+
   const changeTheme = { type: 'CHANGE_THEME', theme: "unknown"};
   store.dispatch(changeTheme)
-  console.log(store.getState())
+  
 }
 
 export default connect(mapStatesToProps)(Home);

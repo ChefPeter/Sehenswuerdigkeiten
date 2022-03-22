@@ -8,8 +8,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 function Login(props) {
   return (
     <div id='hintergrund'>
-      <p>hallo </p>
-     
       <div id='titel'>
         <h1>City2Go</h1>
       </div>

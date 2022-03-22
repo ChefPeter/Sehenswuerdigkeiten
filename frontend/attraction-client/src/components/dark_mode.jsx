@@ -5,15 +5,13 @@ import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import rootReducer from '../reducers/rootReducer';
-
+import {store} from "../index";
 
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 
 function Mode() {
   const theme = useTheme();
   const colorMode = React.useContext(ColorModeContext);
-  const changeTheme = { type: 'CHANGE_THEME', theme: "unknown"};
-  //rootReducer(changeTheme)
   
   return (
     
@@ -30,7 +28,9 @@ export default function Dark_Mode() {
   const colorMode = React.useMemo(
     () => ({
       toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));  
+        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+        const changeTheme = { type: 'CHANGE_THEME', theme: "unknown"};
+        store.dispatch(changeTheme)  
       },
     }),
     [],

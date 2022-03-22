@@ -22,16 +22,17 @@ import { ThemeProvider } from '@mui/private-theming';
 import { Provider } from 'react-redux';
 import {createStore } from "redux"; 
 import rootReducer from './reducers/rootReducer';
+import { createTheme } from '@mui/material';
 
 
 export const store = createStore(rootReducer);
 
-const changeTheme = { type: 'CHANGE_THEME', theme: "unknown"};
-
+//const changeTheme = { type: 'CHANGE_THEME', theme: "unknown"};
 
 const rootElement = document.getElementById("root");
 
 render(
+ 
   <Provider store={store}>
   <BrowserRouter>
     <Routes>
@@ -52,6 +53,7 @@ render(
 
   </BrowserRouter>
   </Provider>
+
  ,
   rootElement
 

@@ -26,6 +26,9 @@ function Login() {
                 Eine Bestätigungsemail wurde versandt — <strong>Checke dein Postfach</strong>
                 </Alert>
             </div>
+
+            <Button variant="text"><Link to="/" style={{ textDecoration: 'none' }}>Schon angemeldet?</Link></Button>
+
         </div>    
     </div>
   );

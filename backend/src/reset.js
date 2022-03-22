@@ -1,7 +1,6 @@
 const mysql = require("mysql");
 const util = require("util");
 const crypto = require("crypto");
-const Mailer = require("./mailer");
 require("dotenv").config();
 
 async function resetPassword(params) {
@@ -21,10 +20,10 @@ async function resetPassword(params) {
     if (params["new-password"] !== params["repeat-new-password"]) return "Die neuen Passwörter stimmen nicht überein!";
 
     // Schauen, ob die Reset Request noch nicht abgelaufen ist
-    if (!(await isValidRequest(params))) return "Die Passwort Anfrage ist abgelaufen";
+    if (!(await isValidRequest(params))) return "Fehler mit der Anfrage";
 
-
-
+    // Das Passwort ändern/zurücksetzen
+    return await changePassword(params);
 }
 
 function checkMandatoryFields(params) {
@@ -42,7 +41,6 @@ function securePassword(password) {
 }
 
 async function isValidRequest(params) {
-    // TODO: fix this
     try {
         const conn = mysql.createConnection({
             host: process.env.DB_HOST,
@@ -53,12 +51,37 @@ async function isValidRequest(params) {
         const query = util.promisify(conn.query).bind(conn);
         const result = await query(
             `SELECT COUNT(*) as count FROM users
-                WHERE username='${username}'`
+                WHERE
+                    email='${params.email}' AND
+                    approved=1 AND
+                    reset_token='${params["reset-token"]}' AND
+                    reset_time > NOW() - INTERVAL 10 MINUTE`
         );
-        return result[0].count === 0;
+        return result[0].count > 0;
     } catch(e) {
         console.error(e);
         return false;
+    }
+}
+
+async function changePassword(params) {
+    try {
+        const conn = mysql.createConnection({
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_DATABASE
+        });
+        const query = util.promisify(conn.query).bind(conn);
+        const result = await query(
+            `UPDATE users SET
+                password='${crypto.createHash("sha256").update(params["new-password"]).digest("hex")}'
+                WHERE email='${params.email}'`
+        );
+        return null;
+    } catch(e) {
+        console.error(e);
+        return "Fehler mit der Datenbank!";
     }
 }
 

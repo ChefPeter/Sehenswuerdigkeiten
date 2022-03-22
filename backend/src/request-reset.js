@@ -69,7 +69,7 @@ async function resetPassword(email) {
             `SELECT username FROM users WHERE email='${email}'`
         );
         const m = new Mailer();
-        m.sendRegisterEmail(result[0].username, email, token);
+        m.sendResetPasswordEmail(result[0].username, email, token);
         return true;
     } catch(e) {
         console.error(e);

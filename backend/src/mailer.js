@@ -23,8 +23,8 @@ class Mailer {
                 ]
             }]
         };
-        console.log(body);
-        //new SibApiV3Sdk.TransactionalEmailsApi().sendTransacEmail(body);
+        //console.log(body);
+        new SibApiV3Sdk.TransactionalEmailsApi().sendTransacEmail(body);
     }
 
     sendRegisterEmail(username, email, token) {

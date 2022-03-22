@@ -10,7 +10,7 @@ function Login() {
     <div id='hintergrund'>
         <div id='eingaben'>
 
-            <TextField id="filled-basic" label="Benutzername" variant="filled" />
+            <TextField id="filled-basic username" label="Benutzername" variant="filled" />
             <br></br>
             <TextField id="filled-basic" label="Email" variant="filled" />
             <br></br>
@@ -18,7 +18,7 @@ function Login() {
             <br></br>
             <TextField id="filled-basic" label="Passwort Wiederholen" variant="filled" />
             <br></br>
-            <Button variant="text">Registrieren</Button>
+            <Button variant="text" onClick={() => post()}>Registrieren</Button>
            
             <div>
                 <Alert severity="info">
@@ -32,6 +32,25 @@ function Login() {
         </div>    
     </div>
   );
+}
+
+function post (){
+
+    console.log(document.getElementById("username-label").value);
+    console.log("DIOCANE");
+    /*fetch("http://10.171.155.62:3000/register", {
+        method: "POST",
+        headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+        "username": "",
+        "email": "",
+        "password": "",
+        "repeat-password": "",
+        })
+    })*/
 }
 
 export default Login;

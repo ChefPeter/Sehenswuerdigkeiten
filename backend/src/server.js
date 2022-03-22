@@ -3,6 +3,7 @@ const login = require("./login");
 const approveUser = require("./approve");
 const requestReset = require("./request-reset");
 const resetPassword = require("./reset");
+const isAuthenticated = require("./authenticator");
 
 const express = require("express");
 const session = require("express-session");
@@ -68,33 +69,12 @@ app.post("/reset-password", async(req, res) => {
     sendResponse(error, res);
 });
 
-app.get("/", async(req, res) => {
-    const mysql = require("mysql");
-    const util = require("util");
-
-    try {
-        const conn = mysql.createConnection({
-            host: "10.10.30.18",
-            user: "bot",
-            password: "Kennwort0",
-            database: "city_to_go"
-        });
-        const query = util.promisify(conn.query).bind(conn);
-        const result = await query(
-            `SHOW TABLES;`
-        );
-        console.log(result);
-    } catch(e) {
-        console.error(e);
-    }
-
+app.get("/", isAuthenticated, async(req, res) => {
+    res.status(200).send("Everything worked! " + req.session.username);
 });
 
 app.get("/debug", (req, res) => {
-    const mailer = require("./mailer");
-    const m = new mailer();
-    m.sendRegisterEmail();
-    res.send(200);
+    res.sendStatus(200);
 });
 
 app.listen(3000, () => console.log("Server running on http://localhost:3000"));

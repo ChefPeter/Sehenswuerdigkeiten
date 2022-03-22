@@ -50,12 +50,11 @@ const initState = {
 }
 
 const mapStatesToProps = (state = initState) => {
-
+  console.log(state)
   return {
     theme: state.theme,
     language: state.language
   }
-
 }
 
 function handleClick() {

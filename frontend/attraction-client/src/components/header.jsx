@@ -19,6 +19,7 @@ import Dark_Mode from './dark_mode';
 import Sidebar from "../components/Sidebar";
 import { FormControl, InputLabel, NativeSelect } from '@mui/material';
 import { Select } from '@mui/material';
+import LanguageSelector from './LanguageSelector';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -176,21 +177,7 @@ export default function Header() {
           </Search>
           
           <Box sx={{ flexGrow: 1 }} />
-          
-          <FormControl>
-        <InputLabel id="demo-simple-select-label">Language</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={"de"}
-          label="selectLanguage"
-         
-        >
-          <MenuItem value={"de"}>Deutsch</MenuItem>
-          <MenuItem value={"en"}>English</MenuItem>
-          <MenuItem value={"it"}>Italiano</MenuItem>
-        </Select>
-      </FormControl>
+          <LanguageSelector></LanguageSelector>
           <Dark_Mode></Dark_Mode>
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton

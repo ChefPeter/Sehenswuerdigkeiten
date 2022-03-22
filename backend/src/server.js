@@ -36,38 +36,22 @@ app.use(bodyParser.json());
 // Middleware für cors bei requests
 app.use(cors());
 
-function sendResponse(error, res) {
+/*function sendResponse(error, res) {
     if (error) {
         res.status(400).send(error);
     } else {
         res.status(200).send();
     }
-}
+}*/
+// Funktion, um Antworten zu schicken
+const sendResponse = (error, res) => error ? res.status(400).send(error) : res.status(200).send();
 
-app.post("/login", async(req, res) => {
-    const error = await login(req);
-    sendResponse(error, res);
-});
+app.post("/login", async(req, res) => sendResponse(await login(req), res));
+app.post("/register", async(req, res) => sendResponse(await register(req.body), res));
+app.post("/approve", async(req, res) => sendResponse(await approveUser(req.body), res));
+app.post("/request-reset", async(req, res) => sendResponse(await requestReset(req.body), res));
+app.post("/reset-password", async(req, res) => sendResponse(await resetPassword(req.body), res));
 
-app.post("/register", async(req, res) => {
-    const error = await register(req.body);
-    sendResponse(error, res);
-});
-
-app.post("/approve", async(req, res) => {
-    const error = await approveUser(req.body);
-    sendResponse(error, res);
-});
-
-app.post("/request-reset", async(req, res) => {
-    const error = await requestReset(req.body);
-    sendResponse(error, res);
-});
-
-app.post("/reset-password", async(req, res) => {
-    const error = await resetPassword(req.body);
-    sendResponse(error, res);
-});
 
 app.get("/", isAuthenticated, async(req, res) => {
     res.status(200).send("Everything worked! " + req.session.username);

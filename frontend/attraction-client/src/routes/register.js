@@ -18,6 +18,8 @@ function Login() {
             <TextField id="filled-basic" label="Passwort Wiederholen" variant="filled" />
             <br></br>
             <Button variant="text">Registrieren</Button>
+            <Button variant="text"><Link to="/" style={{ textDecoration: 'none' }}>Schon angemeldet?</Link></Button>
+
         </div>    
     </div>
   );

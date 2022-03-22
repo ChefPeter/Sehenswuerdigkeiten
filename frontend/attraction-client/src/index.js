@@ -9,24 +9,52 @@ import {
   Routes,
   Route,
 } from "react-router-dom";
-import Start from "./routes/start";
+import Home from "./routes/home";
 import Login from "./routes/login";
-import Register from "./routes/register"
+import Register from "./routes/register";
+import Explore from "./routes/explore";
+import Groups from "./routes/groups";
+import Friends from "./routes/friends";
+import Notifications from "./routes/notifications";
+import Contact from "./routes/contact";
+import { useState } from 'react';
+import { ThemeProvider } from '@mui/private-theming';
+import { Provider } from 'react-redux';
+import {createStore } from "redux"; 
+import rootReducer from './reducers/rootReducer';
+
+
+export const store = createStore(rootReducer);
+
+const changeTheme = { type: 'CHANGE_THEME', theme: "unknown"};
+
 
 const rootElement = document.getElementById("root");
+
 render(
+  <Provider store={store}>
   <BrowserRouter>
     <Routes>
     
-      <Route path="/" element={<Login/>} />
+      <Route path="/" element={<Login />} />
+      <Route path="" element={<Login/>} />
+      <Route path="login" element={<Login/>} />
       <Route path="app" element={<App />} />
-      <Route path="start" element={<Start />} />
+      <Route path="home" element={<Home brand="Ford" />} />
       <Route path="register" element={<Register />} />
+      <Route path="explore" element={<Explore />} />
+      <Route path="groups" element={<Groups />} />
+      <Route path="friends" element={<Friends />} />
+      <Route path="notifications" element={<Notifications />} />
+      <Route path="contact" element={<Contact />} />
 
     </Routes>
 
-  </BrowserRouter>,
+  </BrowserRouter>
+  </Provider>
+ ,
   rootElement
+
 );
 
 // If you want to start measuring performance in your app, pass a function

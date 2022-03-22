@@ -16,10 +16,11 @@
 } 
 
 #titel{
-    padding: 17vh;
+    padding: 16vh;
     display: flex;
     align-items: center;
     flex-direction: column;
     justify-content: center;
     color: rgb(209, 154, 34);
+    font-size: 2.5rem;
 }

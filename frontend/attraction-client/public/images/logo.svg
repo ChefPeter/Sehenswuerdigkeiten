@@ -1,28 +1,5 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-</head>
-
-<body style="background-color: black;">
-    <div style=" font-family: monospace; align-items: center; text-align: center; color: white;">
-
-        <div>
-            <h1>Vielen Dank für Ihre Registrierung!</h1>
-        </div>
-        <div>
-            <h3 style="margin-top: 10%;">Nur noch einen Schritt!</h3>
-            <br>
-            <h4>Um die Registrierung zu beenden bitte auf den folgenden Button clicken. </h4>
-        </div>
-        <div>
-            <a href="###HREF###" style="  background-color: white; color: black; padding: 5px; text-decoration: none; text-transform: uppercase;">registrieren</a>
-        </div>
-    </div>
-    <div style="display: flex; justify-content: center; margin-top: 5%;">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="2000px" height="1333px" viewBox="0 0 2000 1333" enable-background="new 0 0 2000 1333" xml:space="preserve">  <image id="image0" width="2000" height="1333" x="0" y="0"
     href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAB9AAAAU1CAIAAADETMg2AAAABGdBTUEAALGPC/xhBQAAACBjSFJN
 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAAAA
@@ -49463,7 +49440,3 @@ Aex5asrVRRPbLm3maT7kw1GLMf6/hCi5dPpueZMAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjItMDMt
 MjJUMTM6MDk6MTkrMDM6MDBFUdCuAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDIyLTAzLTIyVDEzOjA5
 OjE5KzAzOjAwNAxoEgAAAABJRU5ErkJggg==" />
 </svg>
-
-    </div>
-</body>
-</html>

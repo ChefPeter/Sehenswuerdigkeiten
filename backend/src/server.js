@@ -1,6 +1,8 @@
 const register = require("./register");
 const login = require("./login");
 const approveUser = require("./approve");
+const requestReset = require("./request-reset");
+const resetPassword = require("./reset");
 
 const express = require("express");
 const session = require("express-session");
@@ -58,6 +60,11 @@ app.post("/approve", async(req, res) => {
 
 app.post("/request-reset", async(req, res) => {
     const error = await requestReset(req.body);
+    sendResponse(error, res);
+});
+
+app.post("/reset-password", async(req, res) => {
+    const error = await resetPassword(req.body);
     sendResponse(error, res);
 });
 

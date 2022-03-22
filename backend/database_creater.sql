@@ -20,13 +20,13 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100),
     password VARCHAR(500),
     date_created date,
-	last_time_active date,
+	last_time_active datetime,
     user_desc VARCHAR(2000),
     profile_picture VARCHAR(200),
     approved boolean,
     approved_token VARCHAR(1000),
     reset_token VARCHAR(1000),
-    reset_time date
+    reset_time datetime
 );
 
 CREATE TABLE IF NOT EXISTS friends (

@@ -20,6 +20,7 @@ async function resetRequest(params) {
     // Reset Password
     if (!(await resetPassword(params.email))) return "Fehler mit der Datenbank!";
 
+    return null;
 }
 
 function checkMandatoryFields(params) {

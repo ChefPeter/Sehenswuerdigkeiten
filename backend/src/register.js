@@ -119,7 +119,8 @@ async function insertUser(params) {
                 '${token}'
             )`
         );
-        Mailer.sendRegisterEmail(params.username, params.email, token);
+        const m = new Mailer();
+        m.sendRegisterEmail(params.username, params.email, token);
         return true;
     } catch(e) {
         console.error(e);

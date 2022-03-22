@@ -1,4 +1,5 @@
 require("dotenv").config();
+const queryString = require("query-string");
 const fs = require('fs');
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = process.env.SEND_IN_BLUE_API_KEY;
@@ -6,7 +7,7 @@ SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = process.env.S
 class Mailer {
 
     sendEmail(recipient, recipientName, subject, sender, senderName, content) {
-        new SibApiV3Sdk.TransactionalEmailsApi().sendTransacEmail({
+        const body = {
             "sender":{ 
                 "email": sender,
                 "name": senderName
@@ -21,7 +22,9 @@ class Mailer {
                     }
                 ]
             }]
-        });
+        };
+        console.log(body);
+        //new SibApiV3Sdk.TransactionalEmailsApi().sendTransacEmail(body);
     }
 
     sendRegisterEmail(username, email, token) {
@@ -31,7 +34,12 @@ class Mailer {
             "Willkommen bei City2Go",
             "no-reply@city2go.com",
             "City2Go",
-            fs.readFileSync("../email/registerEmail.html", 'utf-8')
+            fs.readFileSync("./email/register-email.html", 'utf-8').replace(/###HREF###/, 
+                "http://"+
+                process.env.ENV_HOST+
+                "/approve?"+ 
+                queryString.stringify({username: username, email: email, token: token})
+            )
         );
     }
 
@@ -42,7 +50,12 @@ class Mailer {
             "Passwort zurücksetzen",
             "no-reply@city2go.com",
             "City2Go",
-            fs.readFileSync("../email/resetEmail.html", 'utf-8')
+            fs.readFileSync("./email/reset-email.html", 'utf-8').replace(/###HREF###/, 
+                "http://"+
+                process.env.ENV_HOST+
+                "/reset-password?"+
+                queryString.stringify({username: username, email: email, token: token})
+            ) 
         );
     }
 }

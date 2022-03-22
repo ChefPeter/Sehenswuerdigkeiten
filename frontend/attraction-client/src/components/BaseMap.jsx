@@ -8,7 +8,7 @@ const BaseMap = () => {
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: "mapContainer",
-      style: "mapbox://styles/mapbox/dark-v10",
+      style: "mapbox://styles/mapbox/navigation-night-v1",
       center: [-74.5, 40],
       zoom: 9,
     });

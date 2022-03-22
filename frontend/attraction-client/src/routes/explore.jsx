@@ -3,11 +3,7 @@ import Header from "../components/header";
 import "./start.css";
 import { Button, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { color, palette } from "@mui/system";
-import { useEffect } from "react";
-import { Provider } from 'react-redux';
-import { connect } from "react-redux";
-import { store } from "../index";
+import { useSelector } from 'react-redux';
 
 
 // Define theme settings
@@ -27,42 +23,36 @@ const dark = {
 
 function Explore(props) {
  
+  const theme = useSelector(state => {
+    try{
+      return state.theme;
+    }catch(e){
+      return "dark";
+    }
+  });
+  const language = useSelector(state => {
+    try{
+      return state.language;
+    }catch(e){
+      return "de";
+    }
+  });
+
     return (
-      <ThemeProvider theme={createTheme(props.theme === "dark" ? dark : light)}>
+      <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
         <Header></Header>
-         <Paper square elevation="1">
+         <Paper square elevation={5}>
         <Typography variant="body1" component="h4">
-          Du befindest dich auf der Startseite.
+          Du befindest dich auf der Exploreseite.
         </Typography>;
         <TextField id="filled-basic" label="Filled" variant="filled" />
         <Link to="/">Home</Link>
         <Button variant="contained">Contained</Button>
-        <Button onClick={(e) => handleClick()}>HOHOP</Button>
         </Paper>
-     </ThemeProvider>
+      </ThemeProvider>
     );
   
 }
 
-const initState = {
-  theme: "light",
-  language: "de"
-}
 
-const mapStatesToProps = (state = initState) => {
-
-  return {
-    theme: state.theme,
-    language: state.language
-  }
-
-}
-
-function handleClick() {
-
-  const changeTheme = { type: 'CHANGE_THEME', theme: "unknown"};
-  store.dispatch(changeTheme)
-  
-}
-
-export default connect(mapStatesToProps)(Explore);
+export default Explore;

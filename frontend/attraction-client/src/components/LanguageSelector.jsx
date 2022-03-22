@@ -2,14 +2,20 @@ import { FormControl, MenuItem, Select, InputLabel, Box } from "@mui/material";
 import React from "react";
 import { useEffect } from "react/cjs/react.production.min";
 import { connect } from "react-redux";
-import { store } from "../index";
+import store from "../reducers/store";
+import { useSelector } from "react-redux";
 
 
 function LanguageSelector() {
 
-    
-
-    const [language, setLanguage] = React.useState('de');
+  const language_given = useSelector(state => {
+    try{
+      return state.language;
+    }catch(e){
+      return "de";
+    }
+  });
+    const [language, setLanguage] = React.useState(language_given);
 
     const handleChange = (event) => {
         setLanguage(event.target.value);
@@ -20,7 +26,7 @@ function LanguageSelector() {
     };
 
     return(
-     <Box sx={{ minWidth: 100 }}>
+     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">Language</InputLabel>
         <Select

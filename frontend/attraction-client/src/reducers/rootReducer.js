@@ -1,10 +1,10 @@
 const initState = {
-    theme: "light",
+    theme: "dark",
     language: "de"
 }
 
 const rootReducer = (state = initState, action) => {
-    
+  
     if(action.type === "CHANGE_THEME"){
 
         let newTheme = "light";
@@ -22,8 +22,14 @@ const rootReducer = (state = initState, action) => {
             theme: state.theme,
             language: action.language,
         }
-
-    }else{
+    }
+    else if(action.type === "NONE"){
+        return{
+            theme: state.theme,
+            language: state.language, 
+        }
+    }
+    else{
 
         console.error("Error at reducer!");
 

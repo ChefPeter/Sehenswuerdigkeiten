@@ -18,30 +18,30 @@ import Friends from "./routes/friends";
 import Notifications from "./routes/notifications";
 import Contact from "./routes/contact";
 import { useState } from 'react';
-import { ThemeProvider } from '@mui/private-theming';
+import { ThemeProvider } from '@mui/material';
 import { Provider } from 'react-redux';
-import {createStore } from "redux"; 
+import { createStore } from "redux"; 
 import rootReducer from './reducers/rootReducer';
 import { createTheme } from '@mui/material';
-
-
-export const store = createStore(rootReducer);
-
-//const changeTheme = { type: 'CHANGE_THEME', theme: "unknown"};
+import store from './reducers/store';
+import { connect } from "react-redux";
+import { Button } from '@mui/material';
+import { useSelector } from 'react-redux';
 
 const rootElement = document.getElementById("root");
 
-render(
+const Routing = () => {
  
-  <Provider store={store}>
+  return(
+  <Provider store={store}>  
   <BrowserRouter>
     <Routes>
     
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<Login/>} />
       <Route path="" element={<Login/>} />
       <Route path="login" element={<Login/>} />
-      <Route path="app" element={<App />} />
-      <Route path="home" element={<Home brand="Ford" />} />
+      <Route path="app" element={<App /> }/>
+      <Route path="home" element={<Home /> } />
       <Route path="register" element={<Register />} />
       <Route path="explore" element={<Explore />} />
       <Route path="groups" element={<Groups />} />
@@ -52,14 +52,20 @@ render(
     </Routes>
 
   </BrowserRouter>
-  </Provider>
+  </Provider> 
+ );
 
- ,
-  rootElement
+}
 
+ReactDOM.render(
+  <React.StrictMode>
+    <Routing />
+  </React.StrictMode>,
+  document.getElementById('root')
 );
+
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+//reportWebVitals();

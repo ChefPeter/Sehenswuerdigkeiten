@@ -101,8 +101,9 @@ export default function SwipeableTemporaryDrawer() {
             color="inherit"
             aria-label="open drawer"
             sx={{ mr: 2 }}
+            onClick={toggleDrawer("left", true)}
           >
-            <MenuIcon onClick={toggleDrawer("left", true)}></MenuIcon>
+            <MenuIcon></MenuIcon>
           </IconButton>
       {
         <React.Fragment key="left">

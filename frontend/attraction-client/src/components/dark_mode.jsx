@@ -5,7 +5,9 @@ import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import rootReducer from '../reducers/rootReducer';
-import {store} from "../index";
+import store from '../reducers/store';
+import { Paper } from '@mui/material';
+import { useSelector } from 'react-redux';
 
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 
@@ -14,16 +16,24 @@ function Mode() {
   const colorMode = React.useContext(ColorModeContext);
   
   return (
-    
-      <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
+    <Paper onClick={colorMode.toggleColorMode} sx={{
+      width: 120,
+    }}>
+      <IconButton sx={{ ml: 1 }}  color="inherit">
         {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
       </IconButton>
-
+      </Paper>
   );
 }
 
 export default function Dark_Mode() {
-  const defaultTheme = "light";
+  const defaultTheme = useSelector(state => {
+    try{
+      return state.theme;
+    }catch(e){
+      return "dark";
+    }
+  });
   const [mode, setMode] = React.useState(defaultTheme);
   const colorMode = React.useMemo(
     () => ({

@@ -7,14 +7,15 @@ import { color, palette } from "@mui/system";
 import { useEffect } from "react";
 import { Provider } from 'react-redux';
 import { connect } from "react-redux";
-import { store } from "../index";
+import store from "../reducers/store";
+import { useSelector } from 'react-redux';
+import { yellow } from "@mui/material/colors";
 
 
 // Define theme settings
 const light = {
   palette: {
     mode: "light",
-    colorDiv: "white"
   },
 };
 
@@ -26,42 +27,39 @@ const dark = {
 
 
 function Home(props) {
- 
+
+  const theme = useSelector(state => {
+    try{
+      return state.theme;
+    }catch(e){
+      return "dark";
+    }
+  });
+  const language = useSelector(state => {
+    try{
+      return state.language;
+    }catch(e){
+      return "de";
+    }
+  });
+
     return (
-      <ThemeProvider theme={createTheme(props.theme === "dark" ? dark : light)}>
+      <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
         <Header></Header>
-         <Paper square elevation="1">
+        <p>{theme} + {language}</p>
+         <Paper square elevation={5}>
         <Typography variant="body1" component="h4">
           Du befindest dich auf der Startseite.
         </Typography>;
         <TextField id="filled-basic" label="Filled" variant="filled" />
         <Link to="/">Home</Link>
         <Button variant="contained">Contained</Button>
-        <Button onClick={(e) => handleClick()}>HOHOP</Button>
         </Paper>
-     </ThemeProvider>
+      </ThemeProvider>
     );
   
 }
 
-const initState = {
-  theme: "light",
-  language: "de"
-}
 
-const mapStatesToProps = (state = initState) => {
-  console.log(state)
-  return {
-    theme: state.theme,
-    language: state.language
-  }
-}
 
-function handleClick() {
-
-  const changeTheme = { type: 'CHANGE_THEME', theme: "unknown"};
-  store.dispatch(changeTheme)
-  
-}
-
-export default connect(mapStatesToProps)(Home);
+export default Home;

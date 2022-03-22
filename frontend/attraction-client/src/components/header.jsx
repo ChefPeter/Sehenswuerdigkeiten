@@ -20,6 +20,8 @@ import Sidebar from "../components/Sidebar";
 import { FormControl, InputLabel, NativeSelect } from '@mui/material';
 import { Select } from '@mui/material';
 import LanguageSelector from './LanguageSelector';
+import { Paper } from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -85,6 +87,10 @@ export default function Header() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+function sayHello(){
+  console.log("Hallo")
+}
+
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -102,9 +108,23 @@ export default function Header() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem >
+        
+        <Paper  onClick={sayHello()} sx={{
+          width: 120,
+          height: 42
+        }}>  <IconButton sx={{ ml: 1 }}  color="inherit">
+         <AccountCircleIcon />
+      </IconButton>Profile</Paper>
+      </MenuItem>
+
+      <MenuItem><Dark_Mode></Dark_Mode></MenuItem>
+
+      <MenuItem><LanguageSelector></LanguageSelector></MenuItem>
+      
      
     </Menu>
+    
   );
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
@@ -149,6 +169,11 @@ export default function Header() {
         </IconButton>
         <p>Profile</p>
       </MenuItem>
+
+      <MenuItem> <Dark_Mode></Dark_Mode></MenuItem>
+
+      <MenuItem><LanguageSelector></LanguageSelector></MenuItem>
+      
     </Menu>
   );
 
@@ -177,8 +202,7 @@ export default function Header() {
           </Search>
           
           <Box sx={{ flexGrow: 1 }} />
-          <LanguageSelector></LanguageSelector>
-          <Dark_Mode></Dark_Mode>
+         
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton
               size="large"

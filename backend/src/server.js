@@ -56,6 +56,11 @@ app.post("/approve", async(req, res) => {
     sendResponse(error, res);
 });
 
+app.post("/request-reset", async(req, res) => {
+    const error = await requestReset(req.body);
+    sendResponse(error, res);
+});
+
 app.get("/", async(req, res) => {
     const mysql = require("mysql");
     const util = require("util");

@@ -42,7 +42,6 @@ function App(props) {
 
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-        <p>{language}</p>
       <Header/>
       <BaseMap />
       <Slider></Slider>

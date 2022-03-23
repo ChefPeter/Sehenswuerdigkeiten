@@ -1,16 +1,12 @@
-import { Link } from "react-router-dom";
 import { Button, TextField, Alert, AlertTitle, Container, Box, Typography} from '@mui/material';
-import Header from '../components/header';
-import DeleteIcon from '@mui/icons-material/Delete';
-import {useState , setState} from "react";
+import {useState} from "react";
 import { useSearchParams } from "react-router-dom";
-import { useEffect } from 'react/cjs/react.production.min';
+
 
 let passwordInput = "";
 let retypePasswordInput = "";
 
 function ResetPassword() {
-
     const getPasswordValue = (event) => {
         passwordInput = event.target.value;
     };
@@ -24,38 +20,41 @@ function ResetPassword() {
     const [searchParams, setSearchParams] = useSearchParams();
 
   return (
-      
-           <Container maxWidth="sm">
-               <Box sx={{ bgcolor: '#cfe8fc', height: '100vh' }} > 
-               <Typography>
-                   Input your new Password.
-                </Typography>
-            <TextField id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
-              <br></br>
-              <TextField id="filled-password-input" label="Passwort wiederholen" type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} />
-              <br></br>
-              <Button id="knopf" variant="text" onClick={() => post(setErrorText, setShowErrorAlert, setShowInfoAlert, searchParams.get("email"), searchParams.get("token"))}>Registrieren</Button>
-              <br></br>
-              <div>
+      <div id='hintergrund'>
+        <div id='inputs'>
+            <div>
+                <h1>Bitte neues Passwort eingeben!</h1>
+            </div>
+            <div id='abstand'>
+                <TextField id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
+            </div>
 
-                  {showErrorAlert ?
-                      <Alert severity="error">
-                          <AlertTitle>Error</AlertTitle>
-                          {errorText}
-                      </Alert>
-                      : null}
+            <div id='abstand'>
+                <TextField id="filled-password-input" label="Passwort wiederholen" type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} />
+            </div>
 
+            <div id='abstand'>
+                <Button id="knopf" variant="text" onClick={() => post(setErrorText, setShowErrorAlert, setShowInfoAlert, searchParams.get("email"), searchParams.get("token"))}>Registrieren</Button>
+            </div>
 
-                  {showInfoAlert ? <Alert false severity="info">
-                      <AlertTitle>Info</AlertTitle>
-                      Dein Passwort wurde zurückgesetzt! <a href="/login">Login</a>
-                  </Alert> : null}
-
-              </div>
-              
-              </Box>
-              </Container>
-      
+        <div>
+            <div id='abstand'>
+                {showErrorAlert ?
+                <Alert severity="error">
+                    <AlertTitle>Error</AlertTitle>
+                    {errorText}
+                </Alert>
+                : null}
+            </div>
+            <div id="abstand">
+                {showInfoAlert ? <Alert false severity="info">
+                <AlertTitle>Info</AlertTitle>
+                    Dein Passwort wurde zurückgesetzt! <a href="/login">Login</a>
+                </Alert> : null}
+            </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

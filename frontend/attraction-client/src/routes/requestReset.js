@@ -10,7 +10,6 @@ let input = "";
 
 function RequestReset(props) {
 
-    
     const setInput = (event)=>{
         input = event.target.value;
     };
@@ -20,29 +19,32 @@ function RequestReset(props) {
     const [showErrorAlert, setShowErrorAlert] = useState(false);
 
     return (
-        <div>
-            <Container maxWidth="sm">
-
-                <Box sx={{ bgcolor: '#cfe8fc', height: '100vh' }} > <div id="inputs"><Typography>
-                    Input your email and click the button to reset your password.
-                </Typography></div>
+        <div id="hintergrund">
+            <div id="inputs">
+                <h1>Email eingeben und Reset Button clicken!</h1>
+                <div id = "abstand">
                     <TextField sx={{ width: 1 }} id="filled-basic" label="Email" variant="filled" onChange={setInput} />
-                    <Button variant="contained" onClick={() => resetPassword(setErrorText, setShowErrorAlert, setShowInfoAlert)}>Reset</Button>
-
-                    {showErrorAlert ?
-                        <Alert severity="error">
-                            <AlertTitle>Error</AlertTitle>
-                            {errorText}
-                        </Alert>
-                        : null}
-                    {showInfoAlert ? <Alert false severity="info">
-                        <AlertTitle>Info</AlertTitle>
-                            Ihnen wurde eine Email mit den Anweisungen zugeschickt!
-                    </Alert> : null}
-
-                </Box>
-
-            </Container>
+                    <div id="abstand">
+                        <Button variant="text" onClick={() => resetPassword(setErrorText, setShowErrorAlert, setShowInfoAlert)} style={{ textDecoration: 'none' }} id="knopf">Reset</Button>
+                    </div>
+                       </div>
+                <div id="abstand">
+                    <div>
+                        {showErrorAlert ?
+                            <Alert severity="error">
+                                <AlertTitle>Error</AlertTitle>
+                                {errorText}
+                            </Alert>
+                            : null}
+                    </div>
+                        <div>
+                            {showInfoAlert ? <Alert false severity="info">
+                            <AlertTitle>Info</AlertTitle>
+                                Ihnen wurde eine Email mit den Anweisungen zugeschickt!
+                            </Alert> : null}
+                        </div>
+                </div>
+            </div>
         </div>
     );
   

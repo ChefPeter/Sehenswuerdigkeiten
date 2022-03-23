@@ -1,5 +1,19 @@
 #inputs{
     margin-left: 5px;
     margin-right: 5px;
-    
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+    color: rgb(209, 154, 34);
+    text-align: center;
+}
+
+#hintergrund{
+    background-image: url("../../../public/images/leading-er.png");
+}
+
+#abstand{
+    margin-top: 20px;
 }

@@ -33,9 +33,9 @@ const DivOut = styled('div')(({ theme }) => ({
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),'&:hover': {backgroundColor: alpha(theme.palette.common.white, 0.25),},
     width: '40%',
-    height: '40%',
+    height: '60%',
     margin: '30%',
-    position: 'absolute',
+    position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
     display: 'block',
@@ -56,9 +56,13 @@ const PLabel = styled('p')(({ theme }) => ({
     fontSize: '65%',
 }));
 
-const InputLabel = styled('input')(({ theme }) => ({
+//const TextAreaLabel
+
+const InputLabel = styled('textarea')(({ theme }) => ({
     height: '80%',
     width: '98%',
+    resize: 'none',
+    overflow: 'auto',
 }))
 
 function Groups(props) {
@@ -79,6 +83,7 @@ function Groups(props) {
   });
 
     return (
+      <div style={{widht: '100vw', height: '100vh'}}>
         <DivOut>
             <LabelLabel>
                 <PLabel>Message:</PLabel>
@@ -89,6 +94,7 @@ function Groups(props) {
                 <InputLabel></InputLabel>
             </LabelLabel>
         </DivOut>
+      </div>
     );
   
 }

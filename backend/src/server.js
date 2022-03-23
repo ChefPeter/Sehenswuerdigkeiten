@@ -64,7 +64,7 @@ app.post("/sendMessage", isAuthenticated, async(req, res) => sendResponse(await 
 app.post("/change-description", isAuthenticated, async(req, res) => sendResponse(await changeDescription(req), res));
 
 // GET REQUESTS
-app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req.session.username), res));
+app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req), res));
 app.get("/friends", isAuthenticated, async(req, res) => sendGetResponse(await getFriends(req.session.username), res));
 app.get("/conversation", isAuthenticated, async(req, res) => sendGetResponse(await getConversation(req), res));
 app.get("/logged-in", (req, res) => req.session.username ? res.status(200).send() : res.status(401).send());

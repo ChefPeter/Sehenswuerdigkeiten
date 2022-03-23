@@ -1,7 +1,10 @@
 const mysql = require("mysql");
 const util = require("util");
 
-async function getDescription(user) {
+async function getDescription(request) {
+
+    const user = request.query.username ? request.query.username : request.session.username;
+
     try {
         const conn = mysql.createConnection({
             host: process.env.DB_HOST,

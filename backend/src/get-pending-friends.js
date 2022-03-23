@@ -12,7 +12,7 @@ async function getPendingFriends(request) {
         const query = util.promisify(conn.query).bind(conn);
         const result = await query(
             `SELECT user1 FROM friends
-                WHERE user2='${request.session.username}'`
+                WHERE user2='${request.session.username}' AND approved=0`
         );
         return Array.from(result).map(e => e.user1);
     } catch(e) {

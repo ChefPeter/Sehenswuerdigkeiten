@@ -6,7 +6,7 @@ const initState = {
 const rootReducer = (state = initState, action) => {
   
     if(action.type === "CHANGE_THEME"){
-
+        
         let newTheme = "light";
         if(state.theme === "light")
             newTheme = "dark";

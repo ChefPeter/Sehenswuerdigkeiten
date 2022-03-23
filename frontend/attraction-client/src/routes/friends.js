@@ -7,7 +7,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
-import { yellow } from "@mui/material/colors";
 import "../routes/friends.css";
 
 

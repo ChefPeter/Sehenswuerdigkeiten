@@ -3,11 +3,6 @@ import Header from "../components/header";
 import "./start.css";
 import { Button, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { color, palette } from "@mui/system";
-import { useEffect } from "react";
-import { Provider } from 'react-redux';
-import { connect } from "react-redux";
-import store from "../reducers/store";
 import { useSelector } from 'react-redux';
 import { yellow } from "@mui/material/colors";
 

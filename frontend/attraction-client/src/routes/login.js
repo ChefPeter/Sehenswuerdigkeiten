@@ -3,12 +3,13 @@ import "./login.css";
 import { Link } from "react-router-dom";
 import { Button, TextField, Alert, AlertTitle} from '@mui/material';
 import {useState , setState} from "react";
+import { useNavigate } from "react-router-dom";
 
 let usernameInput = "";
 let passwordInput = "";
 
 function Login(props) {
-
+  const navigate = useNavigate();
   const getUsernameValue = (event)=>{
     usernameInput = event.target.value;;
   };
@@ -25,28 +26,30 @@ function Login(props) {
         <h1>City2Go</h1>
       </div>
       <div id = "textfeld">
-        <TextField id="filled-basic" label="Benutzername" variant="filled" onChange={getUsernameValue} />
-        <br></br>
-        <TextField id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
-        <br></br>
-        <Button id='knopf' variant="text" onClick={ () => post(setErrorText, setShowErrorAlert)}>Anmelden!</Button>    
-        <br></br>
-        <Button id='knopf' variant="text"><Link to="/register" style={{ textDecoration: 'none' }}>Neuer Benutzer</Link></Button>
-        <br></br>
-        <Button id='knopf' variant="text"><Link to="/requestreset" style={{ textDecoration: 'none' }}>Passwort zurücksetzen</Link></Button>
-
-        <br></br>
-
-        <Button onClick={() => handle()}>check</Button>
-      </div>
-
-        {showErrorAlert ?
+        <div id="widthTextfields">
+          <div id="textFieldsLogin">
+            <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-basic" label="Benutzername" variant="filled" onChange={getUsernameValue} />
+            <TextField fullWidth id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
+          </div>
+          <Button fullWidth id='btnLoginPage' variant="conained" onClick={ () => post(setErrorText, setShowErrorAlert)}>Anmelden!</Button>    
+         
+          <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/register")}>Neuer Benutzer</Button>
+          
+          <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/requestreset")}>Passwort zurücksetzen</Button>
+          
+          {showErrorAlert ?
             <Alert severity="error"> 
                 <AlertTitle>Error</AlertTitle>
                     {errorText}
             </Alert>
-        : null}
-      
+          : null}
+
+        </div>
+        <br></br>
+
+        <Button onClick={() => handle()}>check</Button>
+      </div>
+    
       </div>   
   );
 }
@@ -87,4 +90,6 @@ function handle(){
     //} 
   });
 }
+
+
 export default Login;

@@ -7,11 +7,16 @@
     flex-direction: column;
     height: 100vh;
     color: rgb(209, 154, 34);
-    text-align: center;
 }
 
 #hintergrund{
     background-image: url("../../../public/images/leading-er.png");
+}
+
+#befehl{
+    text-align: center;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
 }
 
 #abstand{

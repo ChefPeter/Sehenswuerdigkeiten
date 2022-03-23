@@ -21,7 +21,9 @@ function RequestReset(props) {
     return (
         <div id="hintergrund">
             <div id="inputs">
-                <h1>Email eingeben und Reset Button clicken!</h1>
+                <div id="befehl">
+                    <h1>Email eingeben und Reset Button clicken!</h1>
+                </div>
                 <div id = "abstand">
                     <TextField sx={{ width: 1 }} id="filled-basic" label="Email" variant="filled" onChange={setInput} />
                     <div id="abstand">

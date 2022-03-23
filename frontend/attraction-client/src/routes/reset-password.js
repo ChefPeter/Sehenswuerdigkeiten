@@ -22,7 +22,7 @@ function ResetPassword() {
   return (
       <div id='hintergrund'>
         <div id='inputs'>
-            <div>
+            <div id='befehl'>
                 <h1>Bitte neues Passwort eingeben!</h1>
             </div>
             <div id='abstand'>

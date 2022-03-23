@@ -63,6 +63,8 @@ app.post("/change-description", isAuthenticated, async(req, res) => sendResponse
 app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req.session.username), res));
 app.get("/friends", isAuthenticated, async(req, res) => sendGetResponse(await getFriends(req.session.username), res));
 app.get("/conversation", isAuthenticated, async(req, res) => sendGetResponse(await getConversation(req), res));
+app.get("/logged-in", (req, res) => req.session.username ? res.status(200).send() : res.status(400).send());
+
 
 app.get("/", isAuthenticated, async(req, res) => {
     res.status(200).send("Everything worked! " + req.session.username);

@@ -6,9 +6,17 @@ const BaseMap = () => {
   mapboxgl.accessToken = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
   useEffect(() => {
+    let theme;
+    let i = 1;
+    if(i == 0){
+        theme = "mapbox://styles/mapbox/light-v10";
+    }
+    else{
+        theme = "mapbox://styles/mapbox/navigation-night-v1"
+    }
     const map = new mapboxgl.Map({
       container: "mapContainer",
-      style: "mapbox://styles/mapbox/navigation-night-v1",
+      style: theme,
       center: [-74.5, 40],
       zoom: 9,
     });
@@ -25,7 +33,7 @@ const BaseMap = () => {
       map.addControl(geolocate, "top-right")
   }, []);
   
-  return <div id="mapContainer" className="map">hahah</div>;
+  return <div id="mapContainer" className="map"></div>;
 };
 
 export default BaseMap;

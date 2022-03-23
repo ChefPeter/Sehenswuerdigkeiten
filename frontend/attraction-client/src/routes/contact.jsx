@@ -32,10 +32,21 @@ const dark = {
 const DivOut = styled('div')(({ theme }) => ({
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),'&:hover': {backgroundColor: alpha(theme.palette.common.white, 0.25),},
+<<<<<<< Updated upstream
     width: '40%',
     height: '60%',
     margin: '30%',
     position: 'relative',
+=======
+    width: '40vw',
+    height: '40vh',
+    marginLeft: '30vw',
+    marginRight: '30vw',
+    marginTop: '30vh',
+    marginBottom: '30vh',
+    //margin: ('30vw', '30vh', '30vw', '30vh'),
+    position: 'absolute',
+>>>>>>> Stashed changes
     alignItems: 'center',
     justifyContent: 'center',
     display: 'block',

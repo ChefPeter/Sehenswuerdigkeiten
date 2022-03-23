@@ -2,8 +2,6 @@ import './App.css';
 import "./login.css";
 import { Link } from "react-router-dom";
 import { Button, TextField, Alert, AlertTitle} from '@mui/material';
-import Header from '../components/header';
-import DeleteIcon from '@mui/icons-material/Delete';
 import {useState , setState} from "react";
 
 let usernameInput = "";
@@ -22,9 +20,7 @@ function Login(props) {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
 
   return (
-
     <div id='hintergrund'>     
-
       <div id='titel'>
         <h1>City2Go</h1>
       </div>
@@ -72,8 +68,6 @@ function post (setErrorText, setShowErrorAlert){
          window.location.href="/home"
       }
   });
-
 }
-
 
 export default Login;

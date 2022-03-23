@@ -1,0 +1,20 @@
+#textarea{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#rand{
+    padding: 10px;
+}
+
+#copyright{
+    margin-top: 100px;
+    display: flex;
+}
+
+#bild{
+    background-image: url("../../../public/images/leading-er.png");
+    background-size: cover;
+    height: 100vh;
+}

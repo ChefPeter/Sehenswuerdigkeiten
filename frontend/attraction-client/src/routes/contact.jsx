@@ -1,20 +1,10 @@
-import { Link } from "react-router-dom";
-import Header from "../components/header";
-import { styled, alpha } from '@mui/material/styles';
-import "./start.css";
-import { Button, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { color, palette } from "@mui/system";
-import { useEffect } from "react";
-import { Provider } from 'react-redux';
-import { connect } from "react-redux";
-import store from "../reducers/store";
+import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { useSelector } from 'react-redux';
-import { yellow } from "@mui/material/colors";
-import SearchIcon from '@mui/icons-material/Search';
-import InputBase from '@mui/material/InputBase';
-import Box from '@mui/material/Box';
-
+import "../routes/styles/contact.css";
+import Header from "../components/header";
+import React from "react";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { Button} from '@mui/material';
 
 // Define theme settings
 const light = {
@@ -29,47 +19,7 @@ const dark = {
   },
 };
 
-const DivOut = styled('div')(({ theme }) => ({
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),'&:hover': {backgroundColor: alpha(theme.palette.common.white, 0.25),},
-    width: '40vw',
-    height: '40vh',
-    marginLeft: '30vw',
-    marginRight: '30vw',
-    marginTop: '30vh',
-    marginBottom: '30vh',
-    //margin: ('30vw', '30vh', '30vw', '30vh'),
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    display: 'block',
-    border: '1px solid black',
-}));
-
-const LabelLabel = styled('label')(({ theme }) => ({
-    justifyContent: 'center',
-    alignItems: 'center',
-    display: 'block',
-    width: '96%',
-    height: '44%',
-    margin: theme.spacing(1, 1, 1, 1),
-}));
-
-const PLabel = styled('p')(({ theme }) => ({
-    height: '20%',
-    fontSize: '65%',
-}));
-
-//const TextAreaLabel
-
-const InputLabel = styled('textarea')(({ theme }) => ({
-    height: '80%',
-    width: '98%',
-    resize: 'none',
-    overflow: 'auto',
-}))
-
-function Groups(props) {
+function Contact(props) {
 
   const theme = useSelector(state => {
     try{
@@ -87,19 +37,33 @@ function Groups(props) {
   });
 
     return (
-      <div style={{widht: '100vw', height: '100vh'}}>
-        <DivOut>
-            <LabelLabel>
-                <PLabel>Message:</PLabel>
-                <InputLabel></InputLabel>
-            </LabelLabel>
-            <LabelLabel>
-                <PLabel>Details:</PLabel>
-                <InputLabel></InputLabel>
-            </LabelLabel>
-        </DivOut>
+      <div id='bild'>
+        <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
+        <Header/>
+        <div id="rand">
+          <div>
+            <h4>Bitte schreibe dein Anliegen einfach in das Feld. Wir werden uns so schnell wie möglich bei Ihnen melden!</h4>
+          </div>
+          <div id='textarea' >
+            <div>
+              <TextareaAutosize
+                aria-label="minimum height"
+                minRows={8}
+                placeholder="Hier schreiben"
+                style={{ width: 1000 }}
+              />  
+            </div>
+          </div>
+          <div>
+              <Button variant="text">Absenden</Button>
+          </div>     
+          <div id='copyright'>
+            <h6>Alle Inahlte unterliegen der City2Go gmbh und sind stregstens geschützt. Bei Kopie oder Diebstahl wird dies zur Anzeige gebracht. Alle Daten sind nach der aktuellen DSGVO geschützt und gesichert.</h6>
+          </div>
+          </div>
+        </ThemeProvider>
       </div>
     );
   
 }
-export default Groups;
+export default Contact;

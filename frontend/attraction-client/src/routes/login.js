@@ -71,10 +71,12 @@ function post (setErrorText, setShowErrorAlert){
       } else {
           // Infofeld sichtbar machen
          console.log("JAWOLL")
-         //window.location.href="/home"
+         window.location.href="/home";
+         
       }
   });
 }
+
 
 function handle(){
   fetch("http://localhost:5000/logged-in", {
@@ -90,6 +92,7 @@ function handle(){
     //} 
   });
 }
+
 
 
 export default Login;

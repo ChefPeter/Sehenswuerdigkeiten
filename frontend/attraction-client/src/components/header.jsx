@@ -11,14 +11,11 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import "./header.css";
 import Dark_Mode from './dark_mode';
 import Sidebar from "../components/Sidebar";
-import { FormControl, InputLabel, NativeSelect } from '@mui/material';
-import { Select } from '@mui/material';
 import LanguageSelector from './LanguageSelector';
 import { Paper } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -88,7 +85,7 @@ export default function Header() {
   };
 
 function sayHello(){
-  console.log("Hallo")
+  console.log("Halloxxx")
 }
 
   const menuId = 'primary-search-account-menu';
@@ -109,13 +106,14 @@ function sayHello(){
       onClose={handleMenuClose}
     >
       <MenuItem >
-        
+        <div>
         <Paper  onClick={sayHello()} sx={{
           width: 120,
-          height: 42
+          height: 5
         }}>  <IconButton sx={{ ml: 1 }}  color="inherit">
          <AccountCircleIcon />
-      </IconButton>Profile</Paper>
+        </IconButton>Profile</Paper>
+        </div>
       </MenuItem>
 
       <MenuItem><Dark_Mode></Dark_Mode></MenuItem>

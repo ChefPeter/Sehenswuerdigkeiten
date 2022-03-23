@@ -3,7 +3,7 @@ const util = require("util");
 
 async function getDescription(request) {
 
-    const user = request.query.username ? request.query.username : request.session.username;
+    const user = request.query.username ? request.query.username.toLowerCase() : request.session.username;
 
     try {
         const conn = mysql.createConnection({

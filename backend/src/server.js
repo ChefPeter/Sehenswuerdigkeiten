@@ -5,6 +5,7 @@ const requestReset = require("./request-reset");
 const resetPassword = require("./reset");
 const isAuthenticated = require("./authenticator");
 const addFriend = require("./add-friend");
+const rejectFriend = require("./reject-friend");
 const sendMessage = require("./send-message");
 const changeDescription = require("./change-description");
 
@@ -61,6 +62,7 @@ app.post("/approve", async(req, res) => sendResponse(await approveUser(req.body)
 app.post("/request-reset", async(req, res) => sendResponse(await requestReset(req.body), res));
 app.post("/reset-password", async(req, res) => sendResponse(await resetPassword(req.body), res));
 app.post("/add-friend", isAuthenticated, async(req, res) => sendResponse(await addFriend(req), res));
+app.post("/reject-friend", isAuthenticated, async(req, res) => sendResponse(await rejectFriend(req), res));
 app.post("/sendMessage", isAuthenticated, async(req, res) => sendResponse(await sendMessage(req), res));
 app.post("/change-description", isAuthenticated, async(req, res) => sendResponse(await changeDescription(req), res));
 

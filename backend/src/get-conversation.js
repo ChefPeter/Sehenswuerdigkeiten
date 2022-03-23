@@ -13,14 +13,6 @@ async function getConversation(request) {
             database: process.env.DB_DATABASE
         });
         const query = util.promisify(conn.query).bind(conn);
-        console.log(
-            `SELECT sender, recipient, content FROM messages
-                WHERE 
-                ( sender='${request.session.username}' AND recipient='${request.query.friend}' )
-                OR
-                ( sender='${request.query.friend}' AND recipient='${request.session.username}' )
-                ORDER BY message_timestamp ASC
-                `);
         return Array.from(await query(
             `SELECT sender, recipient, content FROM messages
                 WHERE 

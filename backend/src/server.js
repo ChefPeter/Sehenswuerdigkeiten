@@ -9,6 +9,7 @@ const sendMessage = require("./send-message");
 const changeDescription = require("./change-description");
 
 const getDescription = require("./get-description");
+const getFriends = require("./get-friends");
 
 const express = require("express");
 const session = require("express-session");
@@ -58,7 +59,8 @@ app.post("/sendMessage", isAuthenticated, async(req, res) => sendResponse(await 
 app.post("/change-description", isAuthenticated, async(req, res) => sendResponse(await changeDescription(req), res));
 
 // GET REQUESTS
-app.get("/description", isAuthenticated,async (req, res) => sendGetResponse(await getDescription(req.session.username), res));
+app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req.session.username), res));
+app.get("/friends", isAuthenticated, async(req, res) => sendGetResponse(await getFriends(req.session.username), res));
 
 app.get("/", isAuthenticated, async(req, res) => {
     res.status(200).send("Everything worked! " + req.session.username);

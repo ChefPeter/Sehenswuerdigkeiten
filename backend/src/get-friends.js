@@ -1,7 +1,7 @@
 const mysql = require("mysql");
 const util = require("util");
 
-async function getDescription(user) {
+async function getFriends(user) {
     try {
         const conn = mysql.createConnection({
             host: process.env.DB_HOST,
@@ -10,15 +10,21 @@ async function getDescription(user) {
             database: process.env.DB_DATABASE
         });
         const query = util.promisify(conn.query).bind(conn);
-        const result = await query(
-            `SELECT user_desc FROM users
-                WHERE username='${user}'`
+        return Array.from(await query(
+            `SELECT user1 FROM friends
+                WHERE user2='${user}'`
+            ))
+            .map(e => e.user1)
+        .concat(Array.from(await query(
+            `SELECT user2 FROM friends
+                WHERE user1='${user}'`
+            ))
+            .map(e => e.user2)
         );
-        return result[0].user_desc || "";
     } catch(e) {
         console.error(e);
         return null;
     }
 }
 
-module.exports = getDescription;
+module.exports = getFriends;

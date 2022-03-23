@@ -11,7 +11,8 @@ import "../routes/friends.css";
 import { Accordion, Button, Container, Divider, TextField, Typography } from "@mui/material";
 import FriendItem from "../components/FriendItem";
 import SearchFriend from "../components/SearchFriend";
-
+import IncomingRequest from "../components/IncomingRequest";
+import { margin } from "@mui/system";
 
 let searchFriendInput = "";
 // Define theme settings
@@ -34,7 +35,8 @@ const dark = {
 function Friends(props) {
 
   const [friendsName, setFriendsName] = useState([]);
-  const [triedToFetch, setTriedToFetch] = useState(false)
+  const [friendRequests, setFriendRequests] = useState([]);
+  const [triedToFetch, setTriedToFetch] = useState(false);
 
 
   useEffect(async() => {
@@ -48,12 +50,12 @@ function Friends(props) {
         credentials: 'include'
       })
     
-      let text = (await resultFriends.json());
+      let friends = (await resultFriends.json());
       let users = [];
 
-      for(let i = 0; i<text.length; i++){
+      for(let i = 0; i<friends.length; i++){
 
-        const resultDescription = await fetch("http://localhost:5000/description?"+new URLSearchParams({username:text[i]}).toString(), {
+        const resultDescription = await fetch("http://localhost:5000/description?"+new URLSearchParams({username:friends[i]}).toString(), {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
@@ -63,14 +65,27 @@ function Friends(props) {
         
         const description = await resultDescription.text();
         users.push({
-          name: text[i],
+          name: friends[i],
           description: description
         })
 
       }
       
+    
+      //fetch friend requests
+      const resultFriendRequests = await fetch("http://localhost:5000/pending-friends", {
+        method: "get",
+        credentials: 'include'
+      });
+
+      let friendRequests = (await resultFriendRequests.json());
+
+
+      setFriendRequests(friendRequests)
       setFriendsName(users);
-      
+
+
+
     }
 
   });
@@ -84,11 +99,19 @@ function Friends(props) {
     return (
       <ThemeProvider theme={createTheme(light)}>
       <Header/>
+
      
+        <Typography mt={2} ml={1.875}>
+          Incoming Requests!
+        </Typography>
+      
+      {friendRequests.map(e => <IncomingRequest name={e} ></IncomingRequest>)}
+
       <div>
         <TextField type="text" id="filled-basic" label= {<SearchFriend/>} variant="filled" onChange={handleSearchFriendInput} />
         <Button variant="contained" onClick={() => handleAddFriend()}>ADD</Button>
       </div>
+
       <div id="freunde">
       
         <List>

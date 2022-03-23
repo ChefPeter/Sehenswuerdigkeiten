@@ -34,24 +34,27 @@ function Login(props) {
         <Button id='knopf' variant="text"><Link to="/register" style={{ textDecoration: 'none' }}>Neuer Benutzer</Link></Button>
         <br></br>
         <Button id='knopf' variant="text"><Link to="/requestreset" style={{ textDecoration: 'none' }}>Passwort zurücksetzen</Link></Button>
+
         <br></br>
+
+        <Button onClick={() => handle()}>check</Button>
+      </div>
+
         {showErrorAlert ?
             <Alert severity="error"> 
                 <AlertTitle>Error</AlertTitle>
                     {errorText}
             </Alert>
         : null}
+
       
-      </div>
-    </div>    
+      </div>   
   );
 }
 
 function post (setErrorText, setShowErrorAlert){
 
   let formData = new FormData();
-  console.log(passwordInput)
-  console.log(usernameInput)
   formData.append('username', usernameInput);
   formData.append('password', passwordInput)
 
@@ -65,9 +68,20 @@ function post (setErrorText, setShowErrorAlert){
       } else {
           // Infofeld sichtbar machen
          console.log("JAWOLL")
-         window.location.href="/home"
+         //window.location.href="/home"
       }
   });
 }
 
+function handle(){
+  fetch("http://10.171.155.127:5000/logged-in", {
+    method: "GET",
+  }).then(res => {
+    //not logged in
+    console.log(res)
+    if (res.status == 400) {
+        //window.location.href="/login";
+    } 
+  });
+}
 export default Login;

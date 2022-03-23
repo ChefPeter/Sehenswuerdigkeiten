@@ -47,17 +47,17 @@ const LabelLabel = styled('label')(({ theme }) => ({
     alignItems: 'center',
     display: 'block',
     width: '96%',
-    height: '50%',
+    height: '44%',
     margin: theme.spacing(1, 1, 1, 1),
 }));
 
 const PLabel = styled('p')(({ theme }) => ({
     height: '20%',
-    fontSize: '100%',
+    fontSize: '65%',
 }));
 
 const InputLabel = styled('input')(({ theme }) => ({
-    height: '10%',
+    height: '80%',
     width: '98%',
 }))
 
@@ -84,7 +84,6 @@ function Groups(props) {
                 <PLabel>Message:</PLabel>
                 <InputLabel></InputLabel>
             </LabelLabel>
-            <br/>
             <LabelLabel>
                 <PLabel>Details:</PLabel>
                 <InputLabel></InputLabel>

@@ -36,6 +36,9 @@ function Login(props) {
         <Button id='knopf' variant="text" onClick={ () => post(setErrorText, setShowErrorAlert)}>Anmelden!</Button>    
         <br></br>
         <Button id='knopf' variant="text"><Link to="/register" style={{ textDecoration: 'none' }}>Neuer Benutzer</Link></Button>
+        <br></br>
+        <Button id='knopf' variant="text"><Link to="/requestreset" style={{ textDecoration: 'none' }}>Passwort zurücksetzen</Link></Button>
+
       </div>
       
         {showErrorAlert ?

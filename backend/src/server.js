@@ -5,6 +5,7 @@ const requestReset = require("./request-reset");
 const resetPassword = require("./reset");
 const isAuthenticated = require("./authenticator");
 const addFriend = require("./add-friend");
+const sendMessage = require("./send-message");
 
 const express = require("express");
 const session = require("express-session");
@@ -37,22 +38,18 @@ app.use(bodyParser.json());
 // Middleware für cors bei requests
 app.use(cors());
 
-/*function sendResponse(error, res) {
-    if (error) {
-        res.status(400).send(error);
-    } else {
-        res.status(200).send();
-    }
-}*/
 // Funktion, um Antworten zu schicken
 const sendResponse = (error, res) => error ? res.status(400).send(error) : res.status(200).send();
 
 app.post("/login", async(req, res) => sendResponse(await login(req), res));
+app.post("/logout", (req, res) => sendResponse(req.session.destroy(), res));
 app.post("/register", async(req, res) => sendResponse(await register(req.body), res));
 app.post("/approve", async(req, res) => sendResponse(await approveUser(req.body), res));
 app.post("/request-reset", async(req, res) => sendResponse(await requestReset(req.body), res));
 app.post("/reset-password", async(req, res) => sendResponse(await resetPassword(req.body), res));
 app.post("/add-friend", isAuthenticated, async(req, res) => sendResponse(await addFriend(req), res));
+app.post("/sendMessage", isAuthenticated, async(req, res) => sendResponse(await sendMessage(req), res));
+
 
 app.get("/", isAuthenticated, async(req, res) => {
     res.status(200).send("Everything worked! " + req.session.username);

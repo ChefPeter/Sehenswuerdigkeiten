@@ -75,7 +75,9 @@ async function changePassword(params) {
         const query = util.promisify(conn.query).bind(conn);
         const result = await query(
             `UPDATE users SET
-                password='${crypto.createHash("sha256").update(params["new-password"]).digest("hex")}'
+                password='${crypto.createHash("sha256").update(params["new-password"]).digest("hex")}',
+                reset_token=NULL,
+                reset_time=NULL
                 WHERE email='${params.email}'`
         );
         return null;

@@ -38,9 +38,7 @@ function Login(props) {
         <Button id='knopf' variant="text"><Link to="/register" style={{ textDecoration: 'none' }}>Neuer Benutzer</Link></Button>
         <br></br>
         <Button id='knopf' variant="text"><Link to="/requestreset" style={{ textDecoration: 'none' }}>Passwort zurücksetzen</Link></Button>
-
-      </div>
-      
+        <br></br>
         {showErrorAlert ?
             <Alert severity="error"> 
                 <AlertTitle>Error</AlertTitle>
@@ -48,6 +46,7 @@ function Login(props) {
             </Alert>
         : null}
       
+      </div>
     </div>    
   );
 }

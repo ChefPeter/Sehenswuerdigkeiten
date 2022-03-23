@@ -1,16 +1,18 @@
 import { Link } from "react-router-dom";
 import Header from "../components/header";
 import "./start.css";
-import { Button, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
+import { Button, Slider, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSelector } from 'react-redux';
-import { yellow } from "@mui/material/colors";
-
+import DeleteIcon from '@mui/icons-material/Delete';
+import React from "react";
+import BaseMap from '../components/BaseMap';
 
 // Define theme settings
 const light = {
   palette: {
     mode: "light",
+    colorDiv: "white"
   },
 };
 
@@ -20,9 +22,7 @@ const dark = {
   },
 };
 
-
 function Home(props) {
-
   const theme = useSelector(state => {
     try{
       return state.theme;
@@ -37,24 +37,13 @@ function Home(props) {
       return "de";
     }
   });
-
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-        <Header></Header>
-        <p>{theme} + {language}</p>
-         <Paper square elevation={5}>
-        <Typography variant="body1" component="h4">
-          Du befindest dich auf der Startseite.
-        </Typography>;
-        <TextField id="filled-basic" label="Filled" variant="filled" />
-        <Link to="/">Home</Link>
-        <Button variant="contained">Contained</Button>
-        </Paper>
-      </ThemeProvider>
+      <Header/>
+      <BaseMap />
+    </ThemeProvider>
     );
   
 }
-
-
 
 export default Home;

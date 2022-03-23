@@ -37,3 +37,13 @@ CREATE TABLE IF NOT EXISTS friends (
     FOREIGN KEY (user2) REFERENCES users(username),
     PRIMARY KEY (user1, user2)
 );
+
+CREATE TABLE IF NOT EXISTS messages (
+    message_id INT PRIMARY KEY AUTO_INCREMENT,
+    sender VARCHAR(100),
+    recipient VARCHAR(100),
+    message_timestamp datetime,
+    content VARCHAR(10000),
+    FOREIGN KEY (sender) REFERENCES users(username),
+    FOREIGN KEY (recipient) REFERENCES users(username)
+);

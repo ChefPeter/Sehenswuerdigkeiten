@@ -6,9 +6,8 @@ import "./BaseMap.scss";
 import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 
-
 const BaseMap = () => {
-
+    
     const themeN = useSelector(state => {
         try{
            
@@ -41,7 +40,7 @@ const BaseMap = () => {
     const map = new mapboxgl.Map({
       container: "mapContainer",
       style: themeN,
-      center: [-74.5, 40],
+      center: [12.496366, 41.902782],
       zoom: 9,
     });
 
@@ -56,7 +55,21 @@ const BaseMap = () => {
       
       map.addControl(geolocate, "top-right");
 
+      let coordinates;
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          coordinates = [position.coords.latitude, position.coords.longitude];
+        });
+      }
+
       map.on("load", () => {
+        map.flyTo({
+          center: [
+             coordinates[1], // Example data
+             coordinates[0] // Example data
+          ],
+          essential: true // this animation is considered essential with respect to prefers-reduced-motion
+       });
         // add the data source for new a feature collection with no features
         map.addSource("random-points-data", {
           type: "geojson",
@@ -65,6 +78,14 @@ const BaseMap = () => {
             features: []
           }
         });
+        map.loadImage(
+          'https://docs.mapbox.com/mapbox-gl-js/assets/cat.png',
+          (error, image) => {
+          if (error) throw error;
+           
+          // Add the image to the map style.
+          map.addImage('cat', image)});
+
         // now add the layer, and reference the data source above by name
         map.addLayer({
           id: "random-points-layer",
@@ -72,7 +93,7 @@ const BaseMap = () => {
           type: "symbol",
           layout: {
             // full list of icons here: https://labs.mapbox.com/maki-icons
-            "icon-image": "bakery-15", // this will put little croissants on our map
+            "icon-image": "cat", // this will put little croissants on our map
             "icon-padding": 0,
             "icon-allow-overlap": true
           }
@@ -82,7 +103,8 @@ const BaseMap = () => {
       
     map.on("moveend", async () => {
       // get new center coordinates
-      const { lng, lat } = map.getCenter();
+      const lng=coordinates[1];
+      const lat=coordinates[0];
       // fetch new data
       const results = await fetchFakeData({ longitude: lng, latitude: lat });
       // update "random-points-data" source with new data

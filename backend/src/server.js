@@ -5,12 +5,14 @@ const requestReset = require("./request-reset");
 const resetPassword = require("./reset");
 const isAuthenticated = require("./authenticator");
 const addFriend = require("./add-friend");
+const rejectFriend = require("./reject-friend");
 const sendMessage = require("./send-message");
 const changeDescription = require("./change-description");
 
 const getDescription = require("./get-description");
 const getFriends = require("./get-friends");
 const getConversation = require("./get-conversation");
+const getPendingFriends = require("./get-pending-friends");
 
 const express = require("express");
 const session = require("express-session");
@@ -60,6 +62,7 @@ app.post("/approve", async(req, res) => sendResponse(await approveUser(req.body)
 app.post("/request-reset", async(req, res) => sendResponse(await requestReset(req.body), res));
 app.post("/reset-password", async(req, res) => sendResponse(await resetPassword(req.body), res));
 app.post("/add-friend", isAuthenticated, async(req, res) => sendResponse(await addFriend(req), res));
+app.post("/reject-friend", isAuthenticated, async(req, res) => sendResponse(await rejectFriend(req), res));
 app.post("/sendMessage", isAuthenticated, async(req, res) => sendResponse(await sendMessage(req), res));
 app.post("/change-description", isAuthenticated, async(req, res) => sendResponse(await changeDescription(req), res));
 
@@ -68,6 +71,7 @@ app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(awai
 app.get("/friends", isAuthenticated, async(req, res) => sendGetResponse(await getFriends(req.session.username), res));
 app.get("/conversation", isAuthenticated, async(req, res) => sendGetResponse(await getConversation(req), res));
 app.get("/logged-in", (req, res) => req.session.username ? res.status(200).send() : res.status(401).send());
+app.get("/pending-friends", isAuthenticated, async (req, res) => sendGetResponse(await getPendingFriends(req), res));
 
 //app.get("/logged-in", (req, res) => res.send(req.session));
 

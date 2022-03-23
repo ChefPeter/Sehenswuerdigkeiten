@@ -1,10 +1,7 @@
 const mysql = require("mysql");
 const util = require("util");
 
-async function getDescription(request) {
-
-    const user = request.query.username ? request.query.username.toLowerCase() : request.session.username;
-
+async function getPendingFriends(request) {
     try {
         const conn = mysql.createConnection({
             host: process.env.DB_HOST,
@@ -14,14 +11,14 @@ async function getDescription(request) {
         });
         const query = util.promisify(conn.query).bind(conn);
         const result = await query(
-            `SELECT user_desc FROM users
-                WHERE username='${user}'`
+            `SELECT user1 FROM friends
+                WHERE user2='${request.session.username}'`
         );
-        return result[0].user_desc || "";
+        return Array.from(result).map(e => e.user1);
     } catch(e) {
         console.error(e);
         return null;
     }
 }
 
-module.exports = getDescription;
+module.exports = getPendingFriends;

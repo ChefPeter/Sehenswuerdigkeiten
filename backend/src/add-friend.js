@@ -1,7 +1,13 @@
+const mysql = require("mysql");
+const util = require("util");
+
 async function addFriend(request) {
 
     // Schauen ob Pflichtfelder ausgefüllt sind
     if (!checkMandatoryFields(request.body)) return "Nicht alle Pflichtfelder sind ausgefüllt!";
+
+    // friend lowercase machen
+    request.body.friend = request.body.friend.toLowerCase();
 
     // Funktionalität
     return await sendFriendRequest(request.session.username, request.body.friend);
@@ -25,7 +31,7 @@ async function sendFriendRequest(user, friend) {
         const query = util.promisify(conn.query).bind(conn);
 
         // Falls man schon befreundet ist
-        const result = await query(
+        let result = await query(
             `SELECT COUNT(*) AS count FROM friends
                 WHERE 
                     (user1='${user}' AND user2='${friend}' AND approved=1)

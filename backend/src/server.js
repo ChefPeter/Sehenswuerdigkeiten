@@ -52,7 +52,7 @@ app.post("/register", async(req, res) => sendResponse(await register(req.body), 
 app.post("/approve", async(req, res) => sendResponse(await approveUser(req.body), res));
 app.post("/request-reset", async(req, res) => sendResponse(await requestReset(req.body), res));
 app.post("/reset-password", async(req, res) => sendResponse(await resetPassword(req.body), res));
-app.post("/add-friend", isAuthenticated, async(req, res) => sendResponse(await addFriend(req.body), res));
+app.post("/add-friend", isAuthenticated, async(req, res) => sendResponse(await addFriend(req), res));
 
 app.get("/", isAuthenticated, async(req, res) => {
     res.status(200).send("Everything worked! " + req.session.username);

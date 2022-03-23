@@ -8,6 +8,8 @@ const addFriend = require("./add-friend");
 const sendMessage = require("./send-message");
 const changeDescription = require("./change-description");
 
+const getDescription = require("./get-description");
+
 const express = require("express");
 const session = require("express-session");
 const bodyParser = require("body-parser");
@@ -39,9 +41,12 @@ app.use(bodyParser.json());
 // Middleware für cors bei requests
 app.use(cors());
 
-// Funktion, um Antworten zu schicken
+// Funktionen, um Antworten zu schicken
 const sendResponse = (error, res) => error ? res.status(400).send(error) : res.status(200).send();
+const sendGetResponse = (content, res) => content !== null ? res.status(200).send(content) : res.status(400).send("Error!");
 
+
+// POST REQUESTS
 app.post("/login", async(req, res) => sendResponse(await login(req), res));
 app.post("/logout", (req, res) => sendResponse(req.session.destroy(), res));
 app.post("/register", async(req, res) => sendResponse(await register(req.body), res));
@@ -51,6 +56,9 @@ app.post("/reset-password", async(req, res) => sendResponse(await resetPassword(
 app.post("/add-friend", isAuthenticated, async(req, res) => sendResponse(await addFriend(req), res));
 app.post("/sendMessage", isAuthenticated, async(req, res) => sendResponse(await sendMessage(req), res));
 app.post("/change-description", isAuthenticated, async(req, res) => sendResponse(await changeDescription(req), res));
+
+// GET REQUESTS
+app.get("/description", isAuthenticated,async (req, res) => sendGetResponse(await getDescription(req.session.username), res));
 
 app.get("/", isAuthenticated, async(req, res) => {
     res.status(200).send("Everything worked! " + req.session.username);

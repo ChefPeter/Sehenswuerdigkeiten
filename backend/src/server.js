@@ -4,6 +4,7 @@ const approveUser = require("./approve");
 const requestReset = require("./request-reset");
 const resetPassword = require("./reset");
 const isAuthenticated = require("./authenticator");
+const addFriend = require("./add-friend");
 
 const express = require("express");
 const session = require("express-session");
@@ -51,7 +52,7 @@ app.post("/register", async(req, res) => sendResponse(await register(req.body), 
 app.post("/approve", async(req, res) => sendResponse(await approveUser(req.body), res));
 app.post("/request-reset", async(req, res) => sendResponse(await requestReset(req.body), res));
 app.post("/reset-password", async(req, res) => sendResponse(await resetPassword(req.body), res));
-
+app.post("/add-friend", isAuthenticated, async(req, res) => sendResponse(await addFriend(req), res));
 
 app.get("/", isAuthenticated, async(req, res) => {
     res.status(200).send("Everything worked! " + req.session.username);
@@ -61,4 +62,4 @@ app.get("/debug", (req, res) => {
     res.sendStatus(200);
 });
 
-app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+app.listen(5000, () => console.log("Server running on http://localhost:5000"));

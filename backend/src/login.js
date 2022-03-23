@@ -13,7 +13,6 @@ async function login(request) {
 
     // Schauen, ob die eingegebenen Daten stimmen
     const error = await checkCredentials(request.body);
-    console.log(error);
     if (error) return error;
 
     // Falls kein Fehler aufgetreten ist, wird der Benutzer angemeldet

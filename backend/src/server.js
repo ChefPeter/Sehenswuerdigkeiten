@@ -41,7 +41,11 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 // Middleware für cors bei requests
-app.use(cors());
+const corsConfig = {
+    credentials: true,
+    origin: true,
+};
+app.use(cors(corsConfig));
 
 // Funktionen, um Antworten zu schicken
 const sendResponse = (error, res) => error ? res.status(400).send(error) : res.status(200).send();
@@ -63,7 +67,9 @@ app.post("/change-description", isAuthenticated, async(req, res) => sendResponse
 app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req.session.username), res));
 app.get("/friends", isAuthenticated, async(req, res) => sendGetResponse(await getFriends(req.session.username), res));
 app.get("/conversation", isAuthenticated, async(req, res) => sendGetResponse(await getConversation(req), res));
-app.get("/logged-in", (req, res) => req.session.username ? res.status(200).send() : res.status(400).send());
+app.get("/logged-in", (req, res) => req.session.username ? res.status(200).send() : res.status(401).send());
+
+//app.get("/logged-in", (req, res) => res.send(req.session));
 
 
 app.get("/", isAuthenticated, async(req, res) => {

@@ -46,7 +46,6 @@ function Login(props) {
                     {errorText}
             </Alert>
         : null}
-
       
       </div>   
   );
@@ -58,9 +57,10 @@ function post (setErrorText, setShowErrorAlert){
   formData.append('username', usernameInput);
   formData.append('password', passwordInput)
 
-  fetch("http://10.171.155.127:5000/login", {
+  fetch("http://localhost:5000/login", {
       method: "post",
-      body: formData
+      body: formData,
+      credentials: 'include'
   }).then(res => {
       if (res.status == 400) {
           res.text().then(e => setErrorText(e));
@@ -74,14 +74,17 @@ function post (setErrorText, setShowErrorAlert){
 }
 
 function handle(){
-  fetch("http://10.171.155.127:5000/logged-in", {
+  fetch("http://localhost:5000/logged-in", {
     method: "GET",
-  }).then(res => {
+    credentials: "include"
+  })
+  .then(res => res.text())
+  .then(res => {
     //not logged in
     console.log(res)
-    if (res.status == 400) {
+    //if (res.status == 400) {
         //window.location.href="/login";
-    } 
+    //} 
   });
 }
 export default Login;

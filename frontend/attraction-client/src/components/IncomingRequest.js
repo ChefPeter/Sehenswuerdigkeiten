@@ -18,11 +18,10 @@ function IncomingRequest(props) {
           <ListItemAvatar>
               <PersonIcon />
           </ListItemAvatar>
-         
           <ListItemText primary={props.name} />   
           <ListItemAvatar>
-            <CheckIcon sx={{width: 40, color: "green",}}/>
-            <RemoveIcon  sx={{width: 40,color: "red",}}/>
+            <CheckIcon  sx={{width: 40, color: "green",}} onClick={() => accepted(props.name)}/>
+            <RemoveIcon  sx={{width: 40,color: "red",}} onClick={() => rejected(props.name)}/>
           </ListItemAvatar>
       </ListItem>
 
@@ -31,6 +30,55 @@ function IncomingRequest(props) {
     );
   
 }
+
+function accepted(name){
+
+    console.log("accepted")
+
+    let formData = new FormData();
+    formData.append('friend', name);
+  
+    fetch("http://localhost:5000/add-friend", {
+        method: "post",
+        body: formData,
+        credentials: 'include'
+    }).then(res => {
+        if (res.status == 400) {
+            
+        } else {
+            // Infofeld sichtbar machen
+           window.location.reload();
+           
+        }
+    });
+
+
+}
+
+function rejected(name){
+
+    console.log("rejected")
+
+    let formData = new FormData();
+    formData.append('friend', name);
+  
+    fetch("http://localhost:5000/reject-friend", {
+        method: "post",
+        body: formData,
+        credentials: 'include'
+    }).then(res => {
+        if (res.status == 400) {
+            
+        } else {
+            // Infofeld sichtbar machen
+           window.location.reload();
+           
+        }
+    });
+
+
+}
+
 
 
 export default IncomingRequest;

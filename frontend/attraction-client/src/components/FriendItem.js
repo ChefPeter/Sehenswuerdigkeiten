@@ -42,7 +42,7 @@ function FriendItem(props) {
         <Button variant="conatined" onClick={() => handleOpenChat()}>Open Chat</Button> 
         <Button variant="conatined" onClick={() => handleFollowPosition()}>Follow Position</Button> 
         <Button variant="conatined" onClick={() => handleReport()}>Report</Button>
-        <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleRemoveFriend()}><ClearIcon/></Button>
+        <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleRemoveFriend(props.name)}><ClearIcon/></Button>
         
       </Card> : null}
         
@@ -61,7 +61,25 @@ function handleOpenChat(){
 function handleReport(){
 
 }
-function handleRemoveFriend(){
+function handleRemoveFriend(name){
+
+    let formData = new FormData();
+    formData.append('friend', name);
+  
+    fetch("http://localhost:5000/reject-friend", {
+        method: "post",
+        body: formData,
+        credentials: 'include'
+    }).then(res => {
+        if (res.status == 400) {
+            
+        } else {
+            // Infofeld sichtbar machen
+           window.location.reload();
+           
+        }
+    });
+
 
 }
 

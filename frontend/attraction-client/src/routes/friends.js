@@ -3,16 +3,12 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSelector } from 'react-redux';
 import React, { useEffect, useState } from "react";
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemText from '@mui/material/ListItemText';
-import Avatar from '@mui/material/Avatar';
 import "../routes/friends.css";
 import { Accordion, Button, Container, Divider, TextField, Typography } from "@mui/material";
 import FriendItem from "../components/FriendItem";
 import SearchFriend from "../components/SearchFriend";
 import IncomingRequest from "../components/IncomingRequest";
-import { margin } from "@mui/system";
+import "./styles/friends.css";
 
 let searchFriendInput = "";
 // Define theme settings
@@ -41,6 +37,8 @@ function Friends(props) {
 
   useEffect(async() => {
     
+    console.log("efffect")
+
     if(!triedToFetch){
 
       setTriedToFetch(true)
@@ -90,27 +88,33 @@ function Friends(props) {
 
   });
   
-
+ 
 
   const handleSearchFriendInput = (event)=>{
     searchFriendInput = event.target.value;
   };
 
+  
     return (
       <ThemeProvider theme={createTheme(light)}>
+
       <Header/>
 
+      <Container id="alignSearchBar" >
+        <TextField  fullwidth type="text" id="searchBarFriends" className="filled-basic" label= {<SearchFriend/>} variant="filled" onChange={handleSearchFriendInput} />
+        <Button variant="contained" id="searchForFriendBtn" onClick={() => handleAddFriend()}>ADD</Button>
+      </Container>
      
-        <Typography mt={2} ml={1.875}>
+      { friendRequests.length > 0 ?
+        <Typography >
           Incoming Requests!
         </Typography>
+       : null }
+        
       
       {friendRequests.map(e => <IncomingRequest name={e} ></IncomingRequest>)}
 
-      <div>
-        <TextField type="text" id="filled-basic" label= {<SearchFriend/>} variant="filled" onChange={handleSearchFriendInput} />
-        <Button variant="contained" onClick={() => handleAddFriend()}>ADD</Button>
-      </div>
+      
 
       <div id="freunde">
       

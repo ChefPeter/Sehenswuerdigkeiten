@@ -1,0 +1,17 @@
+#alignSearchBar{
+    margin-top: 15px;
+    margin-left: 15px;
+}
+
+#searchBarFriends{
+    width: 30vw;
+    min-width: 200px;
+    
+}
+
+#searchForFriendBtn{
+    height: 3.7em;
+    margin-left: 10px;
+    width: 10vw;
+    min-width: 70px;
+}

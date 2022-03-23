@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
 import Header from "../components/header";
 import "./start.css";
-import { Button, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSelector } from 'react-redux';
+import React from "react";
+import BaseMap from '../components/BaseMap';
 
 
 // Define theme settings
@@ -20,9 +20,7 @@ const dark = {
   },
 };
 
-
 function Explore(props) {
- 
   const theme = useSelector(state => {
     try{
       return state.theme;
@@ -37,22 +35,13 @@ function Explore(props) {
       return "de";
     }
   });
-
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-        <Header></Header>
-         <Paper square elevation={5}>
-        <Typography variant="body1" component="h4">
-          Du befindest dich auf der Exploreseite.
-        </Typography>;
-        <TextField id="filled-basic" label="Filled" variant="filled" />
-        <Link to="/">Home</Link>
-        <Button variant="contained">Contained</Button>
-        </Paper>
-      </ThemeProvider>
+      <Header/>
+      <BaseMap />
+    </ThemeProvider>
     );
   
 }
-
 
 export default Explore;

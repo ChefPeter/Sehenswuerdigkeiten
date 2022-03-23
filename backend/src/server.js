@@ -6,6 +6,7 @@ const resetPassword = require("./reset");
 const isAuthenticated = require("./authenticator");
 const addFriend = require("./add-friend");
 const sendMessage = require("./send-message");
+const changeDescription = require("./change-description");
 
 const express = require("express");
 const session = require("express-session");
@@ -49,7 +50,7 @@ app.post("/request-reset", async(req, res) => sendResponse(await requestReset(re
 app.post("/reset-password", async(req, res) => sendResponse(await resetPassword(req.body), res));
 app.post("/add-friend", isAuthenticated, async(req, res) => sendResponse(await addFriend(req), res));
 app.post("/sendMessage", isAuthenticated, async(req, res) => sendResponse(await sendMessage(req), res));
-
+app.post("/change-description", isAuthenticated, async(req, res) => sendResponse(await changeDescription(req), res));
 
 app.get("/", isAuthenticated, async(req, res) => {
     res.status(200).send("Everything worked! " + req.session.username);

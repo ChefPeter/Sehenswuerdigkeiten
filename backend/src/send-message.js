@@ -1,3 +1,6 @@
+const mysql = require("mysql");
+const util = require("util");
+
 async function sendMessage(request) {
     // Schauen ob Pflichtfelder ausgefüllt sind
     if (!checkMandatoryFields(request.body)) return "Nicht alle Pflichtfelder sind ausgefüllt!";

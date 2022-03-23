@@ -12,12 +12,12 @@ async function getFriends(user) {
         const query = util.promisify(conn.query).bind(conn);
         return Array.from(await query(
             `SELECT user1 FROM friends
-                WHERE user2='${user}'`
+                WHERE user2='${user}' AND approved=1`
             ))
             .map(e => e.user1)
         .concat(Array.from(await query(
             `SELECT user2 FROM friends
-                WHERE user1='${user}'`
+                WHERE user1='${user}' AND approved=1`
             ))
             .map(e => e.user2)
         );

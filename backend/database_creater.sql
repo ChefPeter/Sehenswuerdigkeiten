@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS friends (
 	user1 VARCHAR(100),
 	user2 VARCHAR(100),
+    approved boolean,
     FOREIGN KEY (user1) REFERENCES users(username),
     FOREIGN KEY (user2) REFERENCES users(username),
     PRIMARY KEY (user1, user2)

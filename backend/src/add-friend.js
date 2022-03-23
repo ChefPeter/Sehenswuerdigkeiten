@@ -30,8 +30,16 @@ async function sendFriendRequest(user, friend) {
         });
         const query = util.promisify(conn.query).bind(conn);
 
-        // Falls man schon befreundet ist
+        // Schauen, ob der Freund überhaupt existiert
         let result = await query(
+            `SELECT COUNT(*) AS count FROM users
+                WHERE username='${friend}'`
+        );
+        if (result[0].count === 0) {
+            return "Ungültiger Benutzername!";
+        }
+        // Falls man schon befreundet ist
+        result = await query(
             `SELECT COUNT(*) AS count FROM friends
                 WHERE 
                     (user1='${user}' AND user2='${friend}' AND approved=1)

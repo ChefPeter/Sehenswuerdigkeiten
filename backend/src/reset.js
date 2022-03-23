@@ -11,7 +11,7 @@ async function resetPassword(params) {
     params.email = params.email.toLowerCase();
 
     // Schauen, ob Email im gültigen Format ist
-    if (!/.+@.+/.test(params.email)) return "Geben Sie eine gültige Email ein!";
+    if (!/.+@.+/.test(params.email)) return "Fehler mit der Anfrage!";
 
     // Schauen, ob das neue Passwort sicher genug ist
     if (!securePassword(params["new-password"])) return "Das neue Passwort ist nicht sicher genug!";
@@ -20,7 +20,7 @@ async function resetPassword(params) {
     if (params["new-password"] !== params["repeat-new-password"]) return "Die neuen Passwörter stimmen nicht überein!";
 
     // Schauen, ob die Reset Request noch nicht abgelaufen ist
-    if (!(await isValidRequest(params))) return "Fehler mit der Anfrage";
+    if (!(await isValidRequest(params))) return "Fehler mit der Anfrage!";
 
     // Das Passwort ändern/zurücksetzen
     return await changePassword(params);

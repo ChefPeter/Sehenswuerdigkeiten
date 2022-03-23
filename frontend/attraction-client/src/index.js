@@ -27,6 +27,9 @@ import store from './reducers/store';
 import { connect } from "react-redux";
 import { Button } from '@mui/material';
 import { useSelector } from 'react-redux';
+import Approve from './routes/approve';
+import RequestReset from "./routes/requestReset"
+import ResetPassword from './routes/reset-password';
 
 const rootElement = document.getElementById("root");
 
@@ -48,6 +51,9 @@ const Routing = () => {
       <Route path="friends" element={<Friends />} />
       <Route path="notifications" element={<Notifications />} />
       <Route path="contact" element={<Contact />} />
+      <Route path="approve" element={<Approve/>}/>
+      <Route path="requestReset" element={<RequestReset/>}/>
+      <Route path="reset-password" element={<ResetPassword/>}/>
 
     </Routes>
 

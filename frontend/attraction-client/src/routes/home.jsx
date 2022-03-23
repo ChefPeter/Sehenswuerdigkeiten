@@ -8,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import React from "react";
 import BaseMap from '../components/BaseMap';
 
+
 // Define theme settings
 const light = {
   palette: {

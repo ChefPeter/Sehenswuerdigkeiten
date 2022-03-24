@@ -5,22 +5,33 @@ import Popup from "./Popup";
 import "./BaseMap.scss";
 import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
+import { Button } from "@mui/material";
+import useState from "react";
+import setState from "react";
+
 
 const BaseMap = () => {
     
-    const themeN = useSelector(state => {
+ 
+    let theme = "mapbox://styles/mapbox/navigation-night-v1"
+
+   /* useSelector(state => {
         try{
            
             if(state.theme == "light"){
-                return "mapbox://styles/mapbox/light-v10"
+             
+              setTheme("mapbox://styles/mapbox/light-v10")
+               
             }else{
-                return "mapbox://styles/mapbox/navigation-night-v1"
+              setTheme("mapbox://styles/mapbox/navigation-night-v1")
+               
             }
           
         }catch(e){
-          return "mapbox://styles/mapbox/navigation-night-v1";
+          setTheme("mapbox://styles/mapbox/navigation-night-v1");
         }
-      });
+    });*/
+
       const language = useSelector(state => {
         try{
           return state.language;
@@ -34,13 +45,14 @@ const BaseMap = () => {
 
   const mapContainerRef = useRef(null);
   const popUpRef = useRef(new mapboxgl.Popup({ offset: 15 }));
+  let map;
 
   useEffect(() => {
     
-    const map = new mapboxgl.Map({
+    map = new mapboxgl.Map({
       container: "mapContainer",
-      style: themeN,
       center: [11.657244, 46.717705],
+      style: theme,
       zoom: 9,
     });
 
@@ -100,6 +112,7 @@ const BaseMap = () => {
         });
       });
 
+    
       
     map.on("moveend", async () => {
       // get new center coordinates
@@ -142,12 +155,25 @@ const BaseMap = () => {
       }
     });
 
+    
+   
     // clean up on unmount
     return () => map.remove();
       
   }, []);
+
+  function setStyleOfMap() {
+      map.setStyle("mapbox://styles/mapbox/light-v10")
+    }
   
-  return <div id="mapContainer" className="map" ref={mapContainerRef}></div>;
+  return (<div>
+    <Button onClick={() => setStyleOfMap()}>Hallo</Button>
+    <div id="mapContainer" className="map" ref={map}></div>
+    
+
+  </div>
+  );
 };
+
 
 export default BaseMap;

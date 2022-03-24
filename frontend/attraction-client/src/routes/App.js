@@ -8,6 +8,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import React from "react";
 import BaseMap from '../components/BaseMap';
 
+const API_KEY = "5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752";
+
 // Define theme settings
 const light = {
   palette: {
@@ -21,8 +23,6 @@ const dark = {
     mode: "dark",
   },
 };
-
-
 
 
 function App(props) {
@@ -42,35 +42,25 @@ function App(props) {
     }
   });
 
-  const apiKey = "5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752";
 
-  function apiGet(method, query) {
-    return new Promise(function(resolve, reject) {
-      var otmAPI =
-        "https://api.opentripmap.com/0.1/en/places/" +
-        method +
-        "?apikey=" +
-        apiKey;
-      if (query !== undefined) {
-        otmAPI += "&" + query;
-        console.log("a  a")
-      }
-      fetch(otmAPI)
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .catch(function(err) {
-          console.log("Fetch Error :-S", err);
-        });
-    });
+  function getURL(method, radius, lat, lon, limit)
+  {
+    return `https://api.opentripmap.com/0.1/en/places/${method}?apikey=${API_KEY}&radius=${radius}&limit=${limit}&offset=0&lon=${lon}&lat=${lat}&rate=2&format=json`;
+  }
+
+  async function getDataFromURL(url)
+  {
+    let result = await fetch(url);
+    let answer = null;
+    if(result.ok)
+      answer = await result.json();
+    return answer;
   }
 
   async function getDataFromAPI()
   {
-    
-    apiGet(
-      "radius",
-      `radius=10000&limit=${100}&offset=${0}&lon=${11.6615276}&lat=${46.7217851}&rate=2&format=json`
-    )
+      let result = await getDataFromURL(getURL("radius", 10000, "46.7217851", "11.6615276", 100));
+      console.log(result);
   }
   
     return (

@@ -8,11 +8,13 @@ const addFriend = require("./add-friend");
 const rejectFriend = require("./reject-friend");
 const sendMessage = require("./send-message");
 const changeDescription = require("./change-description");
+const changeProfilePicture = require("./change-profile-picture");
 
 const getDescription = require("./get-description");
 const getFriends = require("./get-friends");
 const getConversation = require("./get-conversation");
 const getPendingFriends = require("./get-pending-friends");
+const getProfilePicture = require("./get-profile-picture");
 
 const express = require("express");
 const session = require("express-session");
@@ -26,7 +28,7 @@ const app = express();
 // Middleware für den Fileupload
 busboy.extend(app, {
     upload: true,
-    path: path.join(__dirname, 'uploads'),
+    path: path.join("./", 'uploads'),
     allowedPath: /./,
 });
 
@@ -65,6 +67,8 @@ app.post("/add-friend", isAuthenticated, async(req, res) => sendResponse(await a
 app.post("/reject-friend", isAuthenticated, async(req, res) => sendResponse(await rejectFriend(req), res));
 app.post("/sendMessage", isAuthenticated, async(req, res) => sendResponse(await sendMessage(req), res));
 app.post("/change-description", isAuthenticated, async(req, res) => sendResponse(await changeDescription(req), res));
+app.post("/change-profile-picture", isAuthenticated, async(req, res) => sendResponse(await changeProfilePicture(req), res));
+
 
 // GET REQUESTS
 app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req), res));
@@ -72,6 +76,7 @@ app.get("/friends", isAuthenticated, async(req, res) => sendGetResponse(await ge
 app.get("/conversation", isAuthenticated, async(req, res) => sendGetResponse(await getConversation(req), res));
 app.get("/logged-in", (req, res) => req.session.username ? res.status(200).send() : res.status(401).send());
 app.get("/pending-friends", isAuthenticated, async (req, res) => sendGetResponse(await getPendingFriends(req), res));
+app.get("/profile-picture", isAuthenticated, async (req, res) => await getProfilePicture(req, res));
 
 //app.get("/logged-in", (req, res) => res.send(req.session));
 

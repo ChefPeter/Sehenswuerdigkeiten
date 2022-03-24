@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input id="pic" type="file" />
+    <button id="b">Senden</button>
+    <script>
+
+        document.getElementById("b").addEventListener("click", f);
+
+        function f() {
+
+            console.log(document.getElementById("pic").files[0]);
+
+            let formdata = new FormData();
+            formdata.append("pic", document.getElementById("pic").files[0]);
+
+            fetch("http://localhost:5000/change-profile-picture", {
+                method: "POST",
+                credentials: "include",
+                body: formdata
+            }).then(res => res.text())
+            .then(res => console.log(res));
+        }
+    </script>
+
+</body>
+</html>

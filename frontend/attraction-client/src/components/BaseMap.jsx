@@ -40,7 +40,7 @@ const BaseMap = () => {
     const map = new mapboxgl.Map({
       container: "mapContainer",
       style: themeN,
-      center: [12.496366, 41.902782],
+      center: [11.657244, 46.717705],
       zoom: 9,
     });
 

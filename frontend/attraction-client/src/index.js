@@ -1,9 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { render } from "react-dom";
 import './index.css';
 import App from './routes/App';
-import reportWebVitals from './reportWebVitals';
 import {
   BrowserRouter,
   Routes,
@@ -17,20 +15,13 @@ import Groups from "./routes/groups";
 import Friends from "./routes/friends";
 import Notifications from "./routes/notifications";
 import Contact from "./routes/contact";
-import { useState } from 'react';
-import { ThemeProvider } from '@mui/material';
 import { Provider } from 'react-redux';
-import { createStore } from "redux"; 
-import rootReducer from './reducers/rootReducer';
-import { createTheme } from '@mui/material';
 import store from './reducers/store';
-import { connect } from "react-redux";
-import { Button } from '@mui/material';
-import { useSelector } from 'react-redux';
 import Approve from './routes/approve';
 import RequestReset from "./routes/requestReset"
 import ResetPassword from './routes/reset-password';
 import Profile from './routes/profile';
+import Impressum from './routes/impressum';
 
 const rootElement = document.getElementById("root");
 
@@ -56,6 +47,7 @@ const Routing = () => {
       <Route path="requestReset" element={<RequestReset/>}/>
       <Route path="reset-password" element={<ResetPassword/>}/>
       <Route path="profile" element={<Profile />}></Route>
+      <Route path='impressum' element={<Impressum></Impressum>}></Route>
 
     </Routes>
 

@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+const path = require("path");
 const util = require("util");
 
 async function getProfilePicture(req, res) {
@@ -16,8 +17,18 @@ async function getProfilePicture(req, res) {
             `SELECT profile_picture AS p FROM users
                 WHERE username='${username}'`
         );
-        if (result.length <= 0) res.status(400).send("Invalid username!");
-        res.status(200).sendFile(result[0].p);
+        if (result.length <= 0) {
+            res.status(400).send("Invalid username!");
+            return;
+        }
+            console.log(result[0]);
+
+        if(result[0].p == null) {
+            res.status(200).send("No profile picture!");
+            return;
+        } 
+
+        res.status(200).sendFile(path.join(__dirname, "..", result[0].p));
     } catch(e) {
         console.error(e);
         res.status(400).send("Fehler mit der Datenbank!");

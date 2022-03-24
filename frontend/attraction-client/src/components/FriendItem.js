@@ -4,18 +4,42 @@ import { ListItemAvatar, Card, Container, Button } from "@mui/material";
 import { useState } from "react";
 import ClearIcon from '@mui/icons-material/Clear';
 import "./styles/friendItem.css";
+import { useEffect } from "react/cjs/react.production.min";
 
 
 function FriendItem(props) {
   
   const [showDescription, setShowDescription] = useState(false);
+  //const [profilePicture, setProfilePicture] = useState(); 
+ // const [usedEffect, setUsedEffect] = useState(false);
+
+ 
+    
+    /*
+    if(!usedEffect){
+      //fetch friend requests
+
+      const fileProfilePicture = await fetch("http://localhost:5000/profile-picture?"+new URLSearchParams({friend: props.name}), {
+        method: "get",
+        credentials: 'include'
+      });
+
+
+      let file = (await fileProfilePicture.blob());
+    
+      setProfilePicture(URL.createObjectURL(file));
+      setUsedEffect(true);
+
+    }*/
+
+  
 
     return (
       <div>
         
         <ListItem id="listItem" button onClick={() => openFriendMenu(setShowDescription, showDescription)} alignItems="flex-start">
           <ListItemAvatar>
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+            <Avatar alt="Avatar" src={props.profilePicture}/>
           </ListItemAvatar>
           <ListItemText
             primary={props.name}

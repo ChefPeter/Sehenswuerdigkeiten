@@ -33,6 +33,7 @@ function Friends(props) {
   const [friendsName, setFriendsName] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
   const [triedToFetch, setTriedToFetch] = useState(false);
+  const [profilePicture, setProfilePicture] = useState();
 
 
   useEffect(async() => {
@@ -50,6 +51,31 @@ function Friends(props) {
     
       let friends = (await resultFriends.json());
       let users = [];
+
+      let profilePictures = [];
+      for(let i = 0; i<friends.length; i++){
+
+        const fileProfilePicture = await fetch("http://localhost:5000/profile-picture?"+new URLSearchParams({friend: friends[i]}), {
+          method: "get",
+          credentials: 'include'
+        });
+
+
+
+        let file = (await fileProfilePicture); //.blob()
+
+        if(file.status === 200){
+          console.log("no profile")
+          file = "NO";
+        }else{
+          file = file.blob();
+          file = URL.createObjectURL(file);
+        }
+        
+        profilePictures.push(file);
+
+      }
+      setProfilePicture(profilePictures);
 
       for(let i = 0; i<friends.length; i++){
 
@@ -81,7 +107,6 @@ function Friends(props) {
 
       setFriendRequests(friendRequests)
       setFriendsName(users);
-
 
 
     }
@@ -119,7 +144,7 @@ function Friends(props) {
       
         <List>
 
-          {friendsName.map(e =>  <FriendItem name={e.name} description={e.description} key={e.name}></FriendItem>)}
+          {friendsName.map((e,i) =>  <FriendItem name={e.name} description={e.description} key={e.name} profilePicture={profilePicture[i]}></FriendItem>)}
          
         </List>
         

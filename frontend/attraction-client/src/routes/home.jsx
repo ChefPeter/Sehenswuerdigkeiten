@@ -58,7 +58,7 @@ function Home(props) {
 }
 
 function handle(){
-  fetch("http://10.171.155.127:5000/logged-in", {
+  fetch("http://localhost:5000/logged-in", {
     method: "GET",
   }).then(res => {
     //not logged in

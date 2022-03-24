@@ -14,6 +14,7 @@ const getDescription = require("./get-description");
 const getFriends = require("./get-friends");
 const getConversation = require("./get-conversation");
 const getPendingFriends = require("./get-pending-friends");
+const getProfilePicture = require("./get-profile-picture");
 
 const express = require("express");
 const session = require("express-session");
@@ -75,6 +76,7 @@ app.get("/friends", isAuthenticated, async(req, res) => sendGetResponse(await ge
 app.get("/conversation", isAuthenticated, async(req, res) => sendGetResponse(await getConversation(req), res));
 app.get("/logged-in", (req, res) => req.session.username ? res.status(200).send() : res.status(401).send());
 app.get("/pending-friends", isAuthenticated, async (req, res) => sendGetResponse(await getPendingFriends(req), res));
+app.get("/profile-picture", isAuthenticated, async (req, res) => await getProfilePicture(req, res));
 
 //app.get("/logged-in", (req, res) => res.send(req.session));
 

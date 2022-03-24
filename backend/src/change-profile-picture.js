@@ -1,6 +1,5 @@
 const mysql = require("mysql");
 const util = require("util");
-require("dotenv").config();
 
 async function changeProfilePicture(request) {
     // Schauen, ob Pflichtfelder ausgefüllt sind

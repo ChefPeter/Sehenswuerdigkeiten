@@ -1,0 +1,14 @@
+#description{
+    display: flex;
+    margin: 20px;
+}
+
+#unten{
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+}
+
+#profil{
+    margin-right: 10px;
+}

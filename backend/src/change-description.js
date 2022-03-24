@@ -14,7 +14,7 @@ function checkMandatoryFields(params) {
     const fields = [
         "description"
     ];
-    return fields.every(field => params[field]);
+    return fields.every(field => params[field] !== undefined);
 }
 
 async function insertDescription(request) {

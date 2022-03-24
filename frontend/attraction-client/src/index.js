@@ -30,6 +30,7 @@ import { useSelector } from 'react-redux';
 import Approve from './routes/approve';
 import RequestReset from "./routes/requestReset"
 import ResetPassword from './routes/reset-password';
+import Profile from './routes/profile';
 
 const rootElement = document.getElementById("root");
 
@@ -54,6 +55,7 @@ const Routing = () => {
       <Route path="approve" element={<Approve/>}/>
       <Route path="requestReset" element={<RequestReset/>}/>
       <Route path="reset-password" element={<ResetPassword/>}/>
+      <Route path="profile" element={<Profile />}></Route>
 
     </Routes>
 

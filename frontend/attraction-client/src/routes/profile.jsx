@@ -19,7 +19,7 @@ const dark = {
   },
 };
 
-function Contact(props) {
+function Profile(props) {
 
   const theme = useSelector(state => {
     try{
@@ -45,4 +45,4 @@ function Contact(props) {
     );
   
 }
-export default Contact;
+export default Profile;

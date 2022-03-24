@@ -159,13 +159,9 @@ const BaseMap = () => {
     return () => map.remove();
       
   }, []);
-
-  function setStyleOfMap() {
-      map.setStyle("mapbox://styles/mapbox/light-v10")
-    }
   
   return (<div>
-    <Button onClick={() => setStyleOfMap()}>Hallo</Button>
+   
     <div id="mapContainer" className="map" ref={map}></div>
     
 

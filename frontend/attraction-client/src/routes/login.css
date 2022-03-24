@@ -35,6 +35,7 @@
 #btnLoginPage{
     background-color: rgba(255, 255, 255, 0.733);
     margin-top: 8px;
+    height:  43px;
 }
 
 #textFieldsLogin{

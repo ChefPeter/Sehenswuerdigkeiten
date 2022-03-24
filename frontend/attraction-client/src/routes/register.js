@@ -1,8 +1,15 @@
 import './styles/start.css';
 import "./styles/register.css";
 import { Button, TextField, Alert, AlertTitle} from '@mui/material';
+import './App.css';
+import "./register.css";
+import { Link } from "react-router-dom";
+import { Button, TextField, Alert, AlertTitle, Fade} from '@mui/material';
+import Header from '../components/header';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {useState , setState} from "react";
 import { useNavigate } from "react-router-dom";
+
 
 let usernameInput = "";
 let emailInput = "";
@@ -45,8 +52,9 @@ function Register() {
               
               <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
              
+              <TextField sx={{ marginBottom: 0.5 }} fullWidth id="filled-password-input" label="Passwort wiederholen" type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} />
+
             </div>
-              <TextField fullWidth id="filled-password-input" label="Passwort wiederholen" type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} />
               
               <Button fullWidth id="btnLoginPage" variant="conained" onClick={() => post(setErrorText, setShowErrorAlert, setShowInfoAlert)}>Registrieren</Button>
              
@@ -55,18 +63,24 @@ function Register() {
               <div>
 
                   {showErrorAlert ?
+                    <Fade in={showErrorAlert} timeout={250}>
                       <Alert id="loginErrorAlert" severity="error">
                           <AlertTitle>Error</AlertTitle>
                           {errorText}
                       </Alert>
+                      </Fade>
                       : null}
 
 
-                  {showInfoAlert ? <Alert id="loginErrorAlert" false severity="info">
+                  {showInfoAlert ? 
+                    <Fade in={showInfoAlert} timeout={250}>
+                    <Alert id="loginErrorAlert" false severity="info">
                       <AlertTitle>Info</AlertTitle>
                       Eine Bestätigungsemail wurde versandt — <strong>Checke dein Postfach</strong>
-                  </Alert> : null}
-                    </div>
+                    </Alert> 
+                    </Fade>
+                    : null}
+                </div>
             </div>
               </div>
           

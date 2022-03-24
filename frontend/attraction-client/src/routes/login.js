@@ -2,6 +2,9 @@ import './styles/app.css';
 import "./login.css";
 import { Button, TextField, Alert, AlertTitle} from '@mui/material';
 import {useState} from "react";
+import { Link } from "react-router-dom";
+import { Button, TextField, Alert, AlertTitle, Fade} from '@mui/material';
+import {useState , setState} from "react";
 import { useNavigate } from "react-router-dom";
 
 let usernameInput = "";
@@ -28,7 +31,7 @@ function Login(props) {
         <div id="widthTextfields">
           <div id="textFieldsLogin">
             <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-basic" label="Benutzername" variant="filled" onChange={getUsernameValue} />
-            <TextField fullWidth id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
+            <TextField sx={{ marginBottom: 0.5 }} fullWidth id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
           </div>
           <Button fullWidth id='btnLoginPage' variant="conained" onClick={ () => post(setErrorText, setShowErrorAlert)}>Anmelden!</Button>    
          
@@ -37,16 +40,15 @@ function Login(props) {
           <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/requestreset")}>Passwort zurücksetzen</Button>
           
           {showErrorAlert ?
+            <Fade in={showErrorAlert} timeout={250}>
             <Alert id="loginErrorAlert" severity="error"> 
                 <AlertTitle>Error</AlertTitle>
                     {errorText}
             </Alert>
+            </Fade>
           : null}
 
         </div>
-        <br></br>
-
-        <Button onClick={() => handle()}>check</Button>
       </div>
     
       </div>   

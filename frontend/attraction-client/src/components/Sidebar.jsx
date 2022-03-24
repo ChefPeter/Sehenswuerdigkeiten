@@ -18,7 +18,9 @@ import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import HomeIcon from '@mui/icons-material/Home';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Link } from "react-router-dom";
-
+import Dark_Mode from './dark_mode';
+import LanguageSelector from './LanguageSelector';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 export default function SwipeableTemporaryDrawer() {
   const [state, setState] = React.useState({
@@ -89,6 +91,17 @@ export default function SwipeableTemporaryDrawer() {
         
       </List>
       <Divider />
+
+      <ListItem button  component={Link} to="/profile">
+            <ListItemIcon>
+            <AccountBoxIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Profile"} />
+      </ListItem>
+
+      <Dark_Mode ></Dark_Mode>
+      <LanguageSelector></LanguageSelector>
+      
     </Box>
     </div>
   );

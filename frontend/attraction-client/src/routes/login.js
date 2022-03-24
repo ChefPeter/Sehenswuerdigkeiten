@@ -38,7 +38,7 @@ function Login(props) {
           <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/requestreset")}>Passwort zurücksetzen</Button>
           
           {showErrorAlert ?
-            <Alert severity="error"> 
+            <Alert id="loginErrorAlert" severity="error"> 
                 <AlertTitle>Error</AlertTitle>
                     {errorText}
             </Alert>

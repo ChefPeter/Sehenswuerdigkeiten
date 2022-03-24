@@ -41,3 +41,6 @@
     border-radius: 100px;
 }
 
+#loginErrorAlert{
+    margin-top: 10px;
+}

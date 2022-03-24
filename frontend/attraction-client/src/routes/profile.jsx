@@ -6,6 +6,8 @@ import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import { Button} from '@mui/material';
 import "../routes/styles/profile.css";
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 // Define theme settings
 const light = {
@@ -49,21 +51,27 @@ function Profile(props) {
             </div>
             <div id='unten'>
                 <div>
-                    <TextField id="filled-basic" label="Vorname" variant="filled" />
+                    <h2>Peter123</h2>
+                </div>
+                <div id='abstand'>
+                    <TextField
+                        id="outlined-multiline-static"
+                        label="Description"
+                        multiline
+                        rows={4}
+                        defaultValue=""
+                    />
                 </div>
                 <div>
-                    <TextField id="filled-basic" label="Nachname" variant="filled" />
+                    <Button variant="contained">Speichern</Button>
                 </div>
-                
-                <TextField
-                    id="outlined-multiline-static"
-                    label="Status"
-                    multiline
-                    rows={4}
-                    defaultValue=""
-                />
-                <Button variant="contained">Speichern</Button>
             </div>
+        </div>
+        <div id='notice'>
+            <Alert severity="info">
+            <AlertTitle>Info</AlertTitle>
+                Ihr Statuts wurde aktualisiert<strong></strong>
+            </Alert>
         </div>
         </ThemeProvider>
       </div>

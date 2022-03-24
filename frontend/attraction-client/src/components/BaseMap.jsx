@@ -7,6 +7,27 @@ import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";
 
+let testRoute = [];
+function addToRoute(object)
+{
+  if(testRoute.filter(x => x.properties.id === object.properties.id).length === 0)
+      testRoute.push(object);
+  console.log(testRoute.length);
+}
+async function postRoute()
+{
+  const response = await fetch("http://localhost:5000/route", {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(testRoute),
+          });
+          response.json().then(data => {
+            console.log(data);
+          });
+}
 
 const BaseMap = () => {
     
@@ -145,6 +166,9 @@ const BaseMap = () => {
         // create popup node
         const popupNode = document.createElement("div");
         ReactDOM.render(<Popup feature={feature} />, popupNode);
+        ReactDOM.render(<Button onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
+        if(testRoute.length > 3)
+          ReactDOM.render(<Button onClick={() => postRoute()}>PostRoute</Button>, popupNode);
         // set popup on map
         popUpRef.current
           .setLngLat(feature.geometry.coordinates)

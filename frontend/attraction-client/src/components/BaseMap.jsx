@@ -93,7 +93,7 @@ const BaseMap = () => {
           type: "symbol",
           layout: {
             // full list of icons here: https://labs.mapbox.com/maki-icons
-            "icon-image": "cat", // this will put little croissants on our map
+            "icon-image": "bakery-15", // this will put little croissants on our map
             "icon-padding": 0,
             "icon-allow-overlap": true
           }

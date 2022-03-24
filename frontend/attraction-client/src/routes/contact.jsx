@@ -37,7 +37,7 @@ function Contact(props) {
   });
 
     return (
-      <div id='bild'>
+      <div>
         <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
         <Header/>
         <div id="rand">
@@ -50,14 +50,14 @@ function Contact(props) {
                 aria-label="minimum height"
                 minRows={8}
                 placeholder="Hier schreiben"
-                style={{ width: 1000 }}
+                style={{ width: 300 }}
               />  
             </div>
+            <div>
+              <Button variant="contained">Contained</Button>
+          </div>     
           </div>
           <div>
-              <Button variant="text">Absenden</Button>
-          </div>     
-          <div id='copyright'>
             <h6>Alle Inahlte unterliegen der City2Go gmbh und sind stregstens geschützt. Bei Kopie oder Diebstahl wird dies zur Anzeige gebracht. Alle Daten sind nach der aktuellen DSGVO geschützt und gesichert.</h6>
           </div>
           </div>

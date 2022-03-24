@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import fetchFakeData from "./fetchFakeData";
 import Popup from "./Popup";
-import "./BaseMap.scss";
+import "./styles/BaseMap.scss";
 import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";

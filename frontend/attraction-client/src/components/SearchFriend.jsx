@@ -1,8 +1,5 @@
 import SearchIcon from '@mui/icons-material/Search';
-import { Typography, Button } from '@mui/material';
-import react from 'react';
 import { Grid } from '@mui/material';
-import LinkIcon from '@mui/icons-material/Search'
 
 function SearchFriend (){
 

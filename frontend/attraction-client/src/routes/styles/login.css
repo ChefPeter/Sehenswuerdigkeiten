@@ -18,7 +18,7 @@
 
 #hintergrund{
     height: 100vh;
-    background-image: url(../../public/images/leading-er.png);
+    background-image: url(../../../public/images/leading-er.png);
     background-size: cover;
 } 
 

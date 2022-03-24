@@ -7,14 +7,13 @@ import CheckIcon from '@mui/icons-material/Check';
 import RemoveIcon from '@mui/icons-material/Remove';
 
 
-
 function IncomingRequest(props) {
   
   
     return (
       <div>
         
-        <ListItem sx={{maxWidth: 400, border: "solid 1px", marginBottom: 1.5}} id="listItem" alignItems="flex-start">
+        <ListItem sx={{maxWidth: 400, border: "solid 0.5px", marginBottom: 1.5}} id="listItem" alignItems="flex-start">
           <ListItemAvatar>
               <PersonIcon />
           </ListItemAvatar>

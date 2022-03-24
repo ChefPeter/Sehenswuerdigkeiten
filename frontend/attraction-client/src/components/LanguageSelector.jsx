@@ -4,6 +4,7 @@ import { useEffect } from "react/cjs/react.production.min";
 import { connect } from "react-redux";
 import store from "../reducers/store";
 import { useSelector } from "react-redux";
+import "./styles/languageselect.css"
 
 
 function LanguageSelector() {
@@ -27,7 +28,7 @@ function LanguageSelector() {
 
     return(
      <Box >
-      <FormControl fullWidth>
+      <FormControl id="languageSelectorStyle" >
         <InputLabel id="demo-simple-select-label">Language</InputLabel>
         <Select
          

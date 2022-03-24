@@ -21,6 +21,16 @@ async function getBestRoute(request) {
     const matrix = [...Array(l)].map(e => Array(l).fill(0));
     for (let i = 0; i < l; i++) {
         for (let x = i+1; x < l; x++) {
+            const distance = getDistance(p[i].geometry, p[x].geometry);
+            matrix[i][x] = distance;
+            matrix[x][i] = distance;
+        }
+    }
+    return tsp(matrix).map(e => p[e]);
+
+    // Gefährlich wegen ban auf mapbox -> 
+    /*for (let i = 0; i < l; i++) {
+        for (let x = i+1; x < l; x++) {
             const url = `https://api.mapbox.com/directions/v5/mapbox/${request.query.vehicle}/${p[i].geometry[0]},${p[i].geometry[1]};${p[x].geometry[0]},${p[x].geometry[1]}?access_token=${process.env.MAPBOX_API_KEY}`;
             const response = await fetch(url);
             const json = await response.json();
@@ -28,16 +38,8 @@ async function getBestRoute(request) {
             matrix[i][x] = distance;
             matrix[x][i] = distance;
         }
-    }
+    }*/
     
-    // https://api.mapbox.com/directions/v5/mapbox/driving/-122.42,37.78;-77.03,38.91?access_token=
-    
-
-    console.log(tsp(matrix).map(e => p[e]));
-
-    //matrix.forEach(e => console.log(e))
-
-    return null;
 }
 
 function tsp(matrix) {
@@ -67,5 +69,22 @@ function tsp(matrix) {
     }
     return cycle;
 }
+
+function rad(x) {
+    return x * Math.PI / 180;
+};
+
+// Harversine distance
+function getDistance(p1, p2) {
+    const R = 6378137; // Radius der Erde
+    const dLat = rad(p2[0] - p1[0]);
+    const dLong = rad(p2[1] - p1[1]);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(rad(p1[0])) * Math.cos(rad(p2[0])) *
+        Math.sin(dLong / 2) * Math.sin(dLong / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c;
+    return d;
+};
 
 module.exports = getBestRoute;

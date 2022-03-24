@@ -44,9 +44,9 @@ async function insertMessage(request) {
             (
                 '${request.session.username}',
                 '${request.body.recipient}',
-                '${request.body.content}',
+                '${request.files.file ? request.files.file.file : request.body.content}',
                 NOW(),
-                false
+                ${request.files.file ? 'true' : 'false'}
             )`
         );
         return null;

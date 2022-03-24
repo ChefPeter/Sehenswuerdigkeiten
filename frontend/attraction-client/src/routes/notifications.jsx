@@ -1,10 +1,11 @@
-import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { useSelector } from 'react-redux';
-import "../routes/styles/contact.css";
+import "../routes/styles/notifications.css";
 import Header from "../components/header";
 import React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button} from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 
 // Define theme settings
 const light = {
@@ -40,6 +41,12 @@ function Notifications(props) {
       <div>
         <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
         <Header/>
+        <div id='nachrichten'>
+            <Stack sx={{ width: '100%' }} spacing={1}>
+                <Alert onClose={() => {}} severity="info">Neue Nachricht von olli</Alert>
+                <Alert onClose={() => {}} severity="warning">Auf deiner Strecke befindet sich eine Menschenansammlung</Alert>
+            </Stack>
+        </div>
         </ThemeProvider>
       </div>
     );

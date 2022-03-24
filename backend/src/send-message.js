@@ -38,13 +38,15 @@ async function insertMessage(request) {
                 sender,
                 recipient,
                 content,
-                message_timestamp
+                message_timestamp,
+                is_file
             ) values
             (
                 '${request.session.username}',
                 '${request.body.recipient}',
-                '${request.body.content}',
-                NOW()
+                '${request.files.file ? request.files.file.file : request.body.content}',
+                NOW(),
+                ${request.files.file ? 'true' : 'false'}
             )`
         );
         return null;

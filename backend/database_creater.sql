@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS messages (
     recipient VARCHAR(100),
     message_timestamp datetime,
     content VARCHAR(10000),
+    is_file boolean,
     FOREIGN KEY (sender) REFERENCES users(username),
     FOREIGN KEY (recipient) REFERENCES users(username)
 );

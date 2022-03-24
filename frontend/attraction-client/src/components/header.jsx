@@ -105,16 +105,7 @@ function sayHello(){
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem >
-        <div>
-        <Paper  onClick={sayHello()} sx={{
-          width: 120,
-          height: 5
-        }}>  <IconButton sx={{ ml: 1 }}  color="inherit">
-         <AccountCircleIcon />
-        </IconButton>Profile</Paper>
-        </div>
-      </MenuItem>
+      
 
       <MenuItem><Dark_Mode></Dark_Mode></MenuItem>
 
@@ -123,55 +114,6 @@ function sayHello(){
     
     </Menu>
     
-  );
-
-  const mobileMenuId = 'primary-search-account-menu-mobile';
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      
-      <MenuItem>
-        <IconButton
-          size="large"
-          color="inherit"
-        >
-          <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem>
-
-      <MenuItem> <Dark_Mode></Dark_Mode></MenuItem>
-
-      <MenuItem><LanguageSelector></LanguageSelector></MenuItem>
-      
-    </Menu>
   );
 
   return (
@@ -198,45 +140,10 @@ function sayHello(){
             />
           </Search>
           
-          <Box sx={{ flexGrow: 1 }} />
-         
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-            >
-              <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
-          </Box>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
-          </Box>
+          
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
+     
       {renderMenu}
       
     </Box>

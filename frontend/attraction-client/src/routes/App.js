@@ -8,6 +8,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import React from "react";
 import BaseMap from '../components/BaseMap';
 
+const API_KEY = "5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752";
+
 // Define theme settings
 const light = {
   palette: {
@@ -21,8 +23,6 @@ const dark = {
     mode: "dark",
   },
 };
-
-
 
 
 function App(props) {
@@ -42,7 +42,13 @@ function App(props) {
     }
   });
 
-  async function getDataFromAPI(url)
+
+  function getURL(method, radius, lat, lon, limit)
+  {
+    return `https://api.opentripmap.com/0.1/en/places/${method}?apikey=${API_KEY}&radius=${radius}&limit=${limit}&offset=0&lon=${lon}&lat=${lat}&rate=2&format=json`;
+  }
+
+  async function getDataFromURL(url)
   {
     let result = await fetch(url);
     let answer = null;
@@ -51,19 +57,16 @@ function App(props) {
     return answer;
   }
 
-  async function enter()
+  async function getDataFromAPI()
   {
-      const URL = "https://heritage.toolforge.org/api/api.php?action=search&srcountry=fr&srlang=fr&srmunicipality=[[Aix-en-Provence]]&format=json";
-      let result = getDataFromAPI(URL);
+      let result = await getDataFromURL(getURL("radius", 10000, "46.7217851", "11.6615276", 100));
       console.log(result);
   }
-
-
   
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
       <Header/>
-      <Button onClick={() => enter()}>click me for data</Button>
+      <Button onClick={() => getDataFromAPI()}>click me for data</Button>
       <BaseMap />
       <Slider></Slider>
       <a>index</a>

@@ -103,18 +103,17 @@ function Friends(props) {
       <Container id="alignSearchBar" >
         <TextField  fullwidth type="text" id="searchBarFriends" className="filled-basic" label= {<SearchFriend/>} variant="filled" onChange={handleSearchFriendInput} />
         <Button variant="contained" id="searchForFriendBtn" onClick={() => handleAddFriend()}>ADD</Button>
-      </Container>
      
-      { friendRequests.length > 0 ?
+        { friendRequests.length > 0 ?
         <Typography >
           Incoming Requests!
         </Typography>
        : null }
-        
-      
+      </Container>
+     
+     
       {friendRequests.map(e => <IncomingRequest name={e} ></IncomingRequest>)}
 
-      
 
       <div id="freunde">
       

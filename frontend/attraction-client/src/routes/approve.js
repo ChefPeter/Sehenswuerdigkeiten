@@ -3,9 +3,12 @@ import Header from "../components/header";
 import "./start.css";
 import { Button, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 function Approve(props) {
+
+    const navigate = useNavigate();
 
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -18,7 +21,7 @@ function Approve(props) {
         formData.append('email', email);
         formData.append('approved-token', token);
 
-        fetch("http://10.171.155.127:5000/approve", {
+        fetch("http://localhost:5000/approve", {
             method: "post",
             body: formData
         }).then(res => res.text())
@@ -28,7 +31,7 @@ function Approve(props) {
 
     return (
         
-        <Paper variant="outlined" elevation={4}>Deine Email wurde bestätigt!</Paper>
+        <Paper variant="outlined" elevation={4}>Deine Email wurde bestätigt! <Button variant="contained" onClick={() => navigate("/login")}>Zum Login</Button></Paper>
         
     );
   

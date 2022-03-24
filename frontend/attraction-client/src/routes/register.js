@@ -5,13 +5,16 @@ import { Button, TextField, Alert, AlertTitle} from '@mui/material';
 import Header from '../components/header';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {useState , setState} from "react";
+import { useNavigate } from "react-router-dom";
 
 let usernameInput = "";
 let emailInput = "";
 let passwordInput = "";
 let retypePasswordInput = "";
 
-function Login() {
+function Register() {
+
+    const navigate = useNavigate();
 
     const getUsernameValue = (event)=>{
         usernameInput = event.target.value;
@@ -32,37 +35,44 @@ function Login() {
 
   return (
       <div id='hintergrund'>
-          <div id='eingaben'>
+          <div id='titel'>
+        <h1>City2Go</h1>
+      </div>
+      <div id = "textfeld">
+        <div id="widthTextfields">
+          <div id="textFieldsLogin">
 
-              <TextField id="filled-basic" label="Benutzername" variant="filled" onChange={getUsernameValue} />
-              <br></br>
-              <TextField id="filled-basic" label="Email" variant="filled" onChange={getEmailValue} />
-              <br></br>
-              <TextField id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
-              <br></br>
-              <TextField id="filled-password-input" label="Passwort wiederholen" type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} />
-              <br></br>
-              <Button id="knopf" variant="text" onClick={() => post(setErrorText, setShowErrorAlert, setShowInfoAlert)}>Registrieren</Button>
-              <br></br>
-              <Button id='knopf' variant="text"><Link to="/" style={{ textDecoration: 'none' }}>Schon angemeldet?</Link></Button>
-              <br></br>
+              <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-basic" label="Benutzername" variant="filled" onChange={getUsernameValue} />
+             
+              <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-basic" label="Email" variant="filled" onChange={getEmailValue} />
+              
+              <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
+             
+            </div>
+              <TextField fullWidth id="filled-password-input" label="Passwort wiederholen" type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} />
+              
+              <Button fullWidth id="btnLoginPage" variant="conained" onClick={() => post(setErrorText, setShowErrorAlert, setShowInfoAlert)}>Registrieren</Button>
+             
+              <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/")}>Schon angemeldet?</Button>
+              
               <div>
 
                   {showErrorAlert ?
-                      <Alert severity="error">
+                      <Alert id="loginErrorAlert" severity="error">
                           <AlertTitle>Error</AlertTitle>
                           {errorText}
                       </Alert>
                       : null}
 
 
-                  {showInfoAlert ? <Alert false severity="info">
+                  {showInfoAlert ? <Alert id="loginErrorAlert" false severity="info">
                       <AlertTitle>Info</AlertTitle>
                       Eine Bestätigungsemail wurde versandt — <strong>Checke dein Postfach</strong>
                   </Alert> : null}
-
+                    </div>
+            </div>
               </div>
-          </div>
+          
 
       </div>
   );
@@ -76,8 +86,8 @@ function post (setErrorText, setShowErrorAlert, setShowInfoAlert){
     formData.append('email', emailInput);
     formData.append('password', passwordInput);
     formData.append('repeat-password', retypePasswordInput);
-
-    fetch("http://10.171.155.127:5000/register", {
+    console.log("hdahhq")
+    fetch("http://localhost:5000/register", {
         method: "post",
         body: formData
     }).then(res => {
@@ -95,4 +105,4 @@ function post (setErrorText, setShowErrorAlert, setShowInfoAlert){
 
 }
 
-export default Login;
+export default Register;

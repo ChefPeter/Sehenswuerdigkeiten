@@ -103,10 +103,13 @@ const BaseMap = () => {
       
     map.on("moveend", async () => {
       // get new center coordinates
-      const lng=coordinates[1];
-      const lat=coordinates[0];
+      let lon=coordinates[1];
+      let lat=coordinates[0];
+      /*lon = "12.4907795";
+      lat = "41.8897653"*/
       // fetch new data
-      const results = await fetchFakeData({ longitude: lng, latitude: lat });
+      const results = await fetchFakeData({ longitude: lon, latitude: lat });
+      console.log(results);
       // update "random-points-data" source with new data
       // all layers that consume the "random-points-data" data source will be updated automatically
       map.getSource("random-points-data").setData(results);

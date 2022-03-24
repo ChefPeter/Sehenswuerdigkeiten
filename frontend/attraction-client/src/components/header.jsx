@@ -65,11 +65,6 @@ export default function Header() {
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
 
   const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null);
@@ -78,10 +73,6 @@ export default function Header() {
   const handleMenuClose = () => {
     setAnchorEl(null);
     handleMobileMenuClose();
-  };
-
-  const handleMobileMenuOpen = (event) => {
-    setMobileMoreAnchorEl(event.currentTarget);
   };
 
 function sayHello(){
@@ -106,12 +97,10 @@ function sayHello(){
       onClose={handleMenuClose}
     >
       
-
       <MenuItem><Dark_Mode></Dark_Mode></MenuItem>
 
       <MenuItem><LanguageSelector></LanguageSelector></MenuItem>
       
-    
     </Menu>
     
   );

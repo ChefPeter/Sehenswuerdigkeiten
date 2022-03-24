@@ -54,7 +54,7 @@ function Contact(props) {
               />  
             </div>
             <div>
-              <Button variant="contained">Contained</Button>
+              <Button variant="contained">Absenden</Button>
           </div>     
           </div>
           <div>

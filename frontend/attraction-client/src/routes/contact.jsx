@@ -58,7 +58,7 @@ function Contact(props) {
           </div>     
           </div>
           <div>
-            <h6>Alle Inahlte unterliegen der City2Go gmbh und sind stregstens geschützt. Bei Kopie oder Diebstahl wird dies zur Anzeige gebracht. Alle Daten sind nach der aktuellen DSGVO geschützt und gesichert.</h6>
+            <h6>Alle Inahlte unterliegen der City2Go GmbH und sind stregstens geschützt. Bei Kopie oder Diebstahl wird dies zur Anzeige gebracht. Alle Daten sind nach der aktuellen DSGVO geschützt und gesichert.</h6>
           </div>
           </div>
         </ThemeProvider>

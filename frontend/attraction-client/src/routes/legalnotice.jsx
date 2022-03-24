@@ -17,7 +17,7 @@ const dark = {
   },
 };
 
-function Impressum(props) {
+function LegalNotice(props) {
 
   const theme = useSelector(state => {
     try{
@@ -86,4 +86,4 @@ function Impressum(props) {
     );
   
 }
-export default Impressum;
+export default LegalNotice;

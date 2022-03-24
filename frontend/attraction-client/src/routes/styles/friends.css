@@ -1,12 +1,13 @@
 #alignSearchBar{
     margin-top: 15px;
-    margin-left: 0px;
+    margin-left: 16px;
+    width: calc(100vw - 16px);
 }
 
 #searchBarFriends{
-    width: 30vw;
-    min-width: 200px;
-    
+    width: 35vw;
+    min-width: 225px;
+    max-width: 95vw;
 }
 
 #searchForFriendBtn{
@@ -17,3 +18,9 @@
     margin-bottom: 20px;
 }
 
+@media only screen and (max-width: 600px) {
+    #searchBarFriends {
+      width: 66vw;
+      min-width: 150px;
+    }
+  }

@@ -48,7 +48,6 @@ function Home(props) {
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
       <Header/>
       <BaseMap />
-      <Footer />
     </ThemeProvider>
     );
   

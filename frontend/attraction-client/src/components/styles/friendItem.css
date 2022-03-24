@@ -6,13 +6,12 @@
 
 #listItem{
     margin-left: 15px;
-    margin-right: 150px;
     margin-top: 5px;
     border-radius: 8px;
+    width: calc(100vw - 30px);
 }
 
 
 #buttonRemoveFriend{
-  
    color: red;
 }

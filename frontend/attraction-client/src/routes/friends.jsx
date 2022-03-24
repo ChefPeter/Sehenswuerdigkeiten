@@ -3,11 +3,15 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import List from '@mui/material/List';
 import "./styles/friends.css";
-import { Button, Container, TextField, Typography } from "@mui/material";
+import { Button, Container, TextField, Typography, LinearProgress, Box } from "@mui/material";
 import FriendItem from "../components/FriendItem";
 import SearchFriend from "../components/SearchFriend";
 import IncomingRequest from "../components/IncomingRequest";
 import "./styles/friends.css";
+import ErrorSnackbar from "../components/ErrorSnackbar";
+import SuccessSnackbar from "../components/SuccessSnackbar";
+import { Snackbar, Alert } from "@mui/material";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 let searchFriendInput = "";
 // Define theme settings
@@ -33,6 +37,11 @@ function Friends(props) {
   const [friendRequests, setFriendRequests] = useState([]);
   const [triedToFetch, setTriedToFetch] = useState(false);
   const [profilePicture, setProfilePicture] = useState();
+  const [showLoadingBar, setShowLoadingBar] = useState(true);
+  const [openSuccessSnack, setOpenSuccessSnack] = useState(false);
+  const [openErrorSnack, setOpenErrorSnack] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("Success");
+  const [errorMessage, setErrorMessage] = useState("Error");
 
 
   useEffect(async() => {
@@ -42,7 +51,7 @@ function Friends(props) {
     if(!triedToFetch){
 
       setTriedToFetch(true)
-
+      console.log("dwq")
       const resultFriends = await fetch("http://localhost:5000/friends", {
         method: "get",
         credentials: 'include'
@@ -51,7 +60,7 @@ function Friends(props) {
       let friends = (await resultFriends.json());
       let users = [];
 
-      let profilePictures = [];
+     /* let profilePictures = [];
       for(let i = 0; i<friends.length; i++){
 
         const fileProfilePicture = await fetch("http://localhost:5000/profile-picture?"+new URLSearchParams({friend: friends[i]}), {
@@ -59,23 +68,26 @@ function Friends(props) {
           credentials: 'include'
         });
 
-
-
         let file = (await fileProfilePicture); //.blob()
-
+        
         if(file.status === 200){
           console.log("no profile")
-          file = "NO";
+          file = "/broken-image.jpg";
         }else{
           file = file.blob();
-          file = URL.createObjectURL(file);
+          try{
+            file = URL.createObjectURL(file);
+          }catch (e){
+            file="/broken-image.jpg";
+          }
         }
-        
+        console.log("NO")
         profilePictures.push(file);
 
       }
-      setProfilePicture(profilePictures);
-
+      
+      console.log(profilePictures)
+      */ 
       for(let i = 0; i<friends.length; i++){
 
         const resultDescription = await fetch("http://localhost:5000/description?"+new URLSearchParams({username:friends[i]}).toString(), {
@@ -106,75 +118,107 @@ function Friends(props) {
 
       setFriendRequests(friendRequests)
       setFriendsName(users);
+     // setProfilePicture(profilePictures);
+      setShowLoadingBar(false)
 
 
     }
 
   });
   
- 
 
   const handleSearchFriendInput = (event)=>{
     searchFriendInput = event.target.value;
   };
 
+  const handleCloseErrorSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenErrorSnack(false);
+  };
+  const handleCloseSuccessSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
   
+    setOpenSuccessSnack(false);
+  };
+
     return (
       <ThemeProvider theme={createTheme(light)}>
 
       <Header/>
 
-      <Container id="alignSearchBar" >
-        <TextField  fullwidth type="text" id="searchBarFriends" className="filled-basic" label= {<SearchFriend/>} variant="filled" onChange={handleSearchFriendInput} />
-        <Button variant="contained" id="searchForFriendBtn" onClick={() => handleAddFriend()}>ADD</Button>
-     
+      { showLoadingBar ? 
+      <LinearProgress color="inherit"/>
+        : null}
+
+      
+      <div id="alignSearchBar">
+      
+      <TextField
+        id="searchBarFriends"
+        type="text"
+        label="Search friend"
+        variant="filled"
+        onChange={handleSearchFriendInput}
+        InputProps={{endAdornment: <Button onClick={() => handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage)}><PersonAddIcon/></Button>}}
+      />
+
         { friendRequests.length > 0 ?
         <Typography >
           Incoming Requests!
         </Typography>
        : null }
-      </Container>
+
+      </div>
      
      
       {friendRequests.map(e => <IncomingRequest name={e} ></IncomingRequest>)}
 
 
-      <div id="freunde">
+      <div id="freunde" >
       
         <List>
 
-          {friendsName.map((e,i) =>  <FriendItem name={e.name} description={e.description} key={e.name} profilePicture={profilePicture[i]}></FriendItem>)}
+          {friendsName.map((e,i) =>  <FriendItem name={e.name} description={e.description} key={e.name} profilePicture={/*profilePicture[i]*/"/broken-image.jpg"}></FriendItem>)}
          
         </List>
         
       </div>
+
+      <ErrorSnackbar openErrorSnack={openErrorSnack} errorMessage={errorMessage} handleClose={handleCloseErrorSnackbar} ></ErrorSnackbar>
+      <SuccessSnackbar openSuccessSnack={openSuccessSnack} successMessage={successMessage} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
+      
     </ThemeProvider>
     );
   
 }
 
-function handleAddFriend(){
+
+function handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage){
 
   console.log(searchFriendInput);
 
+  setOpenErrorSnack(false);
+  setOpenSuccessSnack(false);
+
   let formData = new FormData();
   formData.append('friend', searchFriendInput);
-  
 
   fetch("http://localhost:5000/add-friend", {
       method: "post",
       body: formData,
       credentials: 'include'
   }).then(res => {
-      if (res.status == 400) {
-        res.text().then(e => console.log(e))
-         // res.text().then(e => setErrorText(e));
-         // setShowErrorAlert(true);
+      if (res.status == 400 || res.status === 401) {
+          res.text().then(e =>  setErrorMessage(e))
+          setOpenErrorSnack(true);
       } else {
           // Infofeld sichtbar machen
-         console.log("JAWOLL")
-         
-         
+         setSuccessMessage("Friend request sent!");
+         setOpenSuccessSnack(true);
       }
   });
 

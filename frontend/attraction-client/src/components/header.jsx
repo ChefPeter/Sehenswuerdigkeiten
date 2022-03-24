@@ -105,8 +105,10 @@ function sayHello(){
           
           <Sidebar></Sidebar>
           <Typography
+            id="headText"
             variant="h6"
             noWrap
+            focusable="false"
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
           >

@@ -21,6 +21,7 @@ import { Link } from "react-router-dom";
 import Dark_Mode from './dark_mode';
 import LanguageSelector from './LanguageSelector';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import PolicyIcon from '@mui/icons-material/Policy';
 
 export default function SwipeableTemporaryDrawer() {
   const [state, setState] = React.useState({
@@ -52,41 +53,47 @@ export default function SwipeableTemporaryDrawer() {
       
       <List>
         
+          
           <ListItem button  component={Link} to="/home">
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Home"} />
-          </ListItem>
-          <ListItem button  component={Link} to="/explore">
             <ListItemIcon>
               <TravelExploreIcon />
             </ListItemIcon>
-            <ListItemText primary={"Explore"} />
+            <ListItemText primary={"Home"} />
           </ListItem>
+
           <ListItem button  component={Link} to="/groups">
             <ListItemIcon>
               <GroupIcon />
             </ListItemIcon>
             <ListItemText primary={"Groups"} />
           </ListItem>
+
           <ListItem button  component={Link} to="/friends">
             <ListItemIcon>
             <PersonAddIcon />
             </ListItemIcon>
             <ListItemText primary={"Friends"} />
           </ListItem>
+
           <ListItem button  component={Link} to="/notifications">
             <ListItemIcon>
             <NotificationsIcon />
             </ListItemIcon>
             <ListItemText primary={"Notifications"} />
           </ListItem>
+
           <ListItem button  component={Link} to="/contact">
             <ListItemIcon>
               <ContactPageIcon />
             </ListItemIcon>
             <ListItemText primary={"Contact"} />
+          </ListItem>
+
+          <ListItem button  component={Link} to="/legalnotice">
+            <ListItemIcon>
+              <PolicyIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Legal Notice"} />
           </ListItem>
         
       </List>

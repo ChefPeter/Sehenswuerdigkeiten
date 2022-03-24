@@ -21,7 +21,7 @@ import Approve from './routes/approve';
 import RequestReset from "./routes/requestReset"
 import ResetPassword from './routes/reset-password';
 import Profile from './routes/profile';
-import Impressum from './routes/impressum';
+import LegalNotice from './routes/legalnotice';
 
 const rootElement = document.getElementById("root");
 
@@ -47,7 +47,7 @@ const Routing = () => {
       <Route path="requestReset" element={<RequestReset/>}/>
       <Route path="reset-password" element={<ResetPassword/>}/>
       <Route path="profile" element={<Profile />}></Route>
-      <Route path='impressum' element={<Impressum></Impressum>}></Route>
+      <Route path='legalnotice' element={<LegalNotice></LegalNotice>}></Route>
 
     </Routes>
 

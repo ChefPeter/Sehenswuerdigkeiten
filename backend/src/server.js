@@ -8,6 +8,7 @@ const addFriend = require("./add-friend");
 const rejectFriend = require("./reject-friend");
 const sendMessage = require("./send-message");
 const changeDescription = require("./change-description");
+const changeProfilePicture = require("./change-profile-picture");
 
 const getDescription = require("./get-description");
 const getFriends = require("./get-friends");
@@ -26,7 +27,7 @@ const app = express();
 // Middleware für den Fileupload
 busboy.extend(app, {
     upload: true,
-    path: path.join(__dirname, 'uploads'),
+    path: path.join("./", 'uploads'),
     allowedPath: /./,
 });
 
@@ -65,6 +66,8 @@ app.post("/add-friend", isAuthenticated, async(req, res) => sendResponse(await a
 app.post("/reject-friend", isAuthenticated, async(req, res) => sendResponse(await rejectFriend(req), res));
 app.post("/sendMessage", isAuthenticated, async(req, res) => sendResponse(await sendMessage(req), res));
 app.post("/change-description", isAuthenticated, async(req, res) => sendResponse(await changeDescription(req), res));
+app.post("/change-profile-picture", isAuthenticated, async(req, res) => sendResponse(await changeProfilePicture(req), res));
+
 
 // GET REQUESTS
 app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req), res));

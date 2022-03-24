@@ -78,6 +78,7 @@ app.get("/logged-in", (req, res) => req.session.username ? res.status(200).send(
 app.get("/pending-friends", isAuthenticated, async (req, res) => sendGetResponse(await getPendingFriends(req), res));
 app.get("/profile-picture", isAuthenticated, async (req, res) => await getProfilePicture(req, res));
 app.get("/file", isAuthenticated, async (req, res) => await getFile(req, res));
+app.get("/username", isAuthenticated, (req, res) => res.status(200).send(req.session.username));
 //app.get("/logged-in", (req, res) => res.send(req.session));
 
 

@@ -42,31 +42,9 @@ function App(props) {
     }
   });
 
-
-  function getURL(method, radius, lat, lon, limit)
-  {
-    return `https://api.opentripmap.com/0.1/en/places/${method}?apikey=${API_KEY}&radius=${radius}&limit=${limit}&offset=0&lon=${lon}&lat=${lat}&rate=2&format=json`;
-  }
-
-  async function getDataFromURL(url)
-  {
-    let result = await fetch(url);
-    let answer = null;
-    if(result.ok)
-      answer = await result.json();
-    return answer;
-  }
-
-  async function getDataFromAPI()
-  {
-      let result = await getDataFromURL(getURL("radius", 10000, "46.7217851", "11.6615276", 100));
-      console.log(result);
-  }
-  
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
       <Header/>
-      <Button onClick={() => getDataFromAPI()}>click me for data</Button>
       <BaseMap />
       <Slider></Slider>
       <a>index</a>

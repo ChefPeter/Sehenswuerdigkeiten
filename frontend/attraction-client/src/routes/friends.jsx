@@ -60,7 +60,7 @@ function Friends(props) {
       let friends = (await resultFriends.json());
       let users = [];
 
-     /* let profilePictures = [];
+      let profilePictures = [];
       for(let i = 0; i<friends.length; i++){
 
         const fileProfilePicture = await fetch("http://localhost:5000/profile-picture?"+new URLSearchParams({friend: friends[i]}), {
@@ -70,24 +70,24 @@ function Friends(props) {
 
         let file = (await fileProfilePicture); //.blob()
         
-        if(file.status === 200){
+        if(file.status === 400){
           console.log("no profile")
           file = "/broken-image.jpg";
         }else{
-          file = file.blob();
+         
+          file = await file.blob();
           try{
             file = URL.createObjectURL(file);
           }catch (e){
             file="/broken-image.jpg";
           }
         }
-        console.log("NO")
+        
         profilePictures.push(file);
 
       }
       
-      console.log(profilePictures)
-      */ 
+      
       for(let i = 0; i<friends.length; i++){
 
         const resultDescription = await fetch("http://localhost:5000/description?"+new URLSearchParams({username:friends[i]}).toString(), {
@@ -118,7 +118,7 @@ function Friends(props) {
 
       setFriendRequests(friendRequests)
       setFriendsName(users);
-     // setProfilePicture(profilePictures);
+      setProfilePicture(profilePictures);
       setShowLoadingBar(false)
 
 
@@ -173,8 +173,8 @@ function Friends(props) {
        : null }
 
       </div>
-     
-     
+
+      
       {friendRequests.map(e => <IncomingRequest name={e} ></IncomingRequest>)}
 
 
@@ -182,7 +182,7 @@ function Friends(props) {
       
         <List>
 
-          {friendsName.map((e,i) =>  <FriendItem name={e.name} description={e.description} key={e.name} profilePicture={/*profilePicture[i]*/"/broken-image.jpg"}></FriendItem>)}
+          {friendsName.map((e,i) =>  <FriendItem name={e.name} description={e.description} key={e.name} profilePicture={profilePicture ? profilePicture[i] : null}></FriendItem>)}
          
         </List>
         

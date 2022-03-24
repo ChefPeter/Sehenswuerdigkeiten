@@ -1,0 +1,16 @@
+#container {
+    width: 100vw;
+    height: 90.9vh;
+    position: relative;
+   
+}
+
+  #navi,
+  #infoi {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  #infoi {
+    z-index: 10;
+  }

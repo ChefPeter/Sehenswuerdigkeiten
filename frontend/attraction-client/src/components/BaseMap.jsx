@@ -77,6 +77,7 @@ const BaseMap = () => {
 
     const nav = new mapboxgl.NavigationControl();
     map.addControl(nav, "top-right");
+    map.addControl(new mapboxgl.ScaleControl({position: 'bottom-right'}));
     const geolocate = new mapboxgl.GeolocateControl({
         positionOptions: {
           enableHighAccuracy: true

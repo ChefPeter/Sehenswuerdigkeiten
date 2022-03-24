@@ -24,7 +24,8 @@ async function getProfilePicture(req, res) {
             console.log(result[0]);
 
         if(result[0].p == null) {
-            res.status(200).send("No profile picture!");
+            console.log("dwqdwq")
+            res.status(400).send("No profile picture!");
             return;
         } 
 

@@ -4,7 +4,9 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSelector } from 'react-redux';
 import BaseMap from '../components/BaseMap';
 import React, { useState, useEffect } from 'react';
-import Footer from "../components/footer";
+import { Card } from "@mui/material";
+import "./styles/home.css"
+import MapSearch from "../components/MapSearch";
 
 // Define theme settings
 const light = {
@@ -47,7 +49,13 @@ function Home(props) {
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
       <Header/>
-      <BaseMap />
+      <Card id="container">
+        <BaseMap />
+        <div id="navi"><MapSearch></MapSearch></div>
+      </Card>
+      
+  
+
     </ThemeProvider>
     );
   

@@ -10,7 +10,6 @@ import {
 import Home from "./routes/home";
 import Login from "./routes/login";
 import Register from "./routes/register";
-import Explore from "./routes/explore";
 import Groups from "./routes/groups";
 import Friends from "./routes/friends";
 import Notifications from "./routes/notifications";
@@ -22,6 +21,7 @@ import RequestReset from "./routes/requestReset"
 import ResetPassword from './routes/reset-password';
 import Profile from './routes/profile';
 import LegalNotice from './routes/legalnotice';
+import Chat from './routes/chat';
 
 const rootElement = document.getElementById("root");
 
@@ -38,7 +38,6 @@ const Routing = () => {
       <Route path="app" element={<App /> }/>
       <Route path="home" element={<Home /> } />
       <Route path="register" element={<Register />} />
-      <Route path="explore" element={<Explore />} />
       <Route path="groups" element={<Groups />} />
       <Route path="friends" element={<Friends />} />
       <Route path="notifications" element={<Notifications />} />
@@ -48,6 +47,7 @@ const Routing = () => {
       <Route path="reset-password" element={<ResetPassword/>}/>
       <Route path="profile" element={<Profile />}></Route>
       <Route path='legalnotice' element={<LegalNotice></LegalNotice>}></Route>
+      <Route path='chat' element={<Chat></Chat>}></Route>
 
     </Routes>
 

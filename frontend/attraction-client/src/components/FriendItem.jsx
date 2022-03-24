@@ -5,33 +5,14 @@ import { useState } from "react";
 import ClearIcon from '@mui/icons-material/Clear';
 import "./styles/friendItem.css";
 import { useEffect } from "react/cjs/react.production.min";
-
+import { useNavigate } from "react-router-dom";
 
 function FriendItem(props) {
   
-  const [showDescription, setShowDescription] = useState(false);
-  //const [profilePicture, setProfilePicture] = useState(); 
- // const [usedEffect, setUsedEffect] = useState(false);
-
- 
-    
-    /*
-    if(!usedEffect){
-      //fetch friend requests
-
-      const fileProfilePicture = await fetch("http://localhost:5000/profile-picture?"+new URLSearchParams({friend: props.name}), {
-        method: "get",
-        credentials: 'include'
-      });
-
-
-      let file = (await fileProfilePicture.blob());
-    
-      setProfilePicture(URL.createObjectURL(file));
-      setUsedEffect(true);
-
-    }*/
-
+    const navigate = useNavigate();
+    const [showDescription, setShowDescription] = useState(false);    
+  
+    console.log("prop" + props.profilePicture)
   
 
     return (
@@ -63,7 +44,7 @@ function FriendItem(props) {
       {showDescription ? 
       <Card id="friendCard"> 
         
-        <Button variant="conatined" onClick={() => handleOpenChat()}>Open Chat</Button> 
+        <Button variant="conatined" onClick={() => navigate("/chat")}>Open Chat</Button> 
         <Button variant="conatined" onClick={() => handleFollowPosition()}>Follow Position</Button> 
         <Button variant="conatined" onClick={() => handleReport()}>Report</Button>
         <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleRemoveFriend(props.name)}><ClearIcon/></Button>
@@ -78,9 +59,6 @@ function FriendItem(props) {
   
 }
 
-function handleOpenChat(){
-
-}
 
 function handleReport(){
 

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import Header from "../components/header";
-import "./start.css";
+import "./styles/start.css";
 import { Button, Slider, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSelector } from 'react-redux';

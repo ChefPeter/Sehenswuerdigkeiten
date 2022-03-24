@@ -1,10 +1,9 @@
 import Header from "../components/header";
-import "./start.css";
+import "./styles/start.css";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSelector } from 'react-redux';
 import BaseMap from '../components/BaseMap';
 import React, { useState, useEffect } from 'react';
-import { Button } from "@mui/material";
 import Footer from "../components/footer";
 
 // Define theme settings

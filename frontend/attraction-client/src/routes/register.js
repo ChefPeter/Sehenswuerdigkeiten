@@ -1,9 +1,6 @@
-import './App.css';
-import "./register.css";
-import { Link } from "react-router-dom";
+import './styles/start.css';
+import "./styles/register.css";
 import { Button, TextField, Alert, AlertTitle} from '@mui/material';
-import Header from '../components/header';
-import DeleteIcon from '@mui/icons-material/Delete';
 import {useState , setState} from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -101,8 +98,6 @@ function post (setErrorText, setShowErrorAlert, setShowInfoAlert){
             setShowInfoAlert(true);
         }
     });
-
-
 }
 
 export default Register;

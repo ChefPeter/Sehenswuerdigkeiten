@@ -4,7 +4,6 @@ import Header from "../components/header";
 import React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 
 // Define theme settings

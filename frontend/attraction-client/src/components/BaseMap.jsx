@@ -6,14 +6,12 @@ import "./BaseMap.scss";
 import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";
-import useState from "react";
-import setState from "react";
 
 
 const BaseMap = () => {
     
  
-    let theme = "mapbox://styles/mapbox/navigation-night-v1"
+    let theme = "mapbox://styles/mapbox/satellite-v9"
 
    /* useSelector(state => {
         try{

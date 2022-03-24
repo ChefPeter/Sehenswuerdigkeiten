@@ -1,5 +1,5 @@
 import Header from "../components/header";
-import "./start.css";
+import "./styles/start.css";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSelector } from 'react-redux';
 import React from "react";

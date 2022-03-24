@@ -1,6 +1,5 @@
 import { Link, useSearchParams } from "react-router-dom";
-import Header from "../components/header";
-import "./start.css";
+import "./styles/start.css";
 import { Button, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";

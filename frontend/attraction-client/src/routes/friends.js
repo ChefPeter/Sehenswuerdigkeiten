@@ -1,10 +1,9 @@
 import Header from "../components/header";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useSelector } from 'react-redux';
 import React, { useEffect, useState } from "react";
 import List from '@mui/material/List';
-import "../routes/friends.css";
-import { Accordion, Button, Container, Divider, TextField, Typography } from "@mui/material";
+import "./styles/friends.css";
+import { Button, Container, TextField, Typography } from "@mui/material";
 import FriendItem from "../components/FriendItem";
 import SearchFriend from "../components/SearchFriend";
 import IncomingRequest from "../components/IncomingRequest";

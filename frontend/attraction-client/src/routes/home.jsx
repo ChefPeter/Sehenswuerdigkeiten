@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import BaseMap from '../components/BaseMap';
 import React, { useState, useEffect } from 'react';
 import { Button } from "@mui/material";
-
+import Footer from "../components/footer";
 
 // Define theme settings
 const light = {
@@ -31,8 +31,6 @@ function Home(props) {
   });
   
 
-
-
   const theme = useSelector(state => {
     try{
       return state.theme;
@@ -50,13 +48,14 @@ function Home(props) {
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
       <Header/>
-      <Button onClick={() => handle()}>check</Button>
       <BaseMap />
+      <Footer />
     </ThemeProvider>
     );
   
 }
 
+//checks if logged in
 function handle(){
   fetch("http://localhost:5000/logged-in", {
     method: "GET",

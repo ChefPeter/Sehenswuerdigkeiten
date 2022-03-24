@@ -23,6 +23,8 @@ const dark = {
 };
 
 
+
+
 function App(props) {
  
   const theme = useSelector(state => {
@@ -40,15 +42,35 @@ function App(props) {
     }
   });
 
+  async function getDataFromAPI(url)
+  {
+    let result = await fetch(url);
+    let answer = null;
+    if(result.ok)
+      answer = await result.json();
+    return answer;
+  }
+
+  async function enter()
+  {
+      const URL = "https://heritage.toolforge.org/api/api.php?action=search&srcountry=fr&srlang=fr&srmunicipality=[[Aix-en-Provence]]&format=json";
+      let result = getDataFromAPI(URL);
+      console.log(result);
+  }
+
+
+  
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
       <Header/>
+      <Button onClick={() => enter()}>click me for data</Button>
       <BaseMap />
       <Slider></Slider>
       <a>index</a>
       <Link to="/start">Start</Link>
       <Button variant="contained" >Hello World</Button>;
       <Button variant="contained"   endIcon={<DeleteIcon/>}>
+     
         Send
       </Button>
     </ThemeProvider>

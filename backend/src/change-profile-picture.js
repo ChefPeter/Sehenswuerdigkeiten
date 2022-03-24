@@ -27,7 +27,7 @@ async function insertPicture(username, file) {
         const query = util.promisify(conn.query).bind(conn);
         const result = await query(
             `UPDATE users
-                SET profile_picture='${file.file}'
+                SET profile_picture='${file.file.replace(/\\/g, "\\\\")}'
                 WHERE username='${username}'`
         );
         return null;

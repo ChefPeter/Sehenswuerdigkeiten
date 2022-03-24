@@ -107,6 +107,7 @@ const BaseMap = () => {
       const lat=coordinates[0];
       // fetch new data
       const results = await fetchFakeData({ longitude: lng, latitude: lat });
+      console.log(results)
       // update "random-points-data" source with new data
       // all layers that consume the "random-points-data" data source will be updated automatically
       map.getSource("random-points-data").setData(results);

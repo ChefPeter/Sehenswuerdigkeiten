@@ -13,7 +13,7 @@ import setState from "react";
 const BaseMap = () => {
     
  
-    let theme = "mapbox://styles/mapbox/navigation-night-v1"
+    let theme = "mapbox://styles/mapbox/satellite-v9"
 
    /* useSelector(state => {
         try{
@@ -161,13 +161,9 @@ const BaseMap = () => {
     return () => map.remove();
       
   }, []);
-
-  function setStyleOfMap() {
-      map.setStyle("mapbox://styles/mapbox/light-v10")
-    }
   
   return (<div>
-    <Button onClick={() => setStyleOfMap()}>Hallo</Button>
+   
     <div id="mapContainer" className="map" ref={map}></div>
     
 

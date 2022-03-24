@@ -42,6 +42,36 @@ function App(props) {
     }
   });
 
+  function getMonumentsInArea(method, radius, lat, lon, limit)
+  {
+    return `https://api.opentripmap.com/0.1/en/places/${method}?apikey=${API_KEY}&radius=${radius}&limit=${limit}&offset=0&lon=${lon}&lat=${lat}&rate=2&format=json`;
+  }
+
+  function getDetailsFromMonument(id)
+  {
+    return `https://api.opentripmap.com/0.1/en/places/xid/${id}?apikey=${API_KEY}`;
+  }
+
+  async function getDataFromURL(url)
+  {
+    let result = await fetch(url);
+    let answer = null;
+    if(result.ok)
+      answer = await result.json();
+    return answer;
+  }
+
+  async function getDataFromAPI()
+  {
+      let object = [];
+      let result = await getDataFromURL(getMonumentsInArea("radius", 10000, "46.7217851", "11.6615276", 100));
+      let test = await getDataFromURL(getDetailsFromMonument(result[0].xid))
+      //for(let monument of result)
+          //object.push(await getDataFromURL(getDetailsFromMonument(monument.xid)));
+      
+      console.log(result);
+      console.log(test);
+  }
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
       <Header/>

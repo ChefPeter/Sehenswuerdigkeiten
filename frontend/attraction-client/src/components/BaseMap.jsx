@@ -26,16 +26,17 @@ export async function postRoute()
     formData.append('points', JSON.stringify(testRoute));
     formData.append('vehicle', 'driving');
 
-    fetch('http://localhost:5000/route', {
+    await fetch('http://localhost:5000/route', {
       method: 'post',
       body: formData,
-      credentials: 'include'
+      credentials: 'include',
     }).then(res => res.json())
-    .then(res => 
-
-      res.forEach(x => coords.push(x.geometry.coordinates)));
-
-    console.log(coords);
+    .then(res => res.forEach(x => coords.push(x.geometry.coordinates)));
+    if(map.getSource('route1'))
+    {
+      map.removeLayer("route1");
+      map.removeSource('route1');
+    }
 
     map.addSource('route1', {
       'type': 'geojson',
@@ -44,11 +45,7 @@ export async function postRoute()
       'properties': {},
       'geometry': {
       'type': 'LineString',
-      'coordinates': [[11.653586626052856, 46.72453560653679],
-      [11.656360030174255, 46.71803734805451],
-      [11.65349006652832, 46.71941282290135],
-      [11.643040180206299, 46.720942721647134],
-      [11.653586626052856, 46.72453560653679]]
+      'coordinates': coords
       }
       }
       });
@@ -62,11 +59,9 @@ export async function postRoute()
       },
       'paint': {
       'line-color': 'yellow',
-      'line-width': 10
+      'line-width': 5
       }
       });
-
-
   }
 
   /*const response = await fetch("http://localhost:5000/route", {

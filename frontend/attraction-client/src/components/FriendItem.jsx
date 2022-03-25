@@ -44,7 +44,7 @@ function FriendItem(props) {
       {showDescription ? 
       <Card id="friendCard"> 
         
-        <Button variant="conatined" onClick={ () => navigate("/chat?name="+props.name)}>Open Chat</Button> 
+        <Button variant="conatined" onClick={ () => navigate("/chat?"+new URLSearchParams({name: props.name}))}>Open Chat</Button> 
         <Button variant="conatined" onClick={() => handleFollowPosition()}>Follow Position</Button> 
         <Button variant="conatined" onClick={() => handleReport()}>Report</Button>
         <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleRemoveFriend(props.name)}><ClearIcon/></Button>

@@ -6,7 +6,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSelector } from 'react-redux';
 import DeleteIcon from '@mui/icons-material/Delete';
 import React from "react";
-import BaseMap from '../components/BaseMap';
+import BaseMap, {postRoute} from '../components/BaseMap';
 
 const API_KEY = "5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752";
 

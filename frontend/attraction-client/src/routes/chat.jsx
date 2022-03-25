@@ -7,6 +7,8 @@ import LeftMessage from "../components/LeftMessage";
 import RightMessage from "../components/RightMessage"
 import ChatSendbar from "../components/ChatSendbar"
 import { useSearchParams } from "react-router-dom";
+import {useState , setState, useEffect} from "react";
+
 
 let searchFriendInput = "";
 // Define theme settings
@@ -30,6 +32,24 @@ function Chat (props) {
   
   const [searchParams, setSearchParams] = useSearchParams();
   const name = searchParams.get("name");
+
+  const [messages, setMessages] = useState([]);
+
+    const friend = name;
+    
+    useEffect(async() => {
+      const respone = await fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
+        method: "GET",
+        credentials: "include"
+      });
+      const json = await respone.json();
+    });
+    
+    
+
+    
+    
+    console.log("-------------------------------------------------");
 
     return (
         <ThemeProvider theme={createTheme(light)}>

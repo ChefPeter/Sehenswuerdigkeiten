@@ -1,23 +1,25 @@
 const fetch = require("cross-fetch");
 
-async function getBestRoute(request) {
+async function getBestRoute(request, res) {
     
     // Schauen, ob Pflichtfelder ausgefüllt sind
-    //if (!request.query.points || !request.query.vehicle) return null;
-
+    if (!request.body.points || !request.body.vehicle) {
+        res.status(400).send("Es sind nicht alle Pflichtfelder ausgefüllt!");
+        return;
+    }
     // DEBUG ONLY
-    request.query.vehicle = "driving";
-    request.query.points = [
+    /*request.body.vehicle = "driving";
+    request.body.points = [
         {geometry: [60, 30.2]},
         {geometry: [60.1, 30.3]},
         {geometry: [60.4, 30.4]},
         {geometry: [60.2, 30.5]},
         {geometry: [60, 30.6]},
-    ];
+    ];*/
 
     // Adjazenzmatrix aufbauen
-    const l = request.query.points.length;
-    const p = request.query.points;
+    const l = request.body.points.length;
+    const p = request.body.points;
     const matrix = [...Array(l)].map(e => Array(l).fill(0));
     for (let i = 0; i < l; i++) {
         for (let x = i+1; x < l; x++) {
@@ -26,7 +28,7 @@ async function getBestRoute(request) {
             matrix[x][i] = distance;
         }
     }
-    return tsp(matrix).map(e => p[e]);
+    res.status(200).send(tsp(matrix).map(e => p[e]));
 
     // Gefährlich wegen ban auf mapbox -> 
     /*for (let i = 0; i < l; i++) {

@@ -8,13 +8,15 @@ import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";
 
 let testRoute = [];
+
 function addToRoute(object)
 {
   if(testRoute.filter(x => x.properties.id === object.properties.id).length === 0)
       testRoute.push(object);
   console.log(testRoute.length);
 }
-async function postRoute()
+
+export async function postRoute()
 {
   const response = await fetch("http://localhost:5000/route", {
             method: 'POST',
@@ -28,6 +30,13 @@ async function postRoute()
             console.log(data);
           });
 }
+
+/*const TestButton = () => {
+    useEffect(() => {
+      <Button></Button>
+      console.log("test");
+    });
+};*/
 
 const BaseMap = () => {
     
@@ -103,6 +112,13 @@ const BaseMap = () => {
           ],
           essential: true // this animation is considered essential with respect to prefers-reduced-motion
        });
+       map.loadImage('https://img.icons8.com/color/344/marker--v1.png',
+       function(error, image) {
+               if (error) throw error;
+               map.addImage('marker--v1', image);
+           }
+       );
+
         // add the data source for new a feature collection with no features
         map.addSource("random-points-data", {
           type: "geojson",
@@ -111,13 +127,6 @@ const BaseMap = () => {
             features: []
           }
         });
-        map.loadImage(
-          'https://docs.mapbox.com/mapbox-gl-js/assets/cat.png',
-          (error, image) => {
-          if (error) throw error;
-           
-          // Add the image to the map style.
-          map.addImage('cat', image)});
 
         // now add the layer, and reference the data source above by name
         map.addLayer({
@@ -126,9 +135,10 @@ const BaseMap = () => {
           type: "symbol",
           layout: {
             // full list of icons here: https://labs.mapbox.com/maki-icons
-            "icon-image": "bakery-15", // this will put little croissants on our map
+            "icon-image": "marker--v1", // this will put little croissants on our map
             "icon-padding": 0,
-            "icon-allow-overlap": true
+            "icon-allow-overlap": true,
+            "icon-size":0.08
           }
         });
       });
@@ -167,7 +177,7 @@ const BaseMap = () => {
         const feature = e.features[0];
         // create popup node
         const popupNode = document.createElement("div");
-        ReactDOM.render(<Popup feature={feature} />, popupNode);
+        ReactDOM.render(<Popup feature={feature}/>, popupNode);
         ReactDOM.render(<Button onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
         if(testRoute.length > 3)
           ReactDOM.render(<Button onClick={() => postRoute()}>PostRoute</Button>, popupNode);
@@ -195,5 +205,6 @@ const BaseMap = () => {
   );
 };
 
-
+//module.export = { BaseMap:BaseMap, TestButton:TestButton };
+//export { BaseMap, TestButton };
 export default BaseMap;

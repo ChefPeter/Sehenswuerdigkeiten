@@ -1,8 +1,9 @@
 import Header from "../components/header";
 import "./styles/start.css";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { Button } from "@mui/material";
 import { useSelector } from 'react-redux';
-import BaseMap from '../components/BaseMap';
+import BaseMap, {postRoute} from '../components/BaseMap';
 import React, { useState, useEffect } from 'react';
 import { Card } from "@mui/material";
 import "./styles/home.css"
@@ -51,8 +52,10 @@ function Home(props) {
       <Header/>
       <Card id="container">
         <BaseMap />
+        <Button id="test" onClick={() => postRoute()}>Enter</Button>
         <div id="navi"><MapSearch></MapSearch></div>
       </Card>
+
       
   
 
@@ -60,7 +63,7 @@ function Home(props) {
     );
   
 }
-
+//<Button id="testButton" onClick={() => {console.log("test");}}>Post Route</Button>
 //checks if logged in
 function handle(){
   fetch("http://localhost:5000/logged-in", {
@@ -75,3 +78,5 @@ function handle(){
 }
 
 export default Home;
+
+//getDataFromURL       <TestButton/>

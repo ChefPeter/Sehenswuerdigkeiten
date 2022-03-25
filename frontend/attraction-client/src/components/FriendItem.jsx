@@ -10,6 +10,7 @@ import Link from "@mui/material/Link";
 function FriendItem(props) {
 
     const navigate = useNavigate();
+    
     const [showDescription, setShowDescription] = useState(false);    
 
     console.log("prop" + props.profilePicture)

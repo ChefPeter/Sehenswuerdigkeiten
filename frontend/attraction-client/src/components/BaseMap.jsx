@@ -7,6 +7,7 @@ import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";
 
+let map;
 let testRoute = [];
 
 function addToRoute(object)
@@ -19,6 +20,9 @@ function addToRoute(object)
 export async function postRoute()
 {
     let formData = new FormData();
+    let coords = [];
+    let out;
+
     formData.append('points', JSON.stringify(testRoute));
     formData.append('vehicle', 'driving');
 
@@ -27,7 +31,42 @@ export async function postRoute()
       body: formData,
       credentials: 'include'
     }).then(res => res.json())
-    .then(res => console.log(res));
+    .then(res => 
+
+      res.forEach(x => coords.push(x.geometry.coordinates)));
+
+    console.log(coords);
+
+    map.addSource('route1', {
+      'type': 'geojson',
+      'data': {
+      'type': 'Feature',
+      'properties': {},
+      'geometry': {
+      'type': 'LineString',
+      'coordinates': [[11.653586626052856, 46.72453560653679],
+      [11.656360030174255, 46.71803734805451],
+      [11.65349006652832, 46.71941282290135],
+      [11.643040180206299, 46.720942721647134],
+      [11.653586626052856, 46.72453560653679]]
+      }
+      }
+      });
+      map.addLayer({
+      'id': 'route1',
+      'type': 'line',
+      'source': 'route1',
+      'layout': {
+      'line-join': 'round',
+      'line-cap': 'round'
+      },
+      'paint': {
+      'line-color': 'yellow',
+      'line-width': 10
+      }
+      });
+
+
   }
 
   /*const response = await fetch("http://localhost:5000/route", {
@@ -85,7 +124,6 @@ const BaseMap = () => {
 
   const mapContainerRef = useRef(null);
   const popUpRef = useRef(new mapboxgl.Popup({ offset: 15 }));
-  let map;
 
   useEffect(() => {
     

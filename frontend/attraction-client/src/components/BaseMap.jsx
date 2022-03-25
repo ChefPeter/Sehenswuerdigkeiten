@@ -7,6 +7,7 @@ import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";
 
+
 let map;
 let testRoute = [];
 
@@ -226,8 +227,17 @@ const BaseMap = () => {
         const feature = e.features[0];
         // create popup node
         const popupNode = document.createElement("div");
-        ReactDOM.render(<Popup feature={feature}/>, popupNode);
-        ReactDOM.render(<Button onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
+
+        ReactDOM.render(<Popup feature={feature} />, popupNode);
+        // <img src="./kolosseum.jpg"></img>
+        //ReactDOM.render(<Button variant="contained" style={{borderRadius: '20px'}} onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
+        ReactDOM.render(<div><img src="https://media.istockphoto.com/photos/colosseum-in-rome-during-sunrise-picture-id1271579758?b=1&k=20&m=1271579758&s=170667a&w=0&h=oyXB8ehFjbo5-9HDdSjI9hYZktLstV3Ixz4JUUynahU=" style={{width:"100%", height:"50%"}}></img>
+          <div style={{display: "flex", justifyContent: "space-between"}}><h2 >Name</h2>
+          <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}} onClick={() => addToRoute(feature)}>Add</Button></div></div>, popupNode);
+          
+        if(testRoute.length > 3)
+          ReactDOM.render(<Button onClick={() => postRoute()}>PostRoute</Button>, popupNode);
+
         // set popup on map
         popUpRef.current
           .setLngLat(feature.geometry.coordinates)
@@ -246,7 +256,6 @@ const BaseMap = () => {
   return (<div>
    
     <div id="mapContainer" className="map" ref={map}></div>
-    
 
   </div>
   );

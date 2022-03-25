@@ -28,7 +28,7 @@ function Chat () {
 
 
     return (
-        <ThemeProvider theme={createTheme(light)}>
+        <ThemeProvider theme={createTheme(dark)}>
             <Header />
                 
                 <Card elevation={4}>

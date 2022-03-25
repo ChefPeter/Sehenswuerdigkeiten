@@ -8,6 +8,8 @@ import "../routes/styles/profile.css";
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import React, { useEffect, useState } from "react";
+import SuccessSnackbar from '../components/SuccessSnackbar';
+import ErrorSnackbar from "../components/ErrorSnackbar"
 
 // Define theme settings
 const light = {
@@ -31,7 +33,23 @@ function Profile(props) {
   const [descriptionLabel, setDescriptionLabel] = useState("");
   const [profilePicture, setProfilePicture] = useState();
   const [showInfo, setShowInfo] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [didChangeDescription, setDidChangeDescription] = useState(false);
   const [usedEffect, setUsedEffect] = useState(false)
+  const [successDescription, setSuccessDescription] = useState("Success!");
+
+  const  handleCloseSuccessSnackbar = (event, reason) =>  {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setShowInfo(false);
+  };
+  const  handleCloseErrorSnackbar = (event, reason) =>  {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setShowError(false);
+  };
 
   useEffect(async() => {
 
@@ -53,13 +71,12 @@ function Profile(props) {
 
 
       let username = (await resultUsername.text());
-      let description = (await resultDescription.text());
-      console.log(fileProfilePicture);
+      let description2 = (await resultDescription.text());
       let file = (await fileProfilePicture.blob());
     
 
       setUsername(username);
-      setDescription(description);
+      setDescription(description2);
       setProfilePicture(URL.createObjectURL(file));
       setUsedEffect(true);
 
@@ -67,6 +84,8 @@ function Profile(props) {
 
     if(description.length === 0){
       setDescriptionLabel("Description");
+    }else{
+      setDescriptionLabel("");
     }
 
     
@@ -74,8 +93,10 @@ function Profile(props) {
   
 
   const getDescriptionValue = (event) => {
+    setDidChangeDescription(true);
     descriptionInput = event.target.value;
   };
+ 
 
   const theme = useSelector(state => {
     try{
@@ -92,6 +113,8 @@ function Profile(props) {
     }
   });
 
+  
+
     return (
       <div>
         <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
@@ -101,7 +124,7 @@ function Profile(props) {
           { false ?
             <TextField type="file" ></TextField>
           : null}
-           <input type="file" id="fileInputUpload" hidden onChange={() => handleFileUpload()} ></input>
+           <input type="file" id="fileInputUpload" hidden onChange={() => handleFileUpload(setShowInfo, setShowError, setSuccessDescription)} ></input>
         
             <div id='profil'>
               
@@ -123,18 +146,15 @@ function Profile(props) {
                         onChange={getDescriptionValue}/>
                 </div>
                 <div>
-                    <Button onClick={() => handleSaveNewDescription(descriptionInput ,setShowInfo)} variant="contained">Speichern</Button>
+                    <Button onClick={() => handleSaveNewDescription(descriptionInput ,setShowInfo,setShowError, setSuccessDescription, didChangeDescription)} variant="contained">Speichern</Button>
                 </div>
             </div>
         </div>
         <div id='notice'>
 
-          { showInfo ?
-            <Alert severity="info">
-            <AlertTitle>Info</AlertTitle>
-                Ihr Statuts wurde aktualisiert.
-            </Alert>
-          : null }
+        <SuccessSnackbar openSuccessSnack={showInfo} successMessage={successDescription} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
+        <ErrorSnackbar openSuccessSnack={showError} successMessage={"Upload fehlgeschlagen!"} handleClose={handleCloseErrorSnackbar}></ErrorSnackbar>
+         
         </div>
         </ThemeProvider>
       </div>
@@ -142,9 +162,10 @@ function Profile(props) {
   
 }
 
-function handleFileUpload(){
+function handleFileUpload(setShowInfo, setShowError, setSuccessDescription){
+  setShowInfo(false);
+  setShowError(false)
 
-  console.log("fire")
   let formData = new FormData();
   
   formData.append('profile-picture', document.getElementById("fileInputUpload").files[0]);
@@ -153,13 +174,24 @@ function handleFileUpload(){
       method: "post",
       body: formData,
       credentials: 'include'
-  }).then(res => res.text())
-  .then(res => console.log(res));
-
+  }).then(res => {
+    if (res.status == 400 || res.status == 401) {
+      setShowError(true)
+    } else{
+        setSuccessDescription("Profilbild aktualisiert!")
+        setShowInfo(true);
+    }
+  });
 
 }
 
-function handleSaveNewDescription(description, setShowInfo) {
+function handleSaveNewDescription(description, setShowInfo, setShowError, setSuccessDescription, didChangeDescription) {
+  setShowError(false);
+  setShowInfo(false);
+  if(!didChangeDescription){
+    
+    return;
+  }
 
   let formData = new FormData();
   
@@ -170,9 +202,9 @@ function handleSaveNewDescription(description, setShowInfo) {
       body: formData,
       credentials: 'include'
   }).then(res => {
-    if (res.status !== 400) {
+    if (res.status != 400 && res.status != 401) {
         setShowInfo(true);
-        setTimeout(() => setShowInfo(false), 1000);
+        setSuccessDescription("Beschreibung aktualisiert!")
     } 
   });
  

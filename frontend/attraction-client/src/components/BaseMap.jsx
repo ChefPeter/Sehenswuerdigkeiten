@@ -31,8 +31,9 @@ async function postRoute()
 
 const BaseMap = () => {
     
- 
-    let theme = "mapbox://styles/mapbox/satellite-v9"
+    //mapbox://styles/mapbox/satellite-v9
+    //mapbox://styles/mapbox/light-v10
+    let theme = "mapbox://styles/mapbox/navigation-night-v1"
 
    /* useSelector(state => {
         try{

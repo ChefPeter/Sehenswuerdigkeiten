@@ -53,11 +53,11 @@ function RequestReset(props) {
 }
 
 function resetPassword(setErrorText, setShowErrorAlert, setShowInfoAlert) {
-
+    console.log(input)
     let formData = new FormData();
     formData.append('email', input);
 
-    fetch("http://10.171.155.127:5000/request-reset", {
+    fetch("http://localhost:5000/request-reset", {
         method: "post",
         body: formData
     }).then(res => {
@@ -70,8 +70,9 @@ function resetPassword(setErrorText, setShowErrorAlert, setShowInfoAlert) {
             setShowErrorAlert(false);
             setShowInfoAlert(true);
         }
+        console.log(res.status)
     });
-
+    console.log("haha")
 }
 
 

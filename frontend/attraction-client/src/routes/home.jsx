@@ -53,6 +53,7 @@ function Home(props) {
         <Card id="container">
           <BaseMap />
           <div id="navi"><MapSearch></MapSearch></div>
+          <Button id="test" onClick={() => postRoute()}>Enter</Button>
         </Card>
       </ThemeProvider>
     );

@@ -48,3 +48,11 @@ CREATE TABLE IF NOT EXISTS messages (
     FOREIGN KEY (sender) REFERENCES users(username),
     FOREIGN KEY (recipient) REFERENCES users(username)
 );
+
+CREATE TABLE IF NOT EXISTS reports (
+    report_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(100),
+    content VARCHAR(1000),
+    resolved boolean,
+    FOREIGN KEY (username) REFERENCES users(username)
+);

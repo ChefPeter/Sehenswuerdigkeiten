@@ -9,6 +9,7 @@ const rejectFriend = require("./reject-friend");
 const sendMessage = require("./send-message");
 const changeDescription = require("./change-description");
 const changeProfilePicture = require("./change-profile-picture");
+const insertReport = require("./insert-report");
 
 const getDescription = require("./get-description");
 const getFriends = require("./get-friends");
@@ -70,6 +71,7 @@ app.post("/reject-friend", isAuthenticated, async(req, res) => sendResponse(awai
 app.post("/sendMessage", isAuthenticated, async(req, res) => sendResponse(await sendMessage(req), res));
 app.post("/change-description", isAuthenticated, async(req, res) => sendResponse(await changeDescription(req), res));
 app.post("/change-profile-picture", isAuthenticated, async(req, res) => sendResponse(await changeProfilePicture(req), res));
+app.post("/report", isAuthenticated, async(req, res) => sendResponse(await insertReport(req), res));
 
 // GET REQUESTS
 app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req), res));

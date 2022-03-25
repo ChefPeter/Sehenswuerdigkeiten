@@ -76,14 +76,14 @@ const handleCloseSuccessSnackbar = (event, reason) => {
             <div>
               <TextareaAutosize
                 aria-label="minimum height"
-                minRows={8}
-                placeholder="Hier schreiben"
-                style={{ width: "100%", marginTop: "10px", marginBottom: "10px"}}
+                minRows={12}
+                placeholder="Type your message!"
+                style={{ width: "100%", marginTop: "10px", marginBottom: "10px", resize: "none", fontSize:"large"}}
                 onChange={getInputValue}
               />  
             </div>
             <div>
-              <Button  style={{width: "100%"}} variant="contained" onClick={() => sendContactMessage(setOpenErrorSnack, setOpenSuccessSnack)}>Absenden</Button>
+              <Button  style={{width: "100%",  height: "43px"}} variant="contained" onClick={() => sendContactMessage(setOpenErrorSnack, setOpenSuccessSnack)}>Absenden</Button>
          
           </div>
           </div>

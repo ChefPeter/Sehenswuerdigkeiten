@@ -138,6 +138,7 @@ function Profile(props) {
                 </div>
                 <div id='abstand'>
                     <TextField
+                        fullWidth
                         id="outlined-multiline-static"
                         label={descriptionLabel}
                         multiline
@@ -146,7 +147,7 @@ function Profile(props) {
                         onChange={getDescriptionValue}/>
                 </div>
                 <div>
-                    <Button onClick={() => handleSaveNewDescription(descriptionInput ,setShowInfo,setShowError, setSuccessDescription, didChangeDescription)} variant="contained">Speichern</Button>
+                    <Button fullWidth style={{height: "43px"}} onClick={() => handleSaveNewDescription(descriptionInput ,setShowInfo,setShowError, setSuccessDescription, didChangeDescription)} variant="contained">Speichern</Button>
                 </div>
             </div>
         </div>

@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 function FriendItem(props) {
   
     const navigate = useNavigate();
+    
     const [showDescription, setShowDescription] = useState(false);    
   
     console.log("prop" + props.profilePicture)

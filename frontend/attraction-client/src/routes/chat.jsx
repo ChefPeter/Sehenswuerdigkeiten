@@ -6,6 +6,7 @@ import "./styles/chat.css"
 import LeftMessage from "../components/LeftMessage";
 import RightMessage from "../components/RightMessage"
 import ChatSendbar from "../components/ChatSendbar"
+import {useState , setState, useEffect} from "react";
 
 let searchFriendInput = "";
 // Define theme settings
@@ -27,6 +28,24 @@ const dark = {
 
 function Chat () {
 
+
+  const [messages, setMessages] = useState([]);
+
+    const friend = "loberhauser3";
+    
+    useEffect(async() => {
+      const respone = await fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
+        method: "GET",
+        credentials: "include"
+      });
+      const json = await respone.json();
+    });
+    
+    
+
+    
+    
+    console.log("-------------------------------------------------");
 
     return (
         <ThemeProvider theme={createTheme(light)}>

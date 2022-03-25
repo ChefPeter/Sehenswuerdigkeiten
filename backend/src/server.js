@@ -72,6 +72,7 @@ app.post("/sendMessage", isAuthenticated, async(req, res) => sendResponse(await 
 app.post("/change-description", isAuthenticated, async(req, res) => sendResponse(await changeDescription(req), res));
 app.post("/change-profile-picture", isAuthenticated, async(req, res) => sendResponse(await changeProfilePicture(req), res));
 app.post("/report", isAuthenticated, async(req, res) => sendResponse(await insertReport(req), res));
+app.post("/route", async(req, res) => await getBestRoute(req, res));
 
 // GET REQUESTS
 app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req), res));
@@ -82,7 +83,7 @@ app.get("/pending-friends", isAuthenticated, async (req, res) => sendGetResponse
 app.get("/profile-picture", isAuthenticated, async (req, res) => await getProfilePicture(req, res));
 app.get("/file", isAuthenticated, (req, res) => getFile(req, res));
 app.get("/username", isAuthenticated, (req, res) => res.status(200).send(req.session.username));
-app.get("/route", async(req, res) => sendGetResponse(await getBestRoute(req), res));
+
 
 //app.get("/logged-in", (req, res) => res.send(req.session));
 

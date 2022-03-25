@@ -52,28 +52,26 @@ function LegalNotice(props) {
             Dantestra&szlig;e, 39E, 39042 Brixen, Autonome Provinz</p>
 
             <p>Diese vertreten durch:<br />
-            &#91;Namen der Gesch&auml;ftsf&uuml;hrer der GmbH&#93;</p>
-
-            <p>Handelsregister: &#91;Nummer des Registereintrags&#93;<br />
+            Lukas Schatzer</p>
+            <p>
             Registergericht: Amtsgericht Bozen</p>
             <br />
             <h2>Kontakt</h2>
-            <p>Telefon: &#91;Telefonnummer&#93;<br />
+            <p>
             E-Mail: city2go.gmbh@gmail.com</p>
             <br />
             <h2>Berufsbezeichnung und berufsrechtliche Regelungen</h2>
-            <p>Berufsbezeichnung:<br />
+            <p><strong>Berufsbezeichnung:</strong><br />
             Programmierer</p>
-            <p>Zust&auml;ndige Kammer:<br />
+            <p><strong>Zust&auml;ndige Kammer:</strong><br />
             Peter Costadedoi<br />
             Lukas Gallmetzer<br />
             Noa Pichler<br />
             Nathan Obexer<br />
             Lukas Schatzer<br />
             Philipp Olivotto</p>
-            <p>Verliehen in:<br />
+            <p><strong>Verliehen in:</strong><br />
             Italien</p>
-            <p>Es gelten folgende berufsrechtliche Regelungen:</p>
             <br />
             <h2>EU-Streitschlichtung</h2>
             <p>Die Europ&auml;ische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer">https://ec.europa.eu/consumers/odr/</a>.<br /> Unsere E-Mail-Adresse finden Sie oben im Impressum.</p>

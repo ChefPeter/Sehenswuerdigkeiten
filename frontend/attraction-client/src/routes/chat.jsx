@@ -38,6 +38,9 @@ function Chat (props) {
     const friend = name;
     
     useEffect(async() => {
+
+      console.log("haha")
+
       const respone = await fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
         method: "GET",
         credentials: "include"
@@ -46,6 +49,8 @@ function Chat (props) {
       setMessages(json);
     });
 
+
+    console.log("haha")
     fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
       method: "GET",
       credentials: "include"
@@ -60,7 +65,15 @@ function Chat (props) {
     return (
         <ThemeProvider theme={createTheme(light)}>
             <Header />
-            <p> prop {name}</p>
+            <Card elevation={4} sx={{
+                    marginTop: 1.5, 
+                    marginLeft: 1, 
+                    marginRight: 1, 
+                    paddingTop: 1,
+                    paddingBottom: 1,
+                    paddingRight: 1,
+                    paddingLeft: 1}}> You are writing with: <strong>{name}</strong></Card>
+          
                 <Card elevation={4} sx={{
                     marginTop: 1.5, 
                     marginLeft: 1, 

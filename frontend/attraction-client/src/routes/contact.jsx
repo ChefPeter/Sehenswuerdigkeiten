@@ -78,7 +78,7 @@ const handleCloseSuccessSnackbar = (event, reason) => {
                 aria-label="minimum height"
                 minRows={12}
                 placeholder="Type your message!"
-                style={{ width: "100%", marginTop: "10px", marginBottom: "10px", resize: "none", fontSize:"large"}}
+                style={{ width: "100%", marginTop: "10px", marginBottom: "10px", resize: "none", fontSize:"large", paddingLeft: 3, paddingRight: 3, paddingTop: 3, paddingBottom:3}}
                 onChange={getInputValue}
               />  
             </div>

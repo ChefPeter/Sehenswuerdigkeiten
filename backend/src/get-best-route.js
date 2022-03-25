@@ -34,7 +34,7 @@ async function getBestRoute(request, res) {
         }
     }
 
-    //console.log(JSON.stringify(tsp(matrix).map(e => p[e])));
+    console.log(JSON.stringify(tsp(matrix).map(e => p[e])));
 
     res.status(200).send(JSON.stringify(tsp(matrix).map(e => p[e])));
     //res.status(200).send(tsp(matrix).map(e => p[e]));

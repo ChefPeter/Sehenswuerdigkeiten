@@ -24,14 +24,23 @@ const dark = {
 };
 
 
+
 function Chat () {
 
 
     return (
-        <ThemeProvider theme={createTheme(dark)}>
+        <ThemeProvider theme={createTheme(light)}>
             <Header />
                 
-                <Card elevation={4}>
+                <Card elevation={4} sx={{
+                    marginTop: 1.5, 
+                    marginLeft: 1, 
+                    marginRight: 1, 
+                    paddingTop: 1,
+                    paddingBottom: 1,
+                    paddingRight: 1,
+                    paddingLeft: 1}}>
+ 
                     <LeftMessage message ="Hallo" time="13:00"></LeftMessage>
                     <RightMessage message ="Tschüss" time="13:01"></RightMessage>
                     <LeftMessage></LeftMessage>
@@ -61,7 +70,18 @@ function Chat () {
 
                     
                 </Card>
+
+                  <Card elevation={4} sx={{
+                    marginBottom: 2,
+                    marginTop: 1, 
+                    marginLeft: 1, 
+                    marginRight: 1, 
+                    paddingTop: 2,
+                    paddingBottom: 2,
+                    paddingRight: 1,
+                    paddingLeft: 1}}>
                 <ChatSendbar></ChatSendbar>
+                </Card>
         </ThemeProvider>
     );
 

@@ -13,9 +13,10 @@ function ChatSendbar () {
         message = event.target.value;
     };
 
+ 
 
     return (
-        <Container style={{ marginTop:"15px", marginBottom:"30px" }}>
+        <Container>
         <TextField
                 
                 style={{width:"60%"}}

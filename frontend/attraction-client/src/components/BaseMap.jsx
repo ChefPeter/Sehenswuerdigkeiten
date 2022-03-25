@@ -18,7 +18,20 @@ function addToRoute(object)
 
 export async function postRoute()
 {
-  const response = await fetch("http://localhost:5000/route", {
+    let formData = new FormData();
+    for(let object of testRoute)
+      formData.append('points[]', JSON.stringify(object));
+    formData.append('vehicle', 'driving');
+
+    fetch('http://localhost:5000/route', {
+      method: 'post',
+      body: formData,
+      credentials: 'include'
+    }).then(res => res.json())
+    .then(res => console.log(res));
+  }
+
+  /*const response = await fetch("http://localhost:5000/route", {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -28,8 +41,7 @@ export async function postRoute()
           });
           response.json().then(data => {
             console.log(data);
-          });
-}
+          });*/
 
 /*const TestButton = () => {
     useEffect(() => {
@@ -179,8 +191,6 @@ const BaseMap = () => {
         const popupNode = document.createElement("div");
         ReactDOM.render(<Popup feature={feature}/>, popupNode);
         ReactDOM.render(<Button onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
-        if(testRoute.length > 3)
-          ReactDOM.render(<Button onClick={() => postRoute()}>PostRoute</Button>, popupNode);
         // set popup on map
         popUpRef.current
           .setLngLat(feature.geometry.coordinates)

@@ -7,6 +7,8 @@ async function getBestRoute(request, res) {
         res.status(400).send("Es sind nicht alle Pflichtfelder ausgefüllt!");
         return;
     }
+
+    console.log(request.body);
     // DEBUG ONLY
     /*request.body.vehicle = "driving";
     request.body.points = [

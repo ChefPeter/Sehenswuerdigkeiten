@@ -6,6 +6,7 @@ import "./styles/chat.css"
 import LeftMessage from "../components/LeftMessage";
 import RightMessage from "../components/RightMessage"
 import ChatSendbar from "../components/ChatSendbar"
+import { useSearchParams } from "react-router-dom";
 
 let searchFriendInput = "";
 // Define theme settings
@@ -25,13 +26,15 @@ const dark = {
 
 
 
-function Chat () {
-
+function Chat (props) {
+  
+  const [searchParams, setSearchParams] = useSearchParams();
+  const name = searchParams.get("name");
 
     return (
         <ThemeProvider theme={createTheme(light)}>
             <Header />
-                
+            <p> prop {name}</p>
                 <Card elevation={4} sx={{
                     marginTop: 1.5, 
                     marginLeft: 1, 

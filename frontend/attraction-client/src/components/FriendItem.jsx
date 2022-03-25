@@ -4,17 +4,16 @@ import { ListItemAvatar, Card, Container, Button } from "@mui/material";
 import { useState } from "react";
 import ClearIcon from '@mui/icons-material/Clear';
 import "./styles/friendItem.css";
-import { useEffect } from "react/cjs/react.production.min";
 import { useNavigate } from "react-router-dom";
+import Link from "@mui/material/Link";
 
 function FriendItem(props) {
-  
+
     const navigate = useNavigate();
     const [showDescription, setShowDescription] = useState(false);    
-  
+
     console.log("prop" + props.profilePicture)
   
-
     return (
       <div>
         
@@ -44,7 +43,7 @@ function FriendItem(props) {
       {showDescription ? 
       <Card id="friendCard"> 
         
-        <Button variant="conatined" onClick={() => navigate("/chat")}>Open Chat</Button> 
+        <Button variant="conatined" onClick={ () => navigate("/chat?name="+props.name)}>Open Chat</Button> 
         <Button variant="conatined" onClick={() => handleFollowPosition()}>Follow Position</Button> 
         <Button variant="conatined" onClick={() => handleReport()}>Report</Button>
         <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleRemoveFriend(props.name)}><ClearIcon/></Button>

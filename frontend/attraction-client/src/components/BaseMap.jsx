@@ -7,6 +7,7 @@ import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";
 
+
 let map;
 let testRoute = [];
 
@@ -26,16 +27,17 @@ export async function postRoute()
     formData.append('points', JSON.stringify(testRoute));
     formData.append('vehicle', 'driving');
 
-    fetch('http://localhost:5000/route', {
+    await fetch('http://localhost:5000/route', {
       method: 'post',
       body: formData,
-      credentials: 'include'
+      credentials: 'include',
     }).then(res => res.json())
-    .then(res => 
-
-      res.forEach(x => coords.push(x.geometry.coordinates)));
-
-    console.log(coords);
+    .then(res => res.forEach(x => coords.push(x.geometry.coordinates)));
+    if(map.getSource('route1'))
+    {
+      map.removeLayer("route1");
+      map.removeSource('route1');
+    }
 
     map.addSource('route1', {
       'type': 'geojson',
@@ -44,11 +46,7 @@ export async function postRoute()
       'properties': {},
       'geometry': {
       'type': 'LineString',
-      'coordinates': [[11.653586626052856, 46.72453560653679],
-      [11.656360030174255, 46.71803734805451],
-      [11.65349006652832, 46.71941282290135],
-      [11.643040180206299, 46.720942721647134],
-      [11.653586626052856, 46.72453560653679]]
+      'coordinates': coords
       }
       }
       });
@@ -62,11 +60,9 @@ export async function postRoute()
       },
       'paint': {
       'line-color': 'yellow',
-      'line-width': 10
+      'line-width': 5
       }
       });
-
-
   }
 
   /*const response = await fetch("http://localhost:5000/route", {
@@ -226,8 +222,17 @@ const BaseMap = () => {
         const feature = e.features[0];
         // create popup node
         const popupNode = document.createElement("div");
-        ReactDOM.render(<Popup feature={feature}/>, popupNode);
-        ReactDOM.render(<Button onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
+
+        ReactDOM.render(<Popup feature={feature} />, popupNode);
+        // <img src="./kolosseum.jpg"></img>
+        //ReactDOM.render(<Button variant="contained" style={{borderRadius: '20px'}} onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
+        ReactDOM.render(<div><img src="https://media.istockphoto.com/photos/colosseum-in-rome-during-sunrise-picture-id1271579758?b=1&k=20&m=1271579758&s=170667a&w=0&h=oyXB8ehFjbo5-9HDdSjI9hYZktLstV3Ixz4JUUynahU=" style={{width:"100%", height:"50%"}}></img>
+          <div style={{display: "flex", justifyContent: "space-between"}}><h2 >Name</h2>
+          <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}} onClick={() => addToRoute(feature)}>Add</Button></div></div>, popupNode);
+          
+        if(testRoute.length > 3)
+          ReactDOM.render(<Button onClick={() => postRoute()}>PostRoute</Button>, popupNode);
+
         // set popup on map
         popUpRef.current
           .setLngLat(feature.geometry.coordinates)
@@ -246,7 +251,6 @@ const BaseMap = () => {
   return (<div>
    
     <div id="mapContainer" className="map" ref={map}></div>
-    
 
   </div>
   );

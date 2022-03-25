@@ -8,7 +8,7 @@ async function getBestRoute(request, res) {
         return;
     }
 
-    console.log(request.body);
+    //console.log(request.body);
     // DEBUG ONLY
     /*request.body.vehicle = "driving";
     request.body.points = [
@@ -20,17 +20,24 @@ async function getBestRoute(request, res) {
     ];*/
 
     // Adjazenzmatrix aufbauen
-    const l = request.body.points.length;
-    const p = request.body.points;
+    const p = JSON.parse(request.body.points);
+    const l = p.length;
+    
+    //console.log(p);
+
     const matrix = [...Array(l)].map(e => Array(l).fill(0));
     for (let i = 0; i < l; i++) {
         for (let x = i+1; x < l; x++) {
-            const distance = getDistance(p[i].geometry, p[x].geometry);
+            const distance = getDistance(p[i].geometry.coordinates, p[x].geometry.coordinates);
             matrix[i][x] = distance;
             matrix[x][i] = distance;
         }
     }
-    res.status(200).send(tsp(matrix).map(e => p[e]));
+
+    //console.log(JSON.stringify(tsp(matrix).map(e => p[e])));
+
+    res.status(200).send(JSON.stringify(tsp(matrix).map(e => p[e])));
+    //res.status(200).send(tsp(matrix).map(e => p[e]));
 
     // Gefährlich wegen ban auf mapbox -> 
     /*for (let i = 0; i < l; i++) {

@@ -19,8 +19,7 @@ function addToRoute(object)
 export async function postRoute()
 {
     let formData = new FormData();
-    for(let object of testRoute)
-      formData.append('points[]', JSON.stringify(object));
+    formData.append('points', JSON.stringify(testRoute));
     formData.append('vehicle', 'driving');
 
     fetch('http://localhost:5000/route', {

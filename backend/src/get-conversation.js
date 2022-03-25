@@ -14,7 +14,7 @@ async function getConversation(request) {
         });
         const query = util.promisify(conn.query).bind(conn);
         return Array.from(await query(
-            `SELECT sender, recipient, content, is_file FROM messages
+            `SELECT sender, recipient, content, message_timestamp, is_file FROM messages
                 WHERE 
                 ( sender='${request.session.username}' AND recipient='${request.query.friend}' )
                 OR

@@ -33,7 +33,7 @@ function Chat (props) {
   const [searchParams, setSearchParams] = useSearchParams();
   const name = searchParams.get("name");
 
-  const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState([]);
 
     const friend = name;
     
@@ -43,13 +43,19 @@ function Chat (props) {
         credentials: "include"
       });
       const json = await respone.json();
+      setMessages(json);
     });
-    
-    
 
-    
-    
-    console.log("-------------------------------------------------");
+    fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
+      method: "GET",
+      credentials: "include"
+    })
+    .then(res => res.json())
+    .then(res => {
+      console.log("ANFRAGE WIRD GESCHICKT!");
+      setMessages(res)
+    });
+
 
     return (
         <ThemeProvider theme={createTheme(light)}>
@@ -66,30 +72,14 @@ function Chat (props) {
  
                     <LeftMessage message ="Hallo" time="13:00"></LeftMessage>
                     <RightMessage message ="Tschüss" time="13:01"></RightMessage>
-                    <LeftMessage></LeftMessage>
-                    <RightMessage></RightMessage>
-
-                    <LeftMessage></LeftMessage>
-                    <LeftMessage></LeftMessage>
-                    <RightMessage></RightMessage>
-                    <LeftMessage></LeftMessage>
-                    <LeftMessage></LeftMessage>
-                    <RightMessage></RightMessage>
-                    <LeftMessage></LeftMessage>
-                    <LeftMessage></LeftMessage>
-                    <RightMessage></RightMessage>
-                    <LeftMessage></LeftMessage>
-                    <LeftMessage></LeftMessage>
-                    <RightMessage></RightMessage>
-                    <LeftMessage></LeftMessage>
-                    <LeftMessage></LeftMessage>
-                    <RightMessage></RightMessage>
-                    <LeftMessage></LeftMessage>
-                    <LeftMessage></LeftMessage>
-                    <RightMessage></RightMessage>
-                    <LeftMessage></LeftMessage>
-                    <LeftMessage></LeftMessage>
-                    <RightMessage></RightMessage>
+                    
+                    {messages.map(message => {
+                      if (message.sender === friend) {
+                        <LeftMessage message={message.content} time={message["message_timestamp"]}></LeftMessage>
+                      } else {
+                        <RightMessage message={message.content} time={message["message_timestamp"]}></RightMessage>
+                      }
+                    })}
 
                     
                 </Card>

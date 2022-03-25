@@ -49,17 +49,12 @@ function Home(props) {
   });
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-      <Header/>
-      <Card id="container">
-        <BaseMap />
-        <Button id="test" onClick={() => postRoute()}>Enter</Button>
-        <div id="navi"><MapSearch></MapSearch></div>
-      </Card>
-
-      
-  
-
-    </ThemeProvider>
+        <Header/>
+        <Card id="container">
+          <BaseMap />
+          <div id="navi"><MapSearch></MapSearch></div>
+        </Card>
+      </ThemeProvider>
     );
   
 }

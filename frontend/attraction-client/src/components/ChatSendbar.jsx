@@ -42,7 +42,9 @@ function ChatSendbar (props) {
 
             mediaRecorder.addEventListener('stop', function() {
                 let blob = new Blob(recordedChunks);
-                let file = new File(recordedChunks, "file.mp3");
+                let file = new File(recordedChunks, "file.mp3", {
+                    type: "audio/mp3"
+                });
                 let container = new DataTransfer();
                 container.items.add(file);
                 console.log(container);

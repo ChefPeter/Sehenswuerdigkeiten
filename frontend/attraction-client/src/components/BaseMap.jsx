@@ -7,8 +7,6 @@ import "./styles/BaseMap.scss";
 import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";
-import Info from './Info';
-import changeOpen from './Info';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
 

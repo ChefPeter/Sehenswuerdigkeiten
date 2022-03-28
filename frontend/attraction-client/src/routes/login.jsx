@@ -31,11 +31,8 @@ function Login(props) {
             <TextField sx={{ marginBottom: 0.5 }} fullWidth id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
           </div>
           <Button fullWidth id='btnLoginPage' variant="conained" onClick={ () => post(setErrorText, setShowErrorAlert)}>Anmelden!</Button>    
-         
           <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/register")}>Neuer Benutzer</Button>
-          
           <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/requestreset")}>Passwort zurücksetzen</Button>
-          
           {showErrorAlert ?
             <Fade in={showErrorAlert} timeout={250}>
             <Alert id="loginErrorAlert" severity="error"> 

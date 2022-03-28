@@ -17,7 +17,7 @@ function ResetPassword() {
     const [errorText, setErrorText] = useState("Error");
     const [showInfoAlert, setShowInfoAlert] = useState(false);
     const [showErrorAlert, setShowErrorAlert] = useState(false);
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
 
   return (
       <div id='hintergrund'>
@@ -25,20 +25,13 @@ function ResetPassword() {
             <div id='befehl'>
                 <h1>Bitte neues Passwort eingeben!</h1>
             </div>
-            <div id='abstand'>
-                <TextField id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
+            <div style={{width: "30vw", minWidth: "300px"}}>
+                <TextField sx={{ marginBottom: 1, width: 1}} id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
+                <TextField sx={{ marginBottom: 1, width: 1}} id="filled-password-input" label="Passwort wiederholen" type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} />
+                <Button fullWidth id='btnLoginPage' variant="text" onClick={ () => post(setErrorText, setShowErrorAlert, setShowInfoAlert, searchParams.get("email"), searchParams.get("token"))}>Registrieren</Button>    
             </div>
-
-            <div id='abstand'>
-                <TextField id="filled-password-input" label="Passwort wiederholen" type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} />
-            </div>
-
-            <div id='abstand'>
-                <Button id="knopf" variant="text" onClick={() => post(setErrorText, setShowErrorAlert, setShowInfoAlert, searchParams.get("email"), searchParams.get("token"))}>Registrieren</Button>
-            </div>
-
         <div>
-            <div id='abstand'>
+            <div>
                 {showErrorAlert ?
                 <Alert severity="error">
                     <AlertTitle>Error</AlertTitle>
@@ -46,7 +39,7 @@ function ResetPassword() {
                 </Alert>
                 : null}
             </div>
-            <div id="abstand">
+            <div>
                 {showInfoAlert ? <Alert false severity="info">
                 <AlertTitle>Info</AlertTitle>
                     Dein Passwort wurde zurückgesetzt! <a href="/login">Login</a>

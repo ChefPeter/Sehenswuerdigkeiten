@@ -29,13 +29,8 @@ function Approve(props) {
       });
 
     return (
-        
         <Paper variant="outlined" elevation={4}>Deine Email wurde bestätigt! <Button variant="contained" onClick={() => navigate("/login")}>Zum Login</Button></Paper>
-        
     );
-  
 }
-
-
 
 export default Approve;

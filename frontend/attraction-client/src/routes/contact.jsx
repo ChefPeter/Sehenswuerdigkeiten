@@ -25,7 +25,7 @@ let contactInput = "";
 function Contact(props) {
 
   const [openSuccessSnack, setOpenSuccessSnack] = useState(false);
-const [openErrorSnack, setOpenErrorSnack] = useState(false);
+  const [openErrorSnack, setOpenErrorSnack] = useState(false);
 
 
 
@@ -62,8 +62,6 @@ const handleCloseSuccessSnackbar = (event, reason) => {
   setOpenSuccessSnack(false);
 };
 
-
-
     return (
       <div>
         <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
@@ -77,7 +75,7 @@ const handleCloseSuccessSnackbar = (event, reason) => {
               <TextareaAutosize
                 aria-label="minimum height"
                 minRows={12}
-                placeholder="Type your message!"
+                placeholder="Hier schreiben!"
                 style={{ width: "100%", marginTop: "10px", marginBottom: "10px", resize: "none", fontSize:"large", paddingLeft: 3, paddingRight: 3, paddingTop: 3, paddingBottom:3}}
                 onChange={getInputValue}
               />  

@@ -13,68 +13,68 @@ import LanguageSelector from './LanguageSelector';
 
 
 export default function Header() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+const [anchorEl, setAnchorEl] = React.useState(null);
+const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
-  const isMenuOpen = Boolean(anchorEl);
+const isMenuOpen = Boolean(anchorEl);
 
-  const handleMobileMenuClose = () => {
+const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null);
-  };
+};
 
-  const handleMenuClose = () => {
+const handleMenuClose = () => {
     setAnchorEl(null);
     handleMobileMenuClose();
-  };
+};
 
 
-  const menuId = 'primary-search-account-menu';
-  const renderMenu = (
+const menuId = 'primary-search-account-menu';
+const renderMenu = (
     <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
+    anchorEl={anchorEl}
+    anchorOrigin={{
         vertical: 'top',
         horizontal: 'right',
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
+    }}
+    id={menuId}
+    keepMounted
+    transformOrigin={{
         vertical: 'top',
         horizontal: 'right',
-      }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
+    }}
+    open={isMenuOpen}
+    onClose={handleMenuClose}
     >
-      
-      <MenuItem><Dark_Mode></Dark_Mode></MenuItem>
+    
+    <MenuItem><Dark_Mode></Dark_Mode></MenuItem>
 
-      <MenuItem><LanguageSelector></LanguageSelector></MenuItem>
-      
+    <MenuItem><LanguageSelector></LanguageSelector></MenuItem>
+    
     </Menu>
     
-  );
+);
 
-  return (
+return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+    <AppBar position="static">
         <Toolbar>
-          
-          <Sidebar></Sidebar>
-          <Typography
+        
+        <Sidebar></Sidebar>
+        <Typography
             id="headText"
             variant="h6"
             noWrap
             focusable="false"
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
-          >
+        >
             City2Go
-          </Typography>
+        </Typography>
         </Toolbar>
-      </AppBar>
-     
-      {renderMenu}
-      
+    </AppBar>
+    
+    {renderMenu}
+    
     </Box>
-  );
+);
 }

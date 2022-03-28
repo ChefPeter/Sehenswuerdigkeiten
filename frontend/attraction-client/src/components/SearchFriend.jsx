@@ -8,13 +8,13 @@ function SearchFriend (){
         
             <Grid container direction="row" alignItems="center">
             <Grid item>
-              <SearchIcon />
+            <SearchIcon />
             </Grid>
             <Grid item>
-              Suche einen Freund!
+            Suche einen Freund!
             </Grid>
-          </Grid>
-       
+        </Grid>
+    
     )
 
 }

@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './routes/App';
 import {
-  BrowserRouter,
-  Routes,
-  Route,
+    BrowserRouter,
+    Routes,
+    Route,
 } from "react-router-dom";
 import Home from "./routes/home";
 import Login from "./routes/login";
@@ -32,22 +32,22 @@ const Routing = () => {
   <BrowserRouter>
     <Routes>
     
-      <Route path="/" element={<Login/>} />
-      <Route path="" element={<Login/>} />
-      <Route path="login" element={<Login/>} />
-      <Route path="app" element={<App /> }/>
-      <Route path="home" element={<Home /> } />
-      <Route path="register" element={<Register />} />
-      <Route path="groups" element={<Groups />} />
-      <Route path="friends" element={<Friends />} />
-      <Route path="notifications" element={<Notifications />} />
-      <Route path="contact" element={<Contact />} />
-      <Route path="approve" element={<Approve/>}/>
-      <Route path="requestReset" element={<RequestReset/>}/>
-      <Route path="reset-password" element={<ResetPassword/>}/>
-      <Route path="profile" element={<Profile />}></Route>
-      <Route path='legalnotice' element={<LegalNotice></LegalNotice>}></Route>
-      <Route path='chat' element={<Chat></Chat>}></Route>
+        <Route path="/" element={<Login/>} />
+        <Route path="" element={<Login/>} />
+        <Route path="login" element={<Login/>} />
+        <Route path="app" element={<App /> }/>
+        <Route path="home" element={<Home /> } />
+        <Route path="register" element={<Register />} />
+        <Route path="groups" element={<Groups />} />
+        <Route path="friends" element={<Friends />} />
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="contact" element={<Contact />} />
+        <Route path="approve" element={<Approve/>}/>
+        <Route path="requestReset" element={<RequestReset/>}/>
+        <Route path="reset-password" element={<ResetPassword/>}/>
+        <Route path="profile" element={<Profile />}></Route>
+        <Route path='legalnotice' element={<LegalNotice></LegalNotice>}></Route>
+        <Route path='chat' element={<Chat></Chat>}></Route>
 
     </Routes>
 
@@ -58,10 +58,10 @@ const Routing = () => {
 }
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Routing />
-  </React.StrictMode>,
-  document.getElementById('root')
+    <React.StrictMode>
+        <Routing />
+    </React.StrictMode>,
+    document.getElementById('root')
 );
 
 

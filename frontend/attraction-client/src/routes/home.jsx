@@ -11,66 +11,66 @@ import MapSearch from "../components/MapSearch";
 
 // Define theme settings
 const light = {
-  palette: {
+palette: {
     mode: "light",
     colorDiv: "white"
-  },
+},
 };
 
 const dark = {
-  palette: {
+palette: {
     mode: "dark",
-  },
+},
 };
 
 function Home(props) {
 
- 
-  useEffect(() => {
+
+useEffect(() => {
     
     
 
-  });
-  
+});
 
-  const theme = useSelector(state => {
+
+const theme = useSelector(state => {
     try{
-      return state.theme;
+    return state.theme;
     }catch(e){
-      return "dark";
+    return "dark";
     }
-  });
-  const language = useSelector(state => {
+});
+const language = useSelector(state => {
     try{
-      return state.language;
+    return state.language;
     }catch(e){
-      return "de";
+    return "de";
     }
-  });
+});
     return (
-      <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
+    <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
         <Header/>
         <Card id="container">
-          <BaseMap />
-          <div id="navi"><MapSearch></MapSearch></div>
-          <Button id="test" onClick={() => postRoute()}>Enter</Button>
+        <BaseMap />
+        <div id="navi"><MapSearch></MapSearch></div>
+        <Button id="test" onClick={() => postRoute()}>Enter</Button>
         </Card>
-      </ThemeProvider>
+    </ThemeProvider>
     );
-  
+
 }
 //<Button id="testButton" onClick={() => {console.log("test");}}>Post Route</Button>
 //checks if logged in
 function handle(){
-  fetch("http://localhost:5000/logged-in", {
+fetch("http://localhost:5000/logged-in", {
     method: "GET",
-  }).then(res => {
+}).then(res => {
     //not logged in
     console.log(res)
     if (res.status == 400) {
         //window.location.href="/login";
     } 
-  });
+});
 }
 
 export default Home;

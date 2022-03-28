@@ -1,21 +1,17 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import { IconButton } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GroupIcon from '@mui/icons-material/Group';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
-import HomeIcon from '@mui/icons-material/Home';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Link } from "react-router-dom";
 import Dark_Mode from './dark_mode';
@@ -24,120 +20,120 @@ import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import PolicyIcon from '@mui/icons-material/Policy';
 
 export default function SwipeableTemporaryDrawer() {
-  const [state, setState] = React.useState({
+const [state, setState] = React.useState({
     left: false,
-  });
+});
 
 
-  const toggleDrawer = (anchor, open) => (event) => {
+const toggleDrawer = (anchor, open) => (event) => {
     if (
-      event &&
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
+    event &&
+    event.type === 'keydown' &&
+    (event.key === 'Tab' || event.key === 'Shift')
     ) {
-      return;
+    return;
     }
 
     setState({ ...state, [anchor]: open });
-  };
+};
 
 
-  const list = (anchor) => (
+const list = (anchor) => (
     <div>
     <Box
-      sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 300 }}
-      role="presentation"
-      
-      onKeyDown={toggleDrawer(anchor, false)}
+    sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 300 }}
+    role="presentation"
+    
+    onKeyDown={toggleDrawer(anchor, false)}
     >
-      
-      <List>
+    
+    <List>
         
-          
-          <ListItem button  component={Link} to="/home">
+        
+        <ListItem button  component={Link} to="/home">
             <ListItemIcon>
-              <TravelExploreIcon />
+            <TravelExploreIcon />
             </ListItemIcon>
             <ListItemText primary={"Home"} />
-          </ListItem>
+        </ListItem>
 
-          <ListItem button  component={Link} to="/groups">
+        <ListItem button  component={Link} to="/groups">
             <ListItemIcon>
-              <GroupIcon />
+            <GroupIcon />
             </ListItemIcon>
             <ListItemText primary={"Groups"} />
-          </ListItem>
+        </ListItem>
 
-          <ListItem button  component={Link} to="/friends">
+        <ListItem button  component={Link} to="/friends">
             <ListItemIcon>
             <PersonAddIcon />
             </ListItemIcon>
             <ListItemText primary={"Friends"} />
-          </ListItem>
+        </ListItem>
 
-          <ListItem button  component={Link} to="/notifications">
+        <ListItem button  component={Link} to="/notifications">
             <ListItemIcon>
             <NotificationsIcon />
             </ListItemIcon>
             <ListItemText primary={"Notifications"} />
-          </ListItem>
+        </ListItem>
 
-          <ListItem button  component={Link} to="/contact">
+        <ListItem button  component={Link} to="/contact">
             <ListItemIcon>
-              <ContactPageIcon />
+            <ContactPageIcon />
             </ListItemIcon>
             <ListItemText primary={"Contact"} />
-          </ListItem>
+        </ListItem>
 
-          <ListItem button  component={Link} to="/legalnotice">
+        <ListItem button  component={Link} to="/legalnotice">
             <ListItemIcon>
-              <PolicyIcon />
+            <PolicyIcon />
             </ListItemIcon>
             <ListItemText primary={"Legal Notice"} />
-          </ListItem>
+        </ListItem>
         
-      </List>
-      <Divider />
+    </List>
+    <Divider />
 
-      <ListItem button  component={Link} to="/profile">
+    <ListItem button  component={Link} to="/profile">
             <ListItemIcon>
             <AccountBoxIcon />
             </ListItemIcon>
             <ListItemText primary={"Profile"} />
-      </ListItem>
+    </ListItem>
 
-      <Dark_Mode ></Dark_Mode>
-      <LanguageSelector></LanguageSelector>
-      
+    <Dark_Mode ></Dark_Mode>
+    <LanguageSelector></LanguageSelector>
+    
     </Box>
     </div>
-  );
+);
 
-  return (
+return (
     <div>
-      <IconButton
+    <IconButton
             size="large"
             edge="start"
             color="inherit"
             aria-label="open drawer"
             sx={{ mr: 2 }}
             onClick={toggleDrawer("left", true)}
-          >
+        >
             <MenuIcon></MenuIcon>
-          </IconButton>
-      {
+        </IconButton>
+    {
         <React.Fragment key="left">
-         
-          <SwipeableDrawer
+        
+        <SwipeableDrawer
             anchor="left"
             open={state["left"]}
             onClose={toggleDrawer("left", false)}
             onOpen={toggleDrawer("left", true)}
-          >
+        >
             {list("left")}
-          </SwipeableDrawer>
+        </SwipeableDrawer>
         </React.Fragment>
-      }
+    }
     </div>
-  );
+);
 }

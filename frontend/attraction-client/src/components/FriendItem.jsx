@@ -14,49 +14,49 @@ function FriendItem(props) {
     const [showDescription, setShowDescription] = useState(false);    
 
     console.log("prop" + props.profilePicture)
-  
+
     return (
-      <div>
+    <div>
         
         <ListItem id="listItem" button onClick={() => openFriendMenu(setShowDescription, showDescription)} alignItems="flex-start">
-          <ListItemAvatar>
+        <ListItemAvatar>
             <Avatar alt="Avatar" src={props.profilePicture}/>
-          </ListItemAvatar>
-          <ListItemText
+        </ListItemAvatar>
+        <ListItemText
             primary={props.name}
             secondary={
-              <React.Fragment>
+            <React.Fragment>
                 <Typography
-                  sx={{ display: 'inline' }}
-                  component="span"
-                  variant="body2"
-                  color="text.primary"
+                sx={{ display: 'inline' }}
+                component="span"
+                variant="body2"
+                color="text.primary"
                 >
-                  {props.description}
+                {props.description}
                 </Typography>
                 
-              </React.Fragment>
+            </React.Fragment>
             }
-          />
-          
-      </ListItem>
+        />
+        
+    </ListItem>
 
-      {showDescription ? 
-      <Card id="friendCard"> 
+    {showDescription ? 
+    <Card id="friendCard"> 
         
         <Button variant="conatined" onClick={ () => navigate("/chat?"+new URLSearchParams({name: props.name}))}>Open Chat</Button> 
         <Button variant="conatined" onClick={() => handleFollowPosition()}>Follow Position</Button> 
         <Button variant="conatined" onClick={() => handleReport()}>Report</Button>
         <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleRemoveFriend(props.name)}><ClearIcon/></Button>
         
-      </Card> : null}
+    </Card> : null}
         
         <br></br>
 
-      </div>
+    </div>
     
     );
-  
+
 }
 
 
@@ -67,7 +67,7 @@ function handleRemoveFriend(name){
 
     let formData = new FormData();
     formData.append('friend', name);
-  
+
     fetch("http://localhost:5000/reject-friend", {
         method: "post",
         body: formData,
@@ -77,8 +77,8 @@ function handleRemoveFriend(name){
             
         } else {
             // Infofeld sichtbar machen
-           window.location.reload();
-           
+        window.location.reload();
+        
         }
     });
 
@@ -86,14 +86,14 @@ function handleRemoveFriend(name){
 }
 
 function handleFollowPosition(){
-  console.log("hallo")
+console.log("hallo")
 }
 
 
 function openFriendMenu(setShowDescription, state){
 
- 
-  setShowDescription(!state);
+
+setShowDescription(!state);
 
 }
 

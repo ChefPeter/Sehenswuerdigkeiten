@@ -6,36 +6,36 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 // Define theme settings
 const light = {
-  palette: {
+palette: {
     mode: "light",
-  },
+},
 };
 
 const dark = {
-  palette: {
+palette: {
     mode: "dark",
-  },
+},
 };
 
 function LegalNotice(props) {
 
-  const theme = useSelector(state => {
+const theme = useSelector(state => {
     try{
-      return state.theme;
+    return state.theme;
     }catch(e){
-      return "dark";
+    return "dark";
     }
-  });
-  const language = useSelector(state => {
+});
+const language = useSelector(state => {
     try{
-      return state.language;
+    return state.language;
     }catch(e){
-      return "de";
+    return "de";
     }
-  });
+});
 
     return (
-      <div>
+    <div>
         <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
         <Header/>
         <div id="rand">
@@ -78,10 +78,10 @@ function LegalNotice(props) {
             <br />
             <h2>Verbraucher&shy;streit&shy;beilegung/Universal&shy;schlichtungs&shy;stelle</h2>
             <p>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
-          </div>
+        </div>
         </ThemeProvider>
-      </div>
+    </div>
     );
-  
+
 }
 export default LegalNotice;

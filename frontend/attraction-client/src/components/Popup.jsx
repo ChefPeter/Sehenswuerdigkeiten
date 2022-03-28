@@ -1,14 +1,14 @@
 import React from "react";
 
 const Popup = ({ feature }) => {
-  const { id, name, description } = feature.properties;
+const { id, name, description } = feature.properties;
 
-  return (
+return (
     <div id={`popup-${id}`}>
-      <h3>{name}</h3>
-      {description}
+    <h3>{name}</h3>
+    {description}
     </div>
-  );
+);
 };
 
 export default Popup;

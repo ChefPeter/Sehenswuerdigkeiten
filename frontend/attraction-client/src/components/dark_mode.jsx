@@ -12,59 +12,59 @@ import { useSelector } from 'react-redux';
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 
 function Mode() {
-  const theme = useTheme();
-  const colorMode = React.useContext(ColorModeContext);
-  
-  return (
+const theme = useTheme();
+const colorMode = React.useContext(ColorModeContext);
+
+return (
     <ListItem button onClick={colorMode.toggleColorMode}>
-     
-      
+    
+    
         <ListItemIcon>
         {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
 
             </ListItemIcon>
             
             <ListItemText primary={"Switch Mode"} />
-   
+
     </ListItem>
-  );
+);
 }
 
 export default function Dark_Mode() {
-  const defaultTheme = useSelector(state => {
+const defaultTheme = useSelector(state => {
     try{
-      return state.theme;
+    return state.theme;
     }catch(e){
-      return "dark";
+    return "dark";
     }
-  });
-  const [mode, setMode] = React.useState(defaultTheme);
-  const colorMode = React.useMemo(
+});
+const [mode, setMode] = React.useState(defaultTheme);
+const colorMode = React.useMemo(
     () => ({
-      toggleColorMode: () => {
+    toggleColorMode: () => {
         setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
         const changeTheme = { type: 'CHANGE_THEME', theme: "unknown"};
         store.dispatch(changeTheme)  
-      },
+    },
     }),
     [],
-  );
+);
 
-  const theme = React.useMemo(
+const theme = React.useMemo(
     () =>
-      createTheme({
+    createTheme({
         palette: {
-          mode,
+        mode,
         },
-      }),
+    }),
     [mode],
-  );
+);
 
-  return (
+return (
     <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
         <Mode />
-      </ThemeProvider>
+    </ThemeProvider>
     </ColorModeContext.Provider>
-  );
+);
 }

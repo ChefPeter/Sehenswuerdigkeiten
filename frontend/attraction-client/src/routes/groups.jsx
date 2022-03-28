@@ -6,41 +6,41 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 // Define theme settings
 const light = {
-  palette: {
+palette: {
     mode: "light",
-  },
+},
 };
 
 const dark = {
-  palette: {
+palette: {
     mode: "dark",
-  },
+},
 };
 
 function Groups(props) {
 
-  const theme = useSelector(state => {
+const theme = useSelector(state => {
     try{
-      return state.theme;
+    return state.theme;
     }catch(e){
-      return "dark";
+    return "dark";
     }
-  });
-  const language = useSelector(state => {
+});
+const language = useSelector(state => {
     try{
-      return state.language;
+    return state.language;
     }catch(e){
-      return "de";
+    return "de";
     }
-  });
+});
 
     return (
-      <div>
+    <div>
         <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
         <Header/>
         </ThemeProvider>
-      </div>
+    </div>
     );
-  
+
 }
 export default Groups;

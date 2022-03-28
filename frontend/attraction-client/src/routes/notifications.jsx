@@ -1,43 +1,43 @@
-import { useSelector } from 'react-redux';
-import "../routes/styles/notifications.css";
-import Header from "../components/header";
-import React from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Alert from '@mui/material/Alert';
-import Stack from '@mui/material/Stack';
+    import { useSelector } from 'react-redux';
+    import "../routes/styles/notifications.css";
+    import Header from "../components/header";
+    import React from "react";
+    import { createTheme, ThemeProvider } from "@mui/material/styles";
+    import Alert from '@mui/material/Alert';
+    import Stack from '@mui/material/Stack';
 
-// Define theme settings
-const light = {
-  palette: {
-    mode: "light",
-  },
-};
+    // Define theme settings
+    const light = {
+    palette: {
+        mode: "light",
+    },
+    };
 
-const dark = {
-  palette: {
-    mode: "dark",
-  },
-};
+    const dark = {
+    palette: { 
+        mode: "dark",
+    },
+    };
 
-function Notifications(props) {
+    function Notifications(props) {
 
-  const theme = useSelector(state => {
-    try{
-      return state.theme;
-    }catch(e){
-      return "dark";
-    }
-  });
-  const language = useSelector(state => {
-    try{
-      return state.language;
-    }catch(e){
-      return "de";
-    }
-  });
+    const theme = useSelector(state => {
+        try{
+        return state.theme;
+        }catch(e){
+        return "dark";
+        }
+    });
+    const language = useSelector(state => {
+        try{
+        return state.language;
+        }catch(e){
+        return "de";
+        }
+    });
 
     return (
-      <div>
+    <div>
         <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
         <Header/>
         <div id='nachrichten'>
@@ -47,8 +47,8 @@ function Notifications(props) {
             </Stack>
         </div>
         </ThemeProvider>
-      </div>
+    </div>
     );
-  
-}
-export default Notifications;
+    
+    }
+    export default Notifications;

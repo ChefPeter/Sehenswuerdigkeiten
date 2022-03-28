@@ -9,13 +9,13 @@ import "./styles/languageselect.css"
 
 function LanguageSelector() {
 
-  const language_given = useSelector(state => {
+const language_given = useSelector(state => {
     try{
-      return state.language;
+    return state.language;
     }catch(e){
-      return "de";
+    return "de";
     }
-  });
+});
     const [language, setLanguage] = React.useState(language_given);
 
     const handleChange = (event) => {
@@ -27,23 +27,23 @@ function LanguageSelector() {
     };
 
     return(
-     <Box >
-      <FormControl id="languageSelectorStyle" >
+    <Box >
+    <FormControl id="languageSelectorStyle" >
         <InputLabel id="demo-simple-select-label">Language</InputLabel>
         <Select
-         
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={language}
-          label="Language"
-          onChange={handleChange}
+        
+        labelId="demo-simple-select-label"
+        id="demo-simple-select"
+        value={language}
+        label="Language"
+        onChange={handleChange}
         >
-          <MenuItem value={"de"}>Deutsch</MenuItem>
-          <MenuItem value={"en"}>English</MenuItem>
-          <MenuItem value={"it"}>Italiano</MenuItem>
+        <MenuItem value={"de"}>Deutsch</MenuItem>
+        <MenuItem value={"en"}>English</MenuItem>
+        <MenuItem value={"it"}>Italiano</MenuItem>
         </Select>
-      </FormControl>
-     </Box>
+    </FormControl>
+    </Box>
     );
 
 }
@@ -54,9 +54,9 @@ const initState = {
 
 const mapStatesToProps = (state = initState) => {
     return {
-      language: state.language
+    language: state.language
     }  
 }
-  
+
 
 export default connect(mapStatesToProps)(LanguageSelector);

@@ -12,56 +12,56 @@ const API_KEY = "5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752";
 
 // Define theme settings
 const light = {
-  palette: {
+palette: {
     mode: "light",
     colorDiv: "white"
-  },
+},
 };
 
 const dark = {
-  palette: {
+palette: {
     mode: "dark",
-  },
+},
 };
 
 
 function App(props) {
- 
-  const theme = useSelector(state => {
-    try{
-      return state.theme;
-    }catch(e){
-      return "dark";
-    }
-  });
-  const language = useSelector(state => {
-    try{
-      return state.language;
-    }catch(e){
-      return "de";
-    }
-  });
 
-  function getDetailsFromMonument(id)
-  {
+const theme = useSelector(state => {
+    try{
+    return state.theme;
+    }catch(e){
+    return "dark";
+    }
+});
+const language = useSelector(state => {
+    try{
+    return state.language;
+    }catch(e){
+    return "de";
+    }
+});
+
+function getDetailsFromMonument(id)
+{
     return `https://api.opentripmap.com/0.1/en/places/xid/${id}?apikey=${API_KEY}`;
-  }
+}
 
     return (
-      <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-      <Header/>
-      <BaseMap />
-      <Slider></Slider>
-      <a>index</a>
-      <Link to="/start">Start</Link>
-      <Button variant="contained" >Hello World</Button>;
-      <Button variant="contained"   endIcon={<DeleteIcon/>}>
-     
+    <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
+    <Header/>
+    <BaseMap />
+    <Slider></Slider>
+    <a>index</a>
+    <Link to="/start">Start</Link>
+    <Button variant="contained" >Hello World</Button>;
+    <Button variant="contained"   endIcon={<DeleteIcon/>}>
+    
         Send
-      </Button>
+    </Button>
     </ThemeProvider>
     );
-  
+
 }
 
 

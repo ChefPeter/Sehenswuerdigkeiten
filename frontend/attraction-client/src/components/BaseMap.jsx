@@ -6,10 +6,24 @@ import "./styles/BaseMap.scss";
 import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";
-
+const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
 let map;
 let testRoute = [];
+
+function getRouteURL(type, coords, language)
+{
+  return `https://api.mapbox.com/directions/v5/mapbox/${type}/${(new URLSearchParams(coords).toString()).slice(0,-1)}?alternatives=true&geometries=geojson&language=${language}&overview=simplified&steps=true&access_token=${API_KEY}`;
+}
+
+async function getDataFromURL(url)
+{
+  let result = await fetch(url);
+  let answer = null;
+  if(result.ok)
+    answer = await result.json();
+  return answer;
+}
 
 function addToRoute(object)
 {
@@ -22,7 +36,7 @@ export async function postRoute()
 {
     let formData = new FormData();
     let coords = [];
-    let out;
+    let out = [];
 
     formData.append('points', JSON.stringify(testRoute));
     formData.append('vehicle', 'driving');
@@ -38,7 +52,12 @@ export async function postRoute()
     map.removeLayer("route1");
     map.removeSource('route1');
     }
-
+    for(let count = 1; count < coords.length; count++)
+    {
+      let rout = await getDataFromURL(getRouteURL("walking", `${coords[count].join(",")};${coords[count - 1].join(",")}`, "en"));
+      out.push(rout.routes[0].geometry.coordinates);
+    }
+    out = out.reduce((a, b) => a.concat(b));
     map.addSource('route1', {
     'type': 'geojson',
     'data': {
@@ -46,7 +65,7 @@ export async function postRoute()
     'properties': {},
     'geometry': {
     'type': 'LineString',
-    'coordinates': coords
+    'coordinates': out
     }
     }
     });

@@ -1,11 +1,16 @@
 import React, { useEffect, useRef } from "react";
-import mapboxgl from "mapbox-gl";
+import { useState } from 'react';
+import mapboxgl, { DoubleClickZoomHandler } from "mapbox-gl";
 import fetchFakeData from "./fetchFakeData";
 import Popup from "./Popup";
 import "./styles/BaseMap.scss";
 import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";
+import Info from './Info';
+import changeOpen from './Info';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+
 
 
 let map;
@@ -89,7 +94,8 @@ const BaseMap = () => {
     //mapbox://styles/mapbox/satellite-v9
     //mapbox://styles/mapbox/light-v10
     let theme = "mapbox://styles/mapbox/navigation-night-v1"
-
+  
+    const [open, setOpen] = useState(false);
    /* useSelector(state => {
         try{
            
@@ -206,18 +212,7 @@ const BaseMap = () => {
 
     // change cursor to pointer when user hovers over a clickable feature
     map.on("mouseenter", "random-points-layer", e => {
-      if (e.features.length) {
-        map.getCanvas().style.cursor = "pointer";
-      }
-    });
 
-    // reset cursor to default when user is no longer hovering over a clickable feature
-    map.on("mouseleave", "random-points-layer", () => {
-      map.getCanvas().style.cursor = "";
-    });
-
-    // add popup when user clicks a point
-    map.on("click", "random-points-layer", e => {
       if (e.features.length) {
         const feature = e.features[0];
         // create popup node
@@ -233,14 +228,29 @@ const BaseMap = () => {
         if(testRoute.length > 3)
           ReactDOM.render(<Button onClick={() => postRoute()}>PostRoute</Button>, popupNode);
 
+        //popupNode  = document.createElement("div");
         // set popup on map
         popUpRef.current
           .setLngLat(feature.geometry.coordinates)
           .setDOMContent(popupNode)
           .addTo(map);
+               
       }
     });
 
+    // reset cursor to default when user is no longer hovering over a clickable feature
+    map.on("mouseleave", "random-points-layer", () => {
+      //mapboxgl-popup-close-button
+      popUpRef.current.remove();
+        
+    });
+
+    // add popup when user clicks a point
+    map.on("click", "random-points-layer", e => {
+      if (e.features.length) {
+        setOpen(true);
+      }
+    });
     
    
     // clean up on unmount
@@ -251,7 +261,20 @@ const BaseMap = () => {
   return (<div>
    
     <div id="mapContainer" className="map" ref={map}></div>
-
+    <SwipeableDrawer 
+        anchor='bottom'
+        open={open}
+        onClose={() => setOpen(false)}
+        onOpen={() => {}}>
+          <div>
+            <img src="https://media.istockphoto.com/photos/colosseum-in-rome-during-sunrise-picture-id1271579758?b=1&k=20&m=1271579758&s=170667a&w=0&h=oyXB8ehFjbo5-9HDdSjI9hYZktLstV3Ixz4JUUynahU=" style={{width:"100%", height:"12%"}}></img>
+            <div style={{display: "flex", justifyContent: "space-between"}}>
+              <h2 >Name</h2>
+              <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}}>Add</Button>
+            </div>
+          </div>
+            
+      </SwipeableDrawer>
   </div>
   );
 };

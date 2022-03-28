@@ -3,24 +3,29 @@ const util = require("util");
 
 async function sendMessage(request) {
     // Schauen ob Pflichtfelder ausgefüllt sind
-    if (!checkMandatoryFields(request.body)) return "Nicht alle Pflichtfelder sind ausgefüllt!";
+    if (!checkMandatoryFields(request)) return "Nicht alle Pflichtfelder sind ausgefüllt!";
     
     // recipient lowercase machen
     request.body.recipient.toLowerCase();
 
     // Schauen, ob die Nachricht nicht zu lang ist
-    if (request.body.content.length >= 10000) return "Die Nachricht ist zu lang!";
+    if (!request.files && request.body.content.length >= 10000) return "Die Nachricht ist zu lang!";
     
     // Die Nachricht senden
     return await insertMessage(request);
 }
 
-function checkMandatoryFields(params) {
-    const fields = [
+function checkMandatoryFields(request) {
+    const fields =  request.files ? 
+    [
+        "recipient"
+    ]
+    :
+    [
         "content",
         "recipient"
     ];
-    return fields.every(field => params[field]);
+    return fields.every(field => request.body[field]);
 }
 
 async function insertMessage(request) {
@@ -44,7 +49,7 @@ async function insertMessage(request) {
             (
                 '${request.session.username}',
                 '${request.body.recipient}',
-                '${request.files.file ? request.files.file.file : request.body.content}',
+                '${request.files.file ? request.files.file.file.replace(/\\/g, "\\\\") : request.body.content}',
                 NOW(),
                 ${request.files.file ? 'true' : 'false'}
             )`

@@ -26,31 +26,22 @@ const dark = {
   },
 };
 
-
-
-function Chat (props) {
+/*class Chat extends React.Component {
   
-  const [searchParams, setSearchParams] = useSearchParams();
-  const name = searchParams.get("name");
-
+  constructor(props) {
+    super(props);
+    this.state = { friend: "loberhauser3", messages: [] };
+    //this.updateChat = this.updateChat.bind(this);
+    this.updateChat();
+    //const [searchParams, setSearchParams] = useSearchParams();
+    //const name = searchParams.get("name");
+    //console.log();
+    //console.log(new URLSearchParams(this.props.location.search).get("name"));
+    
     const [messages, setMessages] = useState([]);
 
-    const friend = name;
-    
-    useEffect(async() => {
-
-      console.log("haha")
-
-      const respone = await fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
-        method: "GET",
-        credentials: "include"
-      });
-      const json = await respone.json();
-      setMessages(json);
-    });
-
-
-    console.log("haha")
+    this.friend = "loberhauser3";
+    this.messages = [];
     fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
       method: "GET",
       credentials: "include"
@@ -59,9 +50,91 @@ function Chat (props) {
     .then(res => {
       console.log("ANFRAGE WIRD GESCHICKT!");
       setMessages(res)
+      //setTimeout(() => setMessages(res), 3000);
     });
 
 
+  }
+
+  updateChat() {
+    this.setState({friend: "Peter"}, () => console.log(this.state));
+  }
+
+  render() {
+    return (
+      <ThemeProvider theme={createTheme(light)}>
+            <Header />
+            <Card elevation={4} sx={{
+                    marginTop: 1.5, 
+                    marginLeft: 1, 
+                    marginRight: 1, 
+                    paddingTop: 1,
+                    paddingBottom: 1,
+                    paddingRight: 1,
+                    paddingLeft: 1}}> You are writing with: <strong>{this.state.friend}</strong></Card>
+          
+                <Card elevation={4} sx={{
+                    marginTop: 1.5, 
+                    marginLeft: 1, 
+                    marginRight: 1, 
+                    paddingTop: 1,
+                    paddingBottom: 1,
+                    paddingRight: 1,
+                    paddingLeft: 1}}>
+ 
+                    <LeftMessage message ="Hallo" time="13:00"></LeftMessage>
+                    <RightMessage message ="Tschüss" time="13:01"></RightMessage>
+                    
+                    {this.state.messages.map(message => {
+                      if (message.sender === this.friend) {
+                        <LeftMessage message={message.content} time={message["message_timestamp"]}></LeftMessage>
+                      } else {
+                        <RightMessage message={message.content} time={message["message_timestamp"]}></RightMessage>
+                      }
+                    })}
+
+                    
+                </Card>
+
+                  <Card elevation={4} sx={{
+                    marginBottom: 2,
+                    marginTop: 1, 
+                    marginLeft: 1, 
+                    marginRight: 1, 
+                    paddingTop: 2,
+                    paddingBottom: 2,
+                    paddingRight: 1,
+                    paddingLeft: 1}}>
+                <ChatSendbar></ChatSendbar>
+                </Card>
+        </ThemeProvider>
+    );
+  }
+
+
+}*/
+
+const Chat = (props) => {
+  
+    const [searchParams, setSearchParams] = useSearchParams();
+    const name = searchParams.get("name");
+
+    const [messages, setMessages] = useState([]);
+    const friend = name;
+
+    /*fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
+      method: "GET",
+      credentials: "include"
+    })
+    .then(res => res.json())
+    .then(res => {
+      console.log("ANFRAGE WIRD GESCHICKT!");
+      //setMessages(res)
+      setTimeout(() => setMessages(res), 3000);
+    });*/
+
+
+    console.log("ICH WERDE AUFGERUFEN!");
     return (
         <ThemeProvider theme={createTheme(light)}>
             <Header />
@@ -106,7 +179,7 @@ function Chat (props) {
                     paddingBottom: 2,
                     paddingRight: 1,
                     paddingLeft: 1}}>
-                <ChatSendbar></ChatSendbar>
+                <ChatSendbar name={friend}></ChatSendbar>
                 </Card>
         </ThemeProvider>
     );

@@ -123,17 +123,24 @@ const Chat = (props) => {
     const [messages, setMessages] = useState([]);
     const friend = name;
 
-    setTimeout( () => fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
-      method: "GET",
-      credentials: "include"
-    })
-    .then(res => res.json())
-    .then(res => {
-      //console.log(res);
-      console.log(++counter);
-      setMessages(res)
-      //setTimeout(() => setMessages(res), 3000);
-    }), 3000);
+    function func () {
+      setInterval( () => fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
+        method: "GET",
+        credentials: "include"
+      })
+      .then(res => res.json())
+      .then(res => {
+        console.log("----------------");
+        console.log(res);
+        console.log(++counter);
+        console.log(messages)
+        setMessages(res)
+        
+        //setTimeout(() => setMessages(res), 3000);
+      }), 3000);
+    }
+
+    useEffect(func, []);
 
     
     return (
@@ -159,19 +166,19 @@ const Chat = (props) => {
  
                     <LeftMessage message ="Hallo" time="13:00"></LeftMessage>
                     <RightMessage message ="Tschüss" time="13:01"></RightMessage>
-                    
+                
                     {messages.map(message => {
                       if (message.is_file) {
                         if (message.sender === friend) {
-                          <LeftMessage path={message.content}></LeftMessage>
+                          return <LeftMessage path={message.content}></LeftMessage>
                         } else {
-                          <RightMessage path={message.content}></RightMessage>
+                          return <RightMessage path={message.content}></RightMessage>
                         }
                       } else {
                         if (message.sender === friend) {
-                          <LeftMessage message={message.content} time={message["message_timestamp"]}></LeftMessage>
+                          return <LeftMessage message={message.content} time={message["message_timestamp"]}></LeftMessage>
                         } else {
-                          <RightMessage message={message.content} time={message["message_timestamp"]}></RightMessage>
+                          return <RightMessage message={message.content} time={message["message_timestamp"]}></RightMessage>
                         }
                       }
                     })}

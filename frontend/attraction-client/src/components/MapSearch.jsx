@@ -34,7 +34,7 @@ function MapSearch () {
 
         let obj = [{}];
         let places = [], coords = [];
-        console.log(jsonRes["features"][0])
+       
         for(let i = 0; i<jsonRes["features"].length-1; i++){
 
             
@@ -43,24 +43,22 @@ function MapSearch () {
                 if(jsonRes["features"][i]["place_name"] != undefined && jsonRes["features"][i]["center"] != undefined){
                     places[i] = jsonRes["features"][i]["place_name"];
                     coords[i] = jsonRes["features"][i]["place_name"];
-                   
-                
                 }
-
             }
-
-            //console.log(jsonRes["features"][i]["place_name"])
-           // console.log(jsonRes["features"][0]
-
         }
-        obj = [{name: places[0], coords: coords[0]}]
-        
-        for(let i = 0; i<places.length; i++){
 
-            obj.push({
-                name: places[i],
-                coords: coords[i]
-            });
+        if(places[0] != undefined){
+            obj = [{name: places[0], coords: coords[0]}]
+        
+            for(let i = 0; i<places.length; i++){
+
+                obj.push({
+                    name: places[i],
+                    coords: coords[i]
+                });
+            }
+        }else{
+            obj = [{name: "", coords: ""}];
         }
 
         console.log(obj)
@@ -83,7 +81,7 @@ function MapSearch () {
                 id="idAutocomplete"
                 fullWidth
                 disableClearable
-
+                
                 options={locations.map((option) => option.name)}
                 renderInput={(params) => (
                 <TextField

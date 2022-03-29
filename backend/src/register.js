@@ -48,8 +48,9 @@ function securePassword(password) {
 }
 
 async function checkAvailableUsername(username) {
+    let conn;
     try {
-        const conn = mysql.createConnection({
+        conn = mysql.createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -64,12 +65,15 @@ async function checkAvailableUsername(username) {
     } catch(e) {
         console.error(e);
         return false;
+    } finally {
+        conn.end();
     }
 }
 
 async function checkAvailableEmail(email) {
+    let conn;
     try {
-        const conn = mysql.createConnection({
+        conn = mysql.createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -84,12 +88,15 @@ async function checkAvailableEmail(email) {
     } catch(e) {
         console.error(e);
         return false;
+    } finally {
+        conn.end();
     }
 }
 
 async function insertUser(params) {
+    let conn;
     try {
-        const conn = mysql.createConnection({
+        conn = mysql.createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -125,6 +132,8 @@ async function insertUser(params) {
     } catch(e) {
         console.error(e);
         return false;
+    } finally {
+        conn.end();
     }
 }
 

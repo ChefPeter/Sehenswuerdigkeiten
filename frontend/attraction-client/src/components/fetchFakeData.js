@@ -22,9 +22,7 @@
             description: "",
             img: ""     
           }
-        });
-        console.log(result.xid)
-        
+        });   
     }
   function getURL(method, radius, lat, lon, limit)
   {

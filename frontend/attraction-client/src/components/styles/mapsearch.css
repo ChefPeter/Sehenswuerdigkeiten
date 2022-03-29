@@ -3,6 +3,7 @@
     margin-top: 16px;
     width: 30vw;
     opacity: 0.9;
+   
 }
 
 
@@ -10,4 +11,4 @@
     #searchPaper {
       width: calc(95% - 10px);
     }
-  }
+}

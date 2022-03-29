@@ -4,7 +4,9 @@
     const API_KEY = "5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752";
  
     let points = []; 
-    let results = await getDataFromURL(getURL("radius", 1000, centerCoordinates.latitude, centerCoordinates.longitude, 100));
+    console.log(centerCoordinates.radius2)
+    console.log(centerCoordinates.latitude)
+    let results = await getDataFromURL(getURL("radius", centerCoordinates.radius2*1000, centerCoordinates.latitude, centerCoordinates.longitude, 1000));
     for(let result of results)
     {
         const lon = result.point.lon;

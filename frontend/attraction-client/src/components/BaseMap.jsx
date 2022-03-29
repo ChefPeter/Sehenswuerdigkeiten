@@ -51,7 +51,7 @@ export async function postRoute()
     .then(res => res.forEach(x => coords.push(x.geometry.coordinates)));
     if(map.getSource('route1'))
     {
-      map.removeLayer("route1");
+      map.removeLayer("layer1");
       map.removeSource('route1');
       map.removeLayer("route2");
       map.removeSource('route2');
@@ -74,7 +74,7 @@ export async function postRoute()
       }
       });
       map.addLayer({
-      'id': 'route1',
+      'id': 'layer1',
       'type': 'line',
       'source': 'route1',
       'layout': {
@@ -135,7 +135,7 @@ const BaseMap = () => {
     
     //mapbox://styles/mapbox/satellite-v9
     //mapbox://styles/mapbox/light-v10
-    let theme = "mapbox://styles/mapbox/navigation-night-v1"
+    let theme = "mapbox://styles/mapbox/navigation-night-v1";
   
     const [open, setOpen] = useState(false);
     
@@ -209,6 +209,7 @@ const BaseMap = () => {
           ],
           essential: true // this animation is considered essential with respect to prefers-reduced-motion
        });
+
        map.loadImage('https://img.icons8.com/color/344/marker--v1.png',
        function(error, image) {
                if (error) throw error;
@@ -300,6 +301,8 @@ const BaseMap = () => {
         
     });
 
+    
+
     // add popup when user clicks a point
     map.on("click", "random-points-layer", e => {
       if (e.features.length) {
@@ -331,31 +334,33 @@ const BaseMap = () => {
           </div>
             
       </SwipeableDrawer>
+     
   </div>
   );
 
 };
 
-export async function flyToLocation (coords){
+
+export async function flyToLocation (coords, radius){
   
-  map.flyTo({
-    center: [
-      coords[0],
-      coords[1]
-    ],
-    essential: true // this animation is considered essential with respect to prefers-reduced-motion
+    map.flyTo({
+      center: [
+        coords[0],
+        coords[1]
+      ],
+      essential: true // this animation is considered essential with respect to prefers-reduced-motion
     });
 
-
-    const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1] });
-      //results = results.
-      console.log(results);
-      // update "random-points-data" source with new data
-      // all layers that consume the "random-points-data" data source will be updated automatically
-      map.getSource("random-points-data").setData(results);
+    const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius });
+    console.log(results);
+    // update "random-points-data" source with new data
+    // all layers that consume the "random-points-data" data source will be updated automatically
+    map.getSource("random-points-data").setData(results);
 
 }
 
-//module.export = { BaseMap:BaseMap, TestButton:TestButton };
-//export { BaseMap, TestButton };
+
+
+
+
 export default BaseMap;

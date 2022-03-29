@@ -136,7 +136,7 @@ const BaseMap = () => {
       container: "mapContainer",
       center: [11.657244, 46.717705],
       style: theme,
-      zoom: 9,
+      zoom: 12,
     });
 
     const nav = new mapboxgl.NavigationControl();
@@ -206,12 +206,7 @@ const BaseMap = () => {
       /*lon = "12.4907795";
       lat = "41.8897653"*/
       // fetch new data
-      const results = await fetchFakeData({ longitude: lon, latitude: lat });
-      //results = results.
-      console.log(results);
-      // update "random-points-data" source with new data
-      // all layers that consume the "random-points-data" data source will be updated automatically
-      map.getSource("random-points-data").setData(results);
+      
     });
 
     // change cursor to pointer when user hovers over a clickable feature
@@ -273,10 +268,14 @@ const BaseMap = () => {
         setOpen(true);
       }
     });
-  }, []);
+  }, 
+  []);
+
+  
+
   return (<div>
-   
     <div id="mapContainer" className="map" ref={map}></div>
+    
     <SwipeableDrawer 
         anchor='bottom'
         open={open}
@@ -295,7 +294,29 @@ const BaseMap = () => {
       </SwipeableDrawer>
   </div>
   );
+
 };
+
+export async function flyToLocation (coords){
+  
+  map.flyTo({
+    center: [
+      coords[0],
+      coords[1]
+    ],
+    essential: true // this animation is considered essential with respect to prefers-reduced-motion
+    });
+
+
+    const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1] });
+      //results = results.
+      console.log(results);
+      // update "random-points-data" source with new data
+      // all layers that consume the "random-points-data" data source will be updated automatically
+      map.getSource("random-points-data").setData(results);
+
+}
+
 //module.export = { BaseMap:BaseMap, TestButton:TestButton };
 //export { BaseMap, TestButton };
 export default BaseMap;

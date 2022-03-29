@@ -3,20 +3,24 @@ import Header from "../components/header";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Button, Card, Container, TextField, Typography, LinearProgress, Box } from "@mui/material";
 import "./styles/leftmessagestyle.css";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 
 function LeftMessage (props) {
 
+    const [file, setFile] = useState("");
+
     useEffect(async() => {
         if (props.path) {
+            console.log("BLALBALBLAB");
             const result = await fetch("http://localhost:5000/file?"+new URLSearchParams({file: props.path}).toString(), {
                 method: "GET",
                 credentials: "include"
             });
-            const blob = await result.blob();
-            console.log("BLOOB");
-            console.log(blob);
+            if (result.status === 200) {
+                const blob = await result.blob();
+                setFile(URL.createObjectURL(blob));
+            }
         }
     }, []);
 
@@ -36,9 +40,9 @@ function LeftMessage (props) {
 
            }}>
         { props.path ? 
-        <object>DIOCAEN</object>
-        :
-        <p id="messageLeft">{props.message}</p>
+            <object data={file}></object>
+            :
+            <p>{props.message}</p>
         }
         <Card sx={{backgroundColor: "primary.light", width: "3em"}}>{props.time}</Card>
         </Container>

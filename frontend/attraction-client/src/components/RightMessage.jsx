@@ -3,9 +3,11 @@ import Header from "../components/header";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Button, Card, Container, TextField, Typography, LinearProgress, Box } from "@mui/material";
 import "./styles/rightmessagestyle.css"
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function RightMessage (props) {
+
+    const [file, setFile] = useState("");
 
     useEffect(async() => {
         if (props.path) {
@@ -14,9 +16,10 @@ function RightMessage (props) {
                 method: "GET",
                 credentials: "include"
             });
-            const blob = await result.blob();
-            console.log("BLOOB");
-            console.log(blob);
+            if (result.status === 200) {
+                const blob = await result.blob();
+                setFile(URL.createObjectURL(blob));
+            }
         }
     }, []);
 
@@ -37,7 +40,13 @@ function RightMessage (props) {
             
             
            }}>
-        <p >{props.message}</p>
+        {
+            props.path ? 
+                <object data={file}></object>
+                :
+                <p>{props.message}</p>
+        }
+        
         <Card sx={{backgroundColor: "secondary.light", width: "3em"}}>{props.time}</Card>
         </Container>
 

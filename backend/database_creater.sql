@@ -56,3 +56,18 @@ CREATE TABLE IF NOT EXISTS reports (
     resolved boolean,
     FOREIGN KEY (username) REFERENCES users(username)
 );
+
+CREATE TABLE IF NOT EXISTS usergroups (
+    group_id INT NOT NULL,
+    groupname VARCHAR(100),
+    profile_picture VARCHAR(200),
+    PRIMARY KEY (group_id)
+);
+
+CREATE TABLE IF NOT EXISTS users_usergroups (
+    username VARCHAR(100),
+    group_id INT,
+    FOREIGN KEY (username) REFERENCES users(username),
+    FOREIGN KEY (group_id) REFERENCES usergroups(group_id),
+    PRIMARY KEY (username, group_id)
+);

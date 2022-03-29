@@ -130,13 +130,7 @@ const Chat = (props) => {
       })
       .then(res => res.json())
       .then(res => {
-        console.log("----------------");
-        console.log(res);
-        console.log(++counter);
-        console.log(messages)
-        setMessages(res)
-        
-        //setTimeout(() => setMessages(res), 3000);
+        setMessages(res);
       }), 3000);
     }
 
@@ -167,18 +161,18 @@ const Chat = (props) => {
                     <LeftMessage message ="Hallo" time="13:00"></LeftMessage>
                     <RightMessage message ="Tschüss" time="13:01"></RightMessage>
                 
-                    {messages.map(message => {
+                    {messages.map((message, i) => {
                       if (message.is_file) {
                         if (message.sender === friend) {
-                          return <LeftMessage path={message.content}></LeftMessage>
+                          return <LeftMessage key={"message_"+i} path={message.content}></LeftMessage>
                         } else {
-                          return <RightMessage path={message.content}></RightMessage>
+                          return <RightMessage key={"message_"+i} path={message.content}></RightMessage>
                         }
                       } else {
                         if (message.sender === friend) {
-                          return <LeftMessage message={message.content} time={message["message_timestamp"]}></LeftMessage>
+                          return <LeftMessage key={"message_"+i} message={message.content} time={message["message_timestamp"]}></LeftMessage>
                         } else {
-                          return <RightMessage message={message.content} time={message["message_timestamp"]}></RightMessage>
+                          return <RightMessage key={"message_"+i} message={message.content} time={message["message_timestamp"]}></RightMessage>
                         }
                       }
                     })}

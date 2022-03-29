@@ -2,11 +2,23 @@ import React from "react";
 import Header from "../components/header";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Button, Card, Container, TextField, Typography, LinearProgress, Box } from "@mui/material";
-import "./styles/leftmessagestyle.css"
+import "./styles/leftmessagestyle.css";
+import { useEffect } from 'react';
 
 
 function LeftMessage (props) {
 
+    useEffect(async() => {
+        if (props.path) {
+            const result = await fetch("http://localhost:5000/file?"+new URLSearchParams({file: props.path}).toString(), {
+                method: "GET",
+                credentials: "include"
+            });
+            const blob = await result.blob();
+            console.log("BLOOB");
+            console.log(blob);
+        }
+    }, []);
 
     return (
         <Container  sx={{

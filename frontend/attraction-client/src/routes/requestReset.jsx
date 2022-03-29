@@ -21,16 +21,16 @@ function RequestReset(props) {
     return (
         <div id="hintergrund">
             <div id="inputs">
-                <div id="befehl">
+            <div id="befehl">
                     <h1>Email eingeben und Reset Button clicken!</h1>
                 </div>
-                <div id = "abstand">
-                    <TextField sx={{ width: 1 }} id="filled-basic" label="Email" variant="filled" onChange={setInput} />
-                    <div id="abstand">
-                        <Button variant="text" onClick={() => resetPassword(setErrorText, setShowErrorAlert, setShowInfoAlert)} style={{ textDecoration: 'none' }} id="knopf">Reset</Button>
+                <div style={{width: "30vw", minWidth: "300px"}}>
+                    <TextField sx={{ marginBottom: 1, width: 1}} id="filled-basic" label="Email" variant="filled" onChange={setInput} />
+                    <div>
+                        <Button fullWidth id='btnLoginPage' variant="conained" onClick={ () => resetPassword(setErrorText, setShowErrorAlert, setShowInfoAlert)}>Reset</Button>    
                     </div>
-                       </div>
-                <div id="abstand">
+                </div>
+                <div>
                     <div>
                         {showErrorAlert ?
                             <Alert severity="error">

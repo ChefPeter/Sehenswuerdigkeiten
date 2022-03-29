@@ -6,7 +6,6 @@
     justify-content: center;
     flex-direction: column;
     height: 100vh;
-    color: rgb(209, 154, 34);
 }
 
 #hintergrund{
@@ -16,7 +15,7 @@
 #befehl{
     text-align: center;
     font-size: 1.3rem;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 #abstand{

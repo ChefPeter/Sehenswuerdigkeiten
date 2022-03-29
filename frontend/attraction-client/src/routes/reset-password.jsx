@@ -20,22 +20,18 @@ function ResetPassword() {
     const [searchParams, setSearchParams] = useSearchParams();
 
   return (
-      <div id='hintergrund'>
-        <div id='inputs'>
-            <div id='befehl'>
-                <h1>Bitte neues Passwort eingeben!</h1>
-            </div>
-            <div id='abstand'>
-                <TextField id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
-            </div>
+    <div id='hintergrund'>
+    <div id='inputs'>
+        
+        <div id='befehl'>
+            <h1>Bitte neues Passwort eingeben!</h1>
+        </div>
 
-            <div id='abstand'>
-                <TextField id="filled-password-input" label="Passwort wiederholen" type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} />
-            </div>
-
-            <div id='abstand'>
-                <Button id="knopf" variant="text" onClick={() => post(setErrorText, setShowErrorAlert, setShowInfoAlert, searchParams.get("email"), searchParams.get("token"))}>Registrieren</Button>
-            </div>
+        <div style={{width: "30vw", minWidth: "300px"}}>
+            <TextField sx={{ marginBottom: 1, width: 1}} id="filled-password-input" label="Passwort" type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
+            <TextField sx={{ marginBottom: 1, width: 1}} id="filled-password-input" label="Passwort wiederholen" type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} />
+            <Button fullWidth id='btnLoginPage' variant="text" onClick={ () => post(setErrorText, setShowErrorAlert, setShowInfoAlert, searchParams.get("email"), searchParams.get("token"))}>Registrieren</Button>
+        </div>
 
         <div>
             <div id='abstand'>

@@ -12,6 +12,7 @@ const changeProfilePicture = require("./change-profile-picture");
 const insertReport = require("./insert-report");
 const createGroup = require("./create-group");
 const leaveGroup = require("./leave-group");
+const addToGroup = require("./add-to-group");
 
 const getDescription = require("./get-description");
 const getFriends = require("./get-friends");
@@ -78,6 +79,7 @@ app.post("/report", isAuthenticated, async(req, res) => sendResponse(await inser
 app.post("/route", async(req, res) => await getBestRoute(req, res));
 app.post("/create-group", isAuthenticated, async(req, res) => sendResponse(await createGroup(req), res));
 app.post("/leave-group", isAuthenticated, async(req, res) => sendResponse(await leaveGroup(req), res));
+app.post("/add-to-group", isAuthenticated, async(req, res) => sendResponse(await addToGroup(req), res));
 
 // GET REQUESTS
 app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req), res));

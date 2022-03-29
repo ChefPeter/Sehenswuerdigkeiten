@@ -71,3 +71,14 @@ CREATE TABLE IF NOT EXISTS users_usergroups (
     FOREIGN KEY (group_id) REFERENCES usergroups(group_id),
     PRIMARY KEY (username, group_id)
 );
+
+CREATE TABLE IF NOT EXISTS group_messages (
+    message_id INT PRIMARY KEY AUTO_INCREMENT,
+    sender VARCHAR(100),
+    group_id INT,
+    message_timestamp datetime,
+    content VARCHAR(10000),
+    is_file BOOLEAN,
+    FOREIGN KEY (sender) REFERENCES users(username),
+    FOREIGN KEY (group_id) REFERENCES usergroups(group_id)
+);

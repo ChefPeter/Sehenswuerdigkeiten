@@ -53,6 +53,8 @@ export async function postRoute()
     {
       map.removeLayer("route1");
       map.removeSource('route1');
+      map.removeLayer("route2");
+      map.removeSource('route2');
     }
     for(let count = 1; count < coords.length; count++)
     {
@@ -84,6 +86,30 @@ export async function postRoute()
       'line-width': 5
       }
       });
+      map.addSource('route2', {
+        'type': 'geojson',
+        'data': {
+        'type': 'Feature',
+        'properties': {},
+        'geometry': {
+        'type': 'LineString',
+        'coordinates': coords
+        }
+        }
+        });
+        map.addLayer({
+        'id': 'route2',
+        'type': 'line',
+        'source': 'route2',
+        'layout': {
+        'line-join': 'round',
+        'line-cap': 'round'
+        },
+        'paint': {
+        'line-color': 'red',
+        'line-width': 5
+        }
+        });
   }
 
   /*const response = await fetch("http://localhost:5000/route", {

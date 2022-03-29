@@ -8,12 +8,24 @@ import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-
-
+const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
 let map;
 let testRoute = [];
-let sight = {};
+
+function getRouteURL(type, coords, language)
+{
+  return `https://api.mapbox.com/directions/v5/mapbox/${type}/${(new URLSearchParams(coords).toString()).slice(0,-1)}?alternatives=true&geometries=geojson&language=${language}&overview=simplified&steps=true&access_token=${API_KEY}`;
+}
+
+async function getDataFromURL(url)
+{
+  let result = await fetch(url);
+  let answer = null;
+  if(result.ok)
+    answer = await result.json();
+  return answer;
+}
 
 function addToRoute(object)
 {
@@ -26,7 +38,7 @@ export async function postRoute()
 {
     let formData = new FormData();
     let coords = [];
-    let out;
+    let out = [];
 
     formData.append('points', JSON.stringify(testRoute));
     formData.append('vehicle', 'driving');
@@ -42,7 +54,12 @@ export async function postRoute()
       map.removeLayer("route1");
       map.removeSource('route1');
     }
-
+    for(let count = 1; count < coords.length; count++)
+    {
+      let rout = await getDataFromURL(getRouteURL("walking", `${coords[count].join(",")};${coords[count - 1].join(",")}`, "en"));
+      out.push(rout.routes[0].geometry.coordinates);
+    }
+    out = out.reduce((a, b) => a.concat(b));
     map.addSource('route1', {
       'type': 'geojson',
       'data': {
@@ -50,7 +67,7 @@ export async function postRoute()
       'properties': {},
       'geometry': {
       'type': 'LineString',
-      'coordinates': coords
+      'coordinates': out
       }
       }
       });
@@ -231,9 +248,6 @@ const BaseMap = () => {
         ReactDOM.render(<div><img src="https://media.istockphoto.com/photos/colosseum-in-rome-during-sunrise-picture-id1271579758?b=1&k=20&m=1271579758&s=170667a&w=0&h=oyXB8ehFjbo5-9HDdSjI9hYZktLstV3Ixz4JUUynahU=" style={{width:"100%", height:"50%"}}></img>
           <div style={{display: "flex", justifyContent: "space-between"}}><p style={{color:'black'}}>{desc.name}</p>
           <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}} onClick={() => addToRoute(e.features[0])}>Add</Button></div></div>, popupNode);
-          
-        if(testRoute.length > 3)
-          ReactDOM.render(<Button onClick={() => postRoute()}>PostRoute</Button>, popupNode);
 
         //popupNode  = document.createElement("div");
         // set popup on map
@@ -257,7 +271,6 @@ const BaseMap = () => {
     map.on("mouseleave", "random-points-layer", () => {
       //mapboxgl-popup-close-button
       popUpRef.current.remove();
-      console.log(sight);
         
     });
 

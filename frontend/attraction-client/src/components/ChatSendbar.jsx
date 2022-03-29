@@ -4,10 +4,14 @@ import { Button, TextField, Container, Box } from "@mui/material";
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import { maxHeight } from "@mui/system";
+import StopIcon from '@mui/icons-material/Stop';
+import {useState} from 'react';
 
 let message = "";
 
 function ChatSendbar (props) {
+
+    const [hideButton, setHideButton] = useState(true);
 
     const checkMessageInput = (event) => {
         message = event.target.value;
@@ -29,6 +33,7 @@ function ChatSendbar (props) {
 
     const recordAudio = (event) => {
 
+        //setHideButton(!hideButton);
         const stopButton = document.getElementById("stop");
 
         const handleSuccess = function(stream) {
@@ -57,6 +62,7 @@ function ChatSendbar (props) {
             });
 
             stopButton.addEventListener('click', function() {
+                //setHideButton(!hideButton);
                 mediaRecorder.stop();
             });
 
@@ -110,9 +116,17 @@ function ChatSendbar (props) {
             />
             <input onChange={sendPicture} hidden type="file" id="pictureUpload" accept="image/*;capture=camera" />
             <input onChange={sendAudio} hidden id="audioUpload" />
-            <Button onClick={recordAudio} style={{width:"5%"}}><KeyboardVoiceIcon fontSize="large"></KeyboardVoiceIcon></Button>
+
+            {hideButton ? 
+                <Button onClick={recordAudio} style={{width:"5%"}}><KeyboardVoiceIcon fontSize="large"></KeyboardVoiceIcon></Button>
+            : null}
+
+            {hideButton ?
+                <Button id="stop"><StopIcon fontSize="large"></StopIcon></Button>
+            : null}
+
             <Button onClick={() => document.getElementById("pictureUpload").click()} style={{width:"5%"}}><InsertPhotoIcon fontSize="large"></InsertPhotoIcon></Button>
-            <button id="stop">Stop</button>
+            
         </Container>
     );
 

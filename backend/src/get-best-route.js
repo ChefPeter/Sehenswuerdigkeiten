@@ -81,6 +81,10 @@ function tsp(matrix) {
     return cycle;
 }
 
+//function convexHull(points, matrix) {
+//};
+
+
 function rad(x) {
     return x * Math.PI / 180;
 };

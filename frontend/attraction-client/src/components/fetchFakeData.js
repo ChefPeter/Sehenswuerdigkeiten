@@ -18,9 +18,13 @@
           properties: {
             id: result.xid,
             name: result.name,
+            title: "",
             description: "",
+            img: ""     
           }
         });
+        console.log(result.xid)
+        
     }
   function getURL(method, radius, lat, lon, limit)
   {

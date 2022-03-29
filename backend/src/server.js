@@ -18,6 +18,7 @@ const getPendingFriends = require("./get-pending-friends");
 const getProfilePicture = require("./get-profile-picture");
 const getFile = require("./get-file");
 const getBestRoute = require("./get-best-route");
+const getUsers = require("./get-users");
 
 const express = require("express");
 const session = require("express-session");
@@ -76,6 +77,7 @@ app.post("/route", async(req, res) => await getBestRoute(req, res));
 
 // GET REQUESTS
 app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req), res));
+app.get("/users", isAuthenticated, async(req, res) => sendGetResponse(await getUsers(req), res));
 app.get("/friends", isAuthenticated, async(req, res) => sendGetResponse(await getFriends(req.session.username), res));
 app.get("/conversation", isAuthenticated, async(req, res) => sendGetResponse(await getConversation(req), res));
 app.get("/logged-in", (req, res) => req.session.username ? res.status(200).send() : res.status(401).send());

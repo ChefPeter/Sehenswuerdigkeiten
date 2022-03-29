@@ -23,7 +23,11 @@ function LeftMessage (props) {
             paddingTop: 1.5,
 
            }}>
+        { props.path ? 
+        <object>DIOCAEN</object>
+        :
         <p id="messageLeft">{props.message}</p>
+        }
         <Card sx={{backgroundColor: "primary.light", width: "3em"}}>{props.time}</Card>
         </Container>
     );

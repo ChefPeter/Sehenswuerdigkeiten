@@ -21,8 +21,9 @@ function checkMandatoryFields(params) {
 }
 
 async function sendFriendRequest(user, friend) {
+    let conn;
     try {
-        const conn = mysql.createConnection({
+        conn = mysql.createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -92,6 +93,8 @@ async function sendFriendRequest(user, friend) {
     } catch(e) {
         console.error(e);
         return "Fehler mit der Datenbank!";
+    } finally {
+        conn.end();
     }
 }
 

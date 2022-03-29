@@ -4,9 +4,9 @@ const util = require("util");
 async function getConversation(request) {
 
     if (!request.query.friend) return null;
-
+    let conn;
     try {
-        const conn = mysql.createConnection({
+        conn = mysql.createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -25,6 +25,8 @@ async function getConversation(request) {
     } catch(e) {
         console.error(e);
         return null;
+    } finally {
+        conn.end();
     }
 }
 

@@ -31,8 +31,9 @@ function checkMandatoryFields(params) {
 }
 
 async function userExists(email) {
+    let conn;
     try {
-        const conn = mysql.createConnection({
+        conn = mysql.createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -47,12 +48,15 @@ async function userExists(email) {
     } catch(e) {
         console.error(e);
         return false;
+    } finally {
+        conn.end();
     }
 }
 
 async function resetPassword(email) {
+    let conn;
     try {
-        const conn = mysql.createConnection({
+        conn = mysql.createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -74,6 +78,8 @@ async function resetPassword(email) {
     } catch(e) {
         console.error(e);
         return false;
+    } finally {
+        conn.end();
     }
 }
 

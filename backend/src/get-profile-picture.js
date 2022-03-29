@@ -6,8 +6,9 @@ const fs = require("fs");
 async function getProfilePicture(req, res) {
     // Get user for profile picture
     let username = req.query.friend ? req.query.friend : req.session.username;
+    let conn;
     try {
-        const conn = mysql.createConnection({
+        conn = mysql.createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -36,6 +37,8 @@ async function getProfilePicture(req, res) {
     } catch(e) {
         console.error(e);
         res.status(400).send("Fehler mit der Datenbank!");
+    } finally {
+        conn.end();
     }
 }
 

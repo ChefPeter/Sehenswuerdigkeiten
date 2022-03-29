@@ -19,8 +19,9 @@ function checkMandatoryFields(params) {
 }
 
 async function removeFriend(request) {
+    let conn;
     try {
-        const conn = mysql.createConnection({
+        conn = mysql.createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -38,6 +39,8 @@ async function removeFriend(request) {
     } catch(e) {
         console.error(e);
         return "Fehler mit der Datenbank!";
+    } finally {
+        conn.end();
     }
 }
 

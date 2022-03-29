@@ -113,6 +113,7 @@ const dark = {
 
 
 }*/
+let counter = 0;
 
 const Chat = (props) => {
   
@@ -122,19 +123,19 @@ const Chat = (props) => {
     const [messages, setMessages] = useState([]);
     const friend = name;
 
-    /*fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
+    setTimeout( () => fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
       method: "GET",
       credentials: "include"
     })
     .then(res => res.json())
     .then(res => {
-      console.log("ANFRAGE WIRD GESCHICKT!");
-      //setMessages(res)
-      setTimeout(() => setMessages(res), 3000);
-    });*/
+      //console.log(res);
+      console.log(++counter);
+      setMessages(res)
+      //setTimeout(() => setMessages(res), 3000);
+    }), 3000);
 
-
-    console.log("ICH WERDE AUFGERUFEN!");
+    
     return (
         <ThemeProvider theme={createTheme(light)}>
             <Header />
@@ -160,10 +161,18 @@ const Chat = (props) => {
                     <RightMessage message ="Tschüss" time="13:01"></RightMessage>
                     
                     {messages.map(message => {
-                      if (message.sender === friend) {
-                        <LeftMessage message={message.content} time={message["message_timestamp"]}></LeftMessage>
+                      if (message.is_file) {
+                        if (message.sender === friend) {
+                          <LeftMessage path={message.content}></LeftMessage>
+                        } else {
+                          <RightMessage path={message.content}></RightMessage>
+                        }
                       } else {
-                        <RightMessage message={message.content} time={message["message_timestamp"]}></RightMessage>
+                        if (message.sender === friend) {
+                          <LeftMessage message={message.content} time={message["message_timestamp"]}></LeftMessage>
+                        } else {
+                          <RightMessage message={message.content} time={message["message_timestamp"]}></RightMessage>
+                        }
                       }
                     })}
 

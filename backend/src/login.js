@@ -29,8 +29,9 @@ function checkMandatoryFields(params) {
 }
 
 async function checkCredentials(params) {
+    let conn;
     try {
-        const conn = mysql.createConnection({
+        conn = mysql.createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -48,6 +49,8 @@ async function checkCredentials(params) {
     } catch(e) {
         console.error(e);
         return "Fehler mit der Datenbank!";
+    } finally {
+        conn.end();
     }
 }
 

@@ -4,9 +4,9 @@ const util = require("util");
 async function getDescription(request) {
 
     const user = request.query.username ? request.query.username.toLowerCase() : request.session.username;
-
+    let conn;
     try {
-        const conn = mysql.createConnection({
+        conn = mysql.createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
@@ -21,6 +21,8 @@ async function getDescription(request) {
     } catch(e) {
         console.error(e);
         return null;
+    } finally {
+        conn.end();
     }
 }
 

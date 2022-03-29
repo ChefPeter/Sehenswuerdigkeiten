@@ -1,7 +1,7 @@
 const mysql = require("mysql");
 const util = require("util");
 
-async function getPendingFriends(request) {
+async function getUsers(request) {
     let conn;
     try {
         conn = mysql.createConnection({
@@ -11,11 +11,9 @@ async function getPendingFriends(request) {
             database: process.env.DB_DATABASE
         });
         const query = util.promisify(conn.query).bind(conn);
-        const result = await query(
-            `SELECT user1 FROM friends
-                WHERE user2='${request.session.username}' AND approved=0`
-        );
-        return Array.from(result).map(e => e.user1);
+        return Array.from(await query(
+            `SELECT username FROM users`
+        ));
     } catch(e) {
         console.error(e);
         return null;
@@ -24,4 +22,4 @@ async function getPendingFriends(request) {
     }
 }
 
-module.exports = getPendingFriends;
+module.exports = getUsers;

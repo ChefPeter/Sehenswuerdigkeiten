@@ -179,12 +179,12 @@ function MapSearch () {
             <Typography
                 marginTop={1.5}
                 fontSize="small"
-                marginLeft={"10px"}>Searchradius in km</Typography>
+                marginLeft={"10px"}>Searchradius: {radiusValue} km</Typography>
                 
 
             <Slider 
                 step={1}
-                min={1}
+                min={0.5}
                 max={100}
                 valueLabelDisplay="auto"
                 onChangeCommitted={sliderChange}

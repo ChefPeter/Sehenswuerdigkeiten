@@ -16,7 +16,7 @@ const fetchFakeData = async centerCoordinates => {
   const API_KEY = "5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752";
 
   let points = [];
-  let results = await getDataFromURL(getURL(centerCoordinates.radius2, centerCoordinates.latitude, centerCoordinates.longitude, 100));
+  let results = await getDataFromURL(getURL(centerCoordinates.radius2*1000, centerCoordinates.latitude, centerCoordinates.longitude, 500));
 
   for (let result of results)
   {

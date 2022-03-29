@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import "../routes/styles/contact.css";
-import Header from "../components/header";
+import Sidebar from "../components/Sidebar";
 import React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
@@ -37,8 +37,8 @@ function LegalNotice(props) {
     return (
       <div>
         <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-        <Header/>
-        <div id="rand">
+        <Sidebar/>
+        <div id="rand" style={{marginTop: "calc(16.5px + 3em)"}}>
             <h1>Impressum</h1>
             <br />
             <h2>Angaben gem&auml;&szlig; &sect; 5 TMG</h2>

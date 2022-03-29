@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import Header from "../components/header";
+import Sidebar from "../components/Sidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
@@ -118,8 +118,8 @@ function Profile(props) {
     return (
       <div>
         <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-        <Header/>
-        <div id='description'>
+        <Sidebar/>
+        <div id='description' style={{marginTop: "calc(16.5px + 3.5em)"}}>
 
           { false ?
             <TextField type="file" ></TextField>

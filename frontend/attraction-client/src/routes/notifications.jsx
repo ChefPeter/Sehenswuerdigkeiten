@@ -1,7 +1,8 @@
 import { useSelector } from 'react-redux';
 import "../routes/styles/notifications.css";
-import Header from "../components/header";
+import Sidebar from "../components/Sidebar";
 import React from "react";
+import { Card } from '@mui/material';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
@@ -39,13 +40,15 @@ function Notifications(props) {
     return (
       <div>
         <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-        <Header/>
-        <div id='nachrichten'>
-            <Stack sx={{ width: '100%' }} spacing={1}>
-                <Alert onClose={() => {}} severity="info">Neue Nachricht von olli</Alert>
-                <Alert onClose={() => {}} severity="warning">Auf deiner Strecke befindet sich eine Menschenansammlung</Alert>
-            </Stack>
-        </div>
+          
+          <Sidebar/>
+        
+          <div id='nachrichten' style={{marginTop: "calc(16.5px + 3.5em)"}}>
+              <Stack spacing={1}>
+                  <Alert onClose={() => {}} severity="info">Neue Nachricht von olli</Alert>
+                  <Alert onClose={() => {}} severity="warning">Auf deiner Strecke befindet sich eine Menschenansammlung</Alert>
+              </Stack>
+          </div>
         </ThemeProvider>
       </div>
     );

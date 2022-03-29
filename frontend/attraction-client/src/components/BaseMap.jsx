@@ -3,7 +3,7 @@ import { useState } from 'react';
 import mapboxgl, { DoubleClickZoomHandler } from "mapbox-gl";
 import fetchFakeData from "./fetchFakeData";
 import Popup from "./Popup";
-import "./styles/BaseMap.scss";
+import "./styles/BaseMap.css";
 import ReactDOM from "react-dom";
 import { useSelector } from 'react-redux';
 import { Button } from "@mui/material";
@@ -12,6 +12,9 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
 
 let map;
 let testRoute = [];
+let radiusForPointerSearch = 1;
+let searchByMarker = false;
+let globalCoords = [];
 
 function getRouteURL(type, coords, language)
 {
@@ -171,19 +174,29 @@ const BaseMap = () => {
   const popUpRef = useRef(new mapboxgl.Popup({ offset: 15 }));
       
   const [obj, setObj] = useState({properties: {name: 'test'}});
-
+  const [showSearchHere, setShowSearchHere] = useState(false);
+  const [markerCoords, setMarkerCoords] = useState([]);
 
   useEffect(() => {
     
+    //Brixen
+    let coordinates = [11.65598, 46.71503];
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+           coordinates = [position.coords.longitude, position.coords.latitude];
+          console.log(coordinates)
+      });
+    }
+
+
     map = new mapboxgl.Map({
       container: "mapContainer",
-      center: [11.657244, 46.717705],
+      center: coordinates,
       style: theme,
       zoom: 12,
     });
 
-    const nav = new mapboxgl.NavigationControl();
-    map.addControl(nav, "top-right");
+    map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
     map.addControl(new mapboxgl.ScaleControl({position: 'bottom-right'}));
     const geolocate = new mapboxgl.GeolocateControl({
         positionOptions: {
@@ -192,21 +205,12 @@ const BaseMap = () => {
         trackUserLocation: true
       });
       
-      map.addControl(geolocate, "top-right");
+      map.addControl(geolocate, "bottom-right");
 
-      let coordinates;
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          coordinates = [position.coords.latitude, position.coords.longitude];
-        });
-      }
-
+      
       map.on("load", () => {
         map.flyTo({
-          center: [
-             coordinates[1], // Example data
-             coordinates[0] // Example data
-          ],
+          center: coordinates,
           essential: true // this animation is considered essential with respect to prefers-reduced-motion
        });
 
@@ -241,8 +245,6 @@ const BaseMap = () => {
         });
       });
 
-    
-      
     map.on("moveend", async () => {
       // get new center coordinates
       let lon=coordinates[1];
@@ -304,8 +306,6 @@ const BaseMap = () => {
         
     });
 
-    
-
     // add popup when user clicks a point
     map.on("click", "random-points-layer", e => {
       if (e.features.length) {
@@ -313,12 +313,31 @@ const BaseMap = () => {
         setOpen(true);
       }
     });
+
+
+  let marker = new mapboxgl.Marker();
+  function add_marker (event) {
+    setShowSearchHere(true)
+    let coordinates = event.lngLat;
+    setMarkerCoords([coordinates.lng, coordinates.lat])
+    globalCoords=[coordinates.lng, coordinates.lat];
+    marker.setLngLat(coordinates).addTo(map);
+  }
+  map.on('click', add_marker);
+    
+
   }, 
   []);
 
-  
+
 
   return (<div>
+
+    { showSearchHere ?
+      <Button onClick={() =>  handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowSearchHere)} style={{marginLeft:"600px", width:"100vw"}}>Search here?</Button>
+    : null }
+    
+    
     <div id="mapContainer" className="map" ref={map}></div>
     
     <SwipeableDrawer 
@@ -344,8 +363,22 @@ const BaseMap = () => {
 };
 
 
-export async function flyToLocation (coords, radius){
-  
+function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowSearchHere){
+  setShowSearchHere(false)
+  searchByMarker = true;
+
+  flyToLocation(markerCoords, radiusForPointerSearch, true)
+
+}
+
+
+export async function flyToLocation (coords, radius, marker=false){
+  console.log("ff"+marker)
+  if(!marker)
+    searchByMarker = false;
+  else
+    coords = globalCoords;
+
     map.flyTo({
       center: [
         coords[0],
@@ -362,6 +395,12 @@ export async function flyToLocation (coords, radius){
 
 }
 
+export function setRadiusForPointerSearch (newRadius){
+  radiusForPointerSearch = newRadius;
+  console.log(searchByMarker)
+  if(searchByMarker)
+    flyToLocation(globalCoords, radiusForPointerSearch, true)
+}
 
 
 

@@ -22,10 +22,12 @@ import Dark_Mode from './dark_mode';
 import LanguageSelector from './LanguageSelector';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import PolicyIcon from '@mui/icons-material/Policy';
+import "./styles/sidebar.css"
+
 
 export default function SwipeableTemporaryDrawer() {
   const [state, setState] = React.useState({
-    left: false,
+    left: false
   });
 
 
@@ -44,8 +46,7 @@ export default function SwipeableTemporaryDrawer() {
 
   const list = (anchor) => (
     <div>
-    <Box
-      sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 300 }}
+    <Box id="sidebarBox"
       role="presentation"
       
       onKeyDown={toggleDrawer(anchor, false)}
@@ -53,43 +54,42 @@ export default function SwipeableTemporaryDrawer() {
       
       <List>
         
-          
-          <ListItem button  component={Link} to="/home">
+          <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/home">
             <ListItemIcon>
               <TravelExploreIcon />
             </ListItemIcon>
             <ListItemText primary={"Home"} />
           </ListItem>
 
-          <ListItem button  component={Link} to="/groups">
+          <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/groups">
             <ListItemIcon>
               <GroupIcon />
             </ListItemIcon>
             <ListItemText primary={"Groups"} />
           </ListItem>
 
-          <ListItem button  component={Link} to="/friends">
+          <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/friends">
             <ListItemIcon>
             <PersonAddIcon />
             </ListItemIcon>
             <ListItemText primary={"Friends"} />
           </ListItem>
 
-          <ListItem button  component={Link} to="/notifications">
+          <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/notifications">
             <ListItemIcon>
             <NotificationsIcon />
             </ListItemIcon>
             <ListItemText primary={"Notifications"} />
           </ListItem>
 
-          <ListItem button  component={Link} to="/contact">
+          <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/contact">
             <ListItemIcon>
               <ContactPageIcon />
             </ListItemIcon>
             <ListItemText primary={"Contact"} />
           </ListItem>
 
-          <ListItem button  component={Link} to="/legalnotice">
+          <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/legalnotice">
             <ListItemIcon>
               <PolicyIcon />
             </ListItemIcon>
@@ -99,7 +99,7 @@ export default function SwipeableTemporaryDrawer() {
       </List>
       <Divider />
 
-      <ListItem button  component={Link} to="/profile">
+      <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/profile">
             <ListItemIcon>
             <AccountBoxIcon />
             </ListItemIcon>
@@ -115,17 +115,28 @@ export default function SwipeableTemporaryDrawer() {
 
   return (
     <div>
+    <Box 
+      onClick={toggleDrawer("left", true)}
+      
+      sx={{backgroundColor: 'primary.dark', 
+      border: '2px black',
+      opacity: 0.9,
+      '&:hover': {
+      backgroundColor: 'primary.main',
+      },}} id="navi" style={{marginTop:"16.5px", borderRadius:"6px", width:"2.625em", marginLeft:"0.5em"}}>
       <IconButton
             size="large"
-            edge="start"
+            style={{padding: "10px 10px 10px 10px"}}
             color="inherit"
             aria-label="open drawer"
-            sx={{ mr: 2 }}
-            onClick={toggleDrawer("left", true)}
+            
+           
           >
-            <MenuIcon></MenuIcon>
+            <MenuIcon ></MenuIcon>
           </IconButton>
+          </Box>
       {
+        
         <React.Fragment key="left">
          
           <SwipeableDrawer

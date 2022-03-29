@@ -1,0 +1,19 @@
+
+
+#sidebarBox{
+    width: 30vw;
+}
+
+@media only screen and (max-width: 950px) {
+  #sidebarBox {
+    width: 50vw;
+  }
+}
+
+
+@media only screen and (max-width: 620px) {
+    #sidebarBox {
+      width: 82vw;
+      min-width: 150px;
+    }
+  }

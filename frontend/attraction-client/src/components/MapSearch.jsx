@@ -4,9 +4,11 @@ import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import { Paper, Button, TextField, Container, Card, Box, Divider, Stack, Autocomplete, Slider, Typography, CircularProgress } from "@mui/material";
 import "./styles/mapsearch.css";
-import { fontSize } from "@mui/system";
+import { fontSize, minWidth } from "@mui/system";
 import {useState , setState , useRef} from "react";
-import {flyToLocation} from "./BaseMap"
+import {flyToLocation} from "./BaseMap";
+import {setRadiusForPointerSearch} from "./BaseMap";
+
 
 let locationInput = "";
 let timerID;
@@ -139,15 +141,10 @@ function MapSearch () {
 
     function sliderChange(event, value){
         setRadiusValue(value);
-        console.log(selectedCityCoords)
-
+        setRadiusForPointerSearch(value)
         if(selectedCityCoords.length !== 0){
-            
-            console.log(selectedCityCoords)
-            console.log("new SEARCH !!!")
-            flyToLocation(selectedCityCoords, value);
+            flyToLocation(selectedCityCoords, value, true);
         }
-
     }
 
   
@@ -176,20 +173,28 @@ function MapSearch () {
                 />
                 )}
             />
-            <Typography
-                marginTop={1.5}
+            <Stack spacing={0.5} direction="row" sx={{ mb: 1 }} alignItems="center"><Typography
+                marginTop={0.7}
                 fontSize="small"
-                marginLeft={"10px"}>Searchradius: {radiusValue} km</Typography>
+                marginLeft={"10px"}
+                minWidth={"18.5ch"}
+                marginBottom={0.7}
+                >Searchradius: {radiusValue} km</Typography>
                 
 
             <Slider 
                 step={1}
                 min={0.5}
                 max={100}
+                
                 valueLabelDisplay="auto"
                 onChangeCommitted={sliderChange}
-                size="small" style={{marginLeft: "10px", maxWidth: "calc(100% - 20px)"}}>
+                
+                size="small" style={{marginRight: "16px"}}>
             </Slider>
+
+            </Stack>
+            
 
 
 

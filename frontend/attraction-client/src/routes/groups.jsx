@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import "../routes/styles/contact.css";
-import Header from "../components/header";
+import Sidebar from "../components/Sidebar";
 import React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Button, Container, TextField, Typography, LinearProgress, Box, Card } from "@mui/material";
@@ -61,8 +61,8 @@ function Groups(props) {
   return (
     <div>
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-      <Header/>
-      <Card>
+      <Sidebar/>
+      <Card  style={{marginTop: "calc(16.5px + 3.2em)"}}>
         <TextField
           id="createGroupField"
           type="text"

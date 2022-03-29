@@ -1,14 +1,12 @@
 #searchPaper{
-    margin-left: 16px;
     margin-top: 16px;
     width: 30vw;
     opacity: 0.9;
-   
 }
 
 
 @media only screen and (max-width: 1000px) {
     #searchPaper {
-      width: calc(95% - 10px);
+      width: calc(95% - 1em);
     }
 }

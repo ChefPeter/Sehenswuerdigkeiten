@@ -1,9 +1,9 @@
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { useSelector } from 'react-redux';
 import "../routes/styles/contact.css";
-import Header from "../components/header";
+import Sidebar from "../components/Sidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button} from '@mui/material';
+import { Button, cardClasses} from '@mui/material';
 import ErrorSnackbar from '../components/ErrorSnackbar';
 import SuccessSnackbar from '../components/SuccessSnackbar';
 import React, { useEffect, useState } from "react";
@@ -67,8 +67,8 @@ const handleCloseSuccessSnackbar = (event, reason) => {
     return (
       <div>
         <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-        <Header/>
-        <div id="rand">
+        <Sidebar/>
+        <div id="rand" style={{marginTop: "calc(16.5px + 3.2em)"}}>
           <div>
             <h4>Bitte schreibe dein Anliegen einfach in das Feld. Wir werden uns so schnell wie möglich bei Ihnen melden!</h4>
           </div>
@@ -78,7 +78,7 @@ const handleCloseSuccessSnackbar = (event, reason) => {
                 aria-label="minimum height"
                 minRows={12}
                 placeholder="Type your message!"
-                style={{ width: "100%", marginTop: "10px", marginBottom: "10px", resize: "none", fontSize:"large", paddingLeft: 3, paddingRight: 3, paddingTop: 3, paddingBottom:3}}
+                style={{ width: "calc(100% - 10px)", marginTop: "10px", marginBottom: "5px", resize: "none", fontSize:"large", paddingLeft: "5px", paddingRight: "5px", paddingTop: "5px", paddingBottom:"5px"}}
                 onChange={getInputValue}
               />  
             </div>

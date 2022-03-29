@@ -1,13 +1,13 @@
 import Header from "../components/header";
 import "./styles/start.css";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button } from "@mui/material";
+import { Button, Card } from "@mui/material";
 import { useSelector } from 'react-redux';
 import BaseMap, {postRoute} from '../components/BaseMap';
 import React, { useState, useEffect } from 'react';
-import { Card } from "@mui/material";
 import "./styles/home.css"
 import MapSearch from "../components/MapSearch";
+import Sidebar from "../components/Sidebar"
 
 // Define theme settings
 const light = {
@@ -25,14 +25,6 @@ const dark = {
 
 function Home(props) {
 
- 
-  useEffect(() => {
-    
-    
-
-  });
-  
-
   const theme = useSelector(state => {
     try{
       return state.theme;
@@ -49,16 +41,25 @@ function Home(props) {
   });
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-        <Header/>
+       
         <Card id="container">
+          
           <BaseMap />
-          <div id="navi"><MapSearch></MapSearch></div>
+          
+          <Sidebar/>
+
+          <div id="navi" style={{ marginLeft: "3.625em", width:"100px"}}>
+            <MapSearch></MapSearch>
+          </div>
+             
           <Button style={{marginTop: "100px"}} id="test" onClick={() => postRoute()}>Enter</Button>
+
         </Card>
       </ThemeProvider>
     );
   
 }
+
 //<Button id="testButton" onClick={() => {console.log("test");}}>Post Route</Button>
 //checks if logged in
 function handle(){
@@ -74,5 +75,3 @@ function handle(){
 }
 
 export default Home;
-
-//getDataFromURL       <TestButton/>

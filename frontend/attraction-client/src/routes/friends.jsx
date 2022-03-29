@@ -1,4 +1,4 @@
-import Header from "../components/header";
+import SideBar from "../components/Sidebar"
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import List from '@mui/material/List';
@@ -148,7 +148,7 @@ function Friends(props) {
     return (
       <ThemeProvider theme={createTheme(light)}>
 
-      <Header/>
+      <SideBar/>
 
       { showLoadingBar ? 
       <LinearProgress color="inherit"/>
@@ -157,20 +157,21 @@ function Friends(props) {
       
       <div id="alignSearchBar">
       
-      <TextField
-        id="searchBarFriends"
-        type="text"
-        label="Search friend"
-        variant="filled"
-        onChange={handleSearchFriendInput}
-        InputProps={{endAdornment: <Button onClick={() => handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage)}><PersonAddIcon/></Button>}}
-      />
+        <TextField
+          style={{ marginLeft: "3.625em"}}
+          id="searchBarFriends"
+          type="text"
+          label="Search friend"
+          variant="filled"
+          onChange={handleSearchFriendInput}
+          InputProps={{endAdornment: <Button onClick={() => handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage)}><PersonAddIcon/></Button>}}
+        />
 
-        { friendRequests.length > 0 ?
-        <Typography >
-          Incoming Requests!
-        </Typography>
-       : null }
+          { friendRequests.length > 0 ?
+          <Typography >
+            Incoming Requests!
+          </Typography>
+        : null }
 
       </div>
 

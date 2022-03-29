@@ -9,18 +9,18 @@ import {useState , setState} from "react";
 
 let locationInput = "";
 
-//let locations = [{name:"Sage"},{name:"Tage"}]
 
 function MapSearch () {
 
-    const [locations, setLocations] = useState([{name:"Sage"},{name:"Tage"}])
+    const [locations, setLocations] = useState([])
 
     const handleSearchFriendInput = async (event)=>{
 
         let locations2 = [];
-        console.log("hallo")
         let jsonRes = "";
         let language = "de";
+
+        console.log(event.target.value)
 
         if(event.target.value.length > 2){
 
@@ -29,47 +29,45 @@ function MapSearch () {
             });
 
             jsonRes = await result.json();
+            console.log(jsonRes["features"])
             
-        }
 
-        let obj = [{}];
-        let places = [], coords = [];
-       
-        for(let i = 0; i<jsonRes["features"].length-1; i++){
+            let obj = [{}];
+            let places = [], coords = [];
+        
+            for(let i = 0; i<jsonRes["features"].length-1; i++){
 
-            
-            if(jsonRes["features"][i] != "undefined"){
+                
+                if(jsonRes["features"][i] != "undefined"){
 
-                if(jsonRes["features"][i]["place_name"] != undefined && jsonRes["features"][i]["center"] != undefined){
-                    places[i] = jsonRes["features"][i]["place_name"];
-                    coords[i] = jsonRes["features"][i]["place_name"];
+                    if(jsonRes["features"][i]["place_name"] != undefined && jsonRes["features"][i]["center"] != undefined){
+                        places[i] = jsonRes["features"][i]["place_name"];
+                        coords[i] = jsonRes["features"][i]["place_name"];
+                    }
                 }
             }
-        }
 
-        if(places[0] != undefined){
-            obj = [{name: places[0], coords: coords[0]}]
-        
-            for(let i = 0; i<places.length; i++){
+            if(places[0] != undefined){
+                obj = [{name: places[0], coords: coords[0]}]
+            
+                for(let i = 1; i<places.length; i++){
 
-                obj.push({
-                    name: places[i],
-                    coords: coords[i]
-                });
+                    obj.push({
+                        name: places[i],
+                        coords: coords[i]
+                    });
+                }
+            }else{
+                obj = [{name: "", coords: ""}];
             }
-        }else{
-            obj = [{name: "", coords: ""}];
+            setLocations(obj)
         }
-
-        console.log(obj)
-
-        setLocations(obj)
-       
-        // 0 -10
 
         locationInput = event.target.value;
 
     };
+
+
 
 
     return (
@@ -81,17 +79,15 @@ function MapSearch () {
                 id="idAutocomplete"
                 fullWidth
                 disableClearable
-                
                 options={locations.map((option) => option.name)}
                 renderInput={(params) => (
                 <TextField
                     onChange={handleSearchFriendInput}
                     {...params}
-                    label="Search a place"
+                    label="Search a city"
                     InputProps={{
                     ...params.InputProps,
-
-                    endAdornment: <Container style={{display:"flex", marginRight:"1.2vw", maxWidth:"130px"}}><Button><TravelExploreIcon onClick={() => console.log("explore")} /> </Button>  <Divider orientation="vertical" flexItem /> <Button><GpsFixedIcon  onClick={() => console.log("gps")} /></Button></Container> 
+                    endAdornment: <Container id="btnContainerSearchbar" style={{display:"flex", marginRight:"1.2vw", maxWidth:"130px"}}><Button onClick={() => explore()} ><TravelExploreIcon/> </Button>  <Divider orientation="vertical" flexItem /> <Button onClick={() => console.log("gps")}><GpsFixedIcon/></Button></Container> 
                     }}
                 />
                 )}
@@ -101,5 +97,12 @@ function MapSearch () {
 
     );
 }
+
+function explore(){
+
+    console.log("explore")
+
+}
+
 
 export default MapSearch;

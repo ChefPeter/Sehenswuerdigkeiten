@@ -13,6 +13,7 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
 let map;
 let testRoute = [];
+let sight = {};
 
 function addToRoute(object)
 {
@@ -94,6 +95,7 @@ const BaseMap = () => {
     let theme = "mapbox://styles/mapbox/navigation-night-v1"
   
     const [open, setOpen] = useState(false);
+    
    /* useSelector(state => {
         try{
            
@@ -124,6 +126,9 @@ const BaseMap = () => {
 
   const mapContainerRef = useRef(null);
   const popUpRef = useRef(new mapboxgl.Popup({ offset: 15 }));
+      
+  const [obj, setObj] = useState({properties: {name: 'test'}});
+
 
   useEffect(() => {
     
@@ -202,6 +207,7 @@ const BaseMap = () => {
       lat = "41.8897653"*/
       // fetch new data
       const results = await fetchFakeData({ longitude: lon, latitude: lat });
+      //results = results.
       console.log(results);
       // update "random-points-data" source with new data
       // all layers that consume the "random-points-data" data source will be updated automatically
@@ -228,8 +234,8 @@ const BaseMap = () => {
         // <img src="./kolosseum.jpg"></img>
         //ReactDOM.render(<Button variant="contained" style={{borderRadius: '20px'}} onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
         ReactDOM.render(<div><img src="https://media.istockphoto.com/photos/colosseum-in-rome-during-sunrise-picture-id1271579758?b=1&k=20&m=1271579758&s=170667a&w=0&h=oyXB8ehFjbo5-9HDdSjI9hYZktLstV3Ixz4JUUynahU=" style={{width:"100%", height:"50%"}}></img>
-          <div style={{display: "flex", justifyContent: "space-between"}}><p>{desc.name}</p>
-          <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}} onClick={() => addToRoute(feature)}>Add</Button></div></div>, popupNode);
+          <div style={{display: "flex", justifyContent: "space-between"}}><p style={{color:'black'}}>{desc.name}</p>
+          <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}} onClick={() => addToRoute(e.features[0])}>Add</Button></div></div>, popupNode);
           
         if(testRoute.length > 3)
           ReactDOM.render(<Button onClick={() => postRoute()}>PostRoute</Button>, popupNode);
@@ -256,22 +262,18 @@ const BaseMap = () => {
     map.on("mouseleave", "random-points-layer", () => {
       //mapboxgl-popup-close-button
       popUpRef.current.remove();
+      console.log(sight);
         
     });
 
     // add popup when user clicks a point
     map.on("click", "random-points-layer", e => {
       if (e.features.length) {
+        setObj(e.features[0]);
         setOpen(true);
       }
     });
-    
-   
-    // clean up on unmount
-    return () => map.remove();
-      
   }, []);
-  
   return (<div>
    
     <div id="mapContainer" className="map" ref={map}></div>
@@ -284,8 +286,8 @@ const BaseMap = () => {
             <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%"}}>
             <div><img src="https://media.istockphoto.com/photos/colosseum-in-rome-during-sunrise-picture-id1271579758?b=1&k=20&m=1271579758&s=170667a&w=0&h=oyXB8ehFjbo5-9HDdSjI9hYZktLstV3Ixz4JUUynahU=" style={{maxWidth:"100%"}}></img></div>
             <div style={{display: "flex", justifyContent: "space-between"}}>
-              <h2 >Name</h2>
-              <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}}>Add</Button>
+              <h2 id="nameField" style={{color:'white'}}>{obj.properties.name}</h2>
+              <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}} onClick={() => addToRoute(obj)}>Add</Button>
             </div>
             </div>
           </div>
@@ -294,8 +296,6 @@ const BaseMap = () => {
   </div>
   );
 };
-
 //module.export = { BaseMap:BaseMap, TestButton:TestButton };
 //export { BaseMap, TestButton };
 export default BaseMap;
-   

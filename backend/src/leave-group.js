@@ -18,6 +18,24 @@ async function leaveGroup(request) {
             `DELETE FROM users_usergroups
                 WHERE username='${request.session.username}' AND group_id=${request.body.group_id}`
         );
+        await query(
+            `INSERT INTO group_messages
+            (
+                sender,
+                group_id,
+                message_timestamp,
+                content,
+                is_file
+            )
+            values
+            (
+                NULL,
+                ${request.body.group_id},
+                NOW(),
+                '${request.session.username} left the group!',
+                false
+            )`
+        )
         return null;
     } catch(e) {
         console.error(e);

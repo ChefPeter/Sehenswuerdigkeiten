@@ -15,6 +15,12 @@
     let radiusForPointerSearch = 1;
     let searchByMarker = false;
     let lastCoords = [];
+    let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, touristFacilities: true, museums: true, palaces: true, malls: true, church: true}
+    let currentGlobalResults = [];
+
+    export function setFilter(newFilter){
+        filter = newFilter;
+    }
 
     function getRouteURL(type, coords, language)
     {
@@ -321,86 +327,131 @@
 
 
 
-    return (<div>
+    return (
+    
+        <div>
 
-    { showSearchHere ?
-        <Button onClick={() =>  handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowSearchHere)} style={{marginLeft:"600px", width:"100vw"}}>Search here?</Button>
-    : null }
+        { showSearchHere ?
+            <Button onClick={() =>  handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowSearchHere)} style={{marginLeft:"600px", width:"100vw"}}>Search here?</Button>
+        : null }
 
 
-    <div id="mapContainer" className="map" ref={map}></div>
+        <div id="mapContainer" className="map" ref={map}></div>
 
-    <SwipeableDrawer 
-        anchor='bottom'
-        open={open}
-        onClose={() => setOpen(false)}
-        onOpen={() => {}}>
-            <div style={{maxHeight:"60vh"}}>
-                <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
-                <div>
+        <SwipeableDrawer 
+            anchor='bottom'
+            open={open}
+            onClose={() => setOpen(false)}
+            onOpen={() => {}}>
+                <div style={{maxHeight:"60vh"}}>
+                    <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                     <div>
-                        <Button variant="contained" style={{color: "black", marginBottom:"20px"}} onClick={() => addToRoute(obj)}>Add</Button>
-                        <h2 id="nameField" style={{color:'white', marginBottom:"20px"}}>{obj.properties.name}</h2>
+                        <div>
+                            <Button variant="contained" style={{color: "black", marginBottom:"20px"}} onClick={() => addToRoute(obj)}>Add</Button>
+                            <h2 id="nameField" style={{color:'white', marginBottom:"20px"}}>{obj.properties.name}</h2>
+                        </div>
+                        <div><img src={image} style={{maxWidth:"100%", marginBottom:"20px"}}></img></div>
+                        <div>
+                            <h3 style={{marginBottom:"20px"}}>Hallo hier kommen Infos hin</h3>
+                        </div>
                     </div>
-                    <div><img src={image} style={{maxWidth:"100%", marginBottom:"20px"}}></img></div>
-                    <div>
-                        <h3 style={{marginBottom:"20px"}}>Hallo hier kommen Infos hin</h3>
                     </div>
                 </div>
-                </div>
-            </div>
-        </SwipeableDrawer>
-        
-    </div>
+            </SwipeableDrawer>
+            
+        </div>
     );
 
     };
 
 
     function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowSearchHere){
-    // setLastSearchWasByClickOnMap(true)
-    lastCoords = markerCoords;
+        // setLastSearchWasByClickOnMap(true)
+        lastCoords = markerCoords;
 
-    setShowSearchHere(false)
-    searchByMarker = true;
+        setShowSearchHere(false)
+        searchByMarker = true;
 
-    flyToLocation(markerCoords, radiusForPointerSearch, false)
+        flyToLocation(markerCoords, radiusForPointerSearch, false)
 
     }
 
 
     export async function flyToLocation (coords, radius, newCoordinates = false){
 
+        if(newCoordinates){
+            lastCoords = coords;
+        }else{
+            coords = lastCoords;
+        }
 
+        map.flyTo({
+            center: [
+            coords[0],
+            coords[1]
+            ],
+            essential: true // this animation is considered essential with respect to prefers-reduced-motion
+        });
 
-    if(newCoordinates){
-    lastCoords = coords;
-    }else{
-    coords = lastCoords;
+        const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius });
+        currentGlobalResults = results;
+        let filteredResults = filterResults(results);
+        
+        console.log(filteredResults)
+        console.log(results)
+     
+        // update "random-points-data" source with new data
+        // all layers that consume the "random-points-data" data source will be updated automatically
+        map.getSource("random-points-data").setData({"type": "FeatureCollection", "features": filteredResults});
+
     }
 
-    map.flyTo({
-        center: [
-        coords[0],
-        coords[1]
-        ],
-        essential: true // this animation is considered essential with respect to prefers-reduced-motion
-    });
+    export function filterResults (results=false){
+        
+        let init=true;
 
-    const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius });
-    console.log(results);
-    // update "random-points-data" source with new data
-    // all layers that consume the "random-points-data" data source will be updated automatically
-    map.getSource("random-points-data").setData(results);
+        if(!results){
+            init=false;
+            if(currentGlobalResults === [])
+                return
+            else
+                results = currentGlobalResults;
+        }
+
+        let filteredResults = [], xx = false;
+        for(let i = 0; i<results["features"].length; i++){
+            let kinds = results["features"][i]["properties"]["kinds"];
+            xx=false;
+            Object.keys(filter).forEach(function(k){
+                
+                if(filter[k] === true && !xx){
+                    if(kinds.includes(k.toString())){
+                        filteredResults.push(results["features"][i]);
+                        xx=true;
+                        //break doesnt work??
+                    }
+                }
+            });
+        }
+
+        if(init)
+            return filteredResults;
+        else{
+            // update "random-points-data" source with new data
+            // all layers that consume the "random-points-data" data source will be updated automatically
+            map.getSource("random-points-data").setData({"type": "FeatureCollection", "features": filteredResults});
+        }
+
 
     }
+
 
 
     export function setRadiusForPointerSearch (newRadius){
-    radiusForPointerSearch = newRadius;
-    console.log(searchByMarker)
-    if(searchByMarker)
-    flyToLocation(lastCoords, radiusForPointerSearch, false)
+        radiusForPointerSearch = newRadius;
+        console.log(searchByMarker)
+        if(searchByMarker)
+        flyToLocation(lastCoords, radiusForPointerSearch, false)
     }
 
-    export default BaseMap;
+export default BaseMap;

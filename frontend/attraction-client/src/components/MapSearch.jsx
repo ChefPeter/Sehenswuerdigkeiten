@@ -2,14 +2,24 @@ import React from "react";
 import "./styles/mapsearch.css";
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-import { Paper, Fade, Button, TextField, Container, Card, Box, Divider, Stack, Autocomplete, Slider, Typography, CircularProgress } from "@mui/material";
+import { Paper, Fade, Button, TextField, Container, Chip, Box, Divider, Stack, Autocomplete, Slider, Typography, CircularProgress, IconButton } from "@mui/material";
 import "./styles/mapsearch.css";
 import { fontSize, minWidth } from "@mui/system";
 import {useState , setState , useRef} from "react";
 import {flyToLocation} from "./BaseMap";
 import {setRadiusForPointerSearch} from "./BaseMap";
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
-
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import AlignVerticalBottomIcon from '@mui/icons-material/AlignVerticalBottom';
+import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+import LandscapeIcon from '@mui/icons-material/Landscape';
+import PeopleIcon from '@mui/icons-material/People';
+import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
+import MuseumIcon from '@mui/icons-material/Museum';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import LocalMallIcon from '@mui/icons-material/LocalMall';
+import ChurchIcon from '@mui/icons-material/Church';
+import {setFilter, filterResults} from "./BaseMap";
 
 let locationInput = "";
 let timerID;
@@ -22,6 +32,16 @@ function MapSearch () {
     const [showLoading, setShowLoading] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false)
 
+    const [architecture, setArchitecture] = useState(true)
+    const [culture, setCulture] = useState(true)
+    const [churches, setChurches] = useState(true)
+    const [historical, setHistorical] = useState(true)
+    const [natural, setNatural] = useState(true)
+    const [religion, setReligion] = useState(true)
+    const [touristFacilities, setTouristFacilities] = useState(true)
+    const [museums, setMuseums] = useState(true)
+    const [palaces, setPalaces] = useState(true)
+    const [malls, setMalls] = useState(true)
 
     const handleSearchFriendInput = async (event)=>{
 
@@ -202,13 +222,94 @@ function MapSearch () {
             
             { showDropdown ? 
                 <Fade in={showDropdown} timeout={200}>
-                    <Button>Hallo</Button>
+                  <div style={{paddingLeft:"10px", paddingBottom:"10px", paddingRight:"10px"}}>
+                    <Typography style={{marginLeft:"5px"}}>Filter</Typography>
+
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<ApartmentIcon/>} variant={architecture ? "filled" : "outlined"} label="Architecture" onClick={() => handleClickArchitecture()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<AlignVerticalBottomIcon/>} variant={culture ? "filled" : "outlined"} label="Cultural" onClick={() => handleClickCulture()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<ChurchIcon/>} variant={churches ? "filled" : "outlined"} label="Churches" onClick={() => handleClickChurch()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<HistoryEduIcon/>} variant={historical ? "filled" : "outlined"} label="Historical" onClick={() => handleClickHistorical()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<LandscapeIcon/>} variant={natural ? "filled" : "outlined"} label="Natural" onClick={() => handleClickNatural()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<PeopleIcon/>} variant={religion ? "filled" : "outlined"} label="Religion" onClick={() => handleClickReligion()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<EmojiPeopleIcon/>} variant={touristFacilities ? "filled" : "outlined"} label="Tourist facilities" onClick={() => handleClickTouristFacilities()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<MuseumIcon/>} variant={museums ? "filled" : "outlined"} label="Museums" onClick={() => handleClickMuseums()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<AccountBalanceIcon/>} variant={palaces ? "filled" : "outlined"} label="palaces" onClick={() => handleClickPalaces()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<LocalMallIcon/>} variant={malls ? "filled" : "outlined"} label="malls" onClick={() => handleClickMalls()} />
+
+                </div>
                 </Fade>
             : null}
 
         </Paper>
 
     );
+
+
+
+    //Function for Chips!!!
+    function handleClickArchitecture(){
+        //opposite way on purpose
+        let obj = {architecture: !architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        setArchitecture(!architecture)
+        setFilter(obj);    
+        filterResults()
+    }
+    function handleClickCulture(){
+        let obj = {architecture: architecture, cultural: !culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        setCulture(!culture)
+        setFilter(obj);  
+        filterResults()
+    }
+
+    function handleClickHistorical(){
+        let obj = {architecture: architecture, cultural: culture, historic: !historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        setHistorical(!historical)
+        setFilter(obj);  
+        filterResults()
+    }
+    function handleClickNatural(){
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: !natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        setNatural(!natural)
+        setFilter(obj); 
+        filterResults() 
+    }
+    function handleClickReligion(){
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: !religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        setReligion(!religion)
+        setFilter(obj); 
+        filterResults() 
+    }
+    function handleClickTouristFacilities(){
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: !touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        setTouristFacilities(!touristFacilities)
+        setFilter(obj);  
+        filterResults()
+    }
+    function handleClickMuseums(){
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: !museums, palaces: palaces, malls: malls, churches: churches}
+        setMuseums(!museums)
+        setFilter(obj); 
+        filterResults() 
+    }
+    function handleClickPalaces(){
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: !palaces, malls: malls, churches: churches}
+        setPalaces(!palaces)
+        setFilter(obj);  
+        filterResults()
+    }
+    function handleClickMalls(){
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: !malls, churches: churches}
+        setMalls(!malls)
+        setFilter(obj);  
+        filterResults()
+    }
+    function handleClickChurch(){
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: !churches}
+        setChurches(!churches)
+        setFilter(obj);
+        filterResults() 
+    }
+
 }
 
 

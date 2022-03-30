@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "../components/header";
+import Sidebar from "../components/Sidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Button, Card, Container, TextField, Typography, LinearProgress, Box } from "@mui/material";
 import "./styles/chat.css"
@@ -139,9 +139,9 @@ const Chat = (props) => {
     
     return (
         <ThemeProvider theme={createTheme(light)}>
-            <Header />
+          <Sidebar/>
             <Card elevation={4} sx={{
-                    marginTop: 1.5, 
+                    marginTop: 8.5, 
                     marginLeft: 1, 
                     marginRight: 1, 
                     paddingTop: 1,

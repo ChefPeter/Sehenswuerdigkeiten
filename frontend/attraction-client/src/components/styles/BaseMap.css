@@ -17,3 +17,7 @@
 .mapboxgl-ctrl-attrib{
     display: none !important;
 }
+
+.mapboxgl-popup-close-button{
+    display: none !important;
+}

@@ -17,11 +17,11 @@ const fetchFakeData = async centerCoordinates => {
 
   let points = [];
   let results = await getDataFromURL(getURL(centerCoordinates.radius2*1000, centerCoordinates.latitude, centerCoordinates.longitude, 500));
+  results = results.filter((item, index, self) =>
+  index === self.findIndex((x) => (x.wikidata === item.wikidata)));
 
   for (let result of results)
   {
-      if(results.some(x => x.id != result.id && x.wikidata === result.wikidata))
-        continue;
       const lon = result.point.lon;
       const lat = result.point.lat;
       points.push({

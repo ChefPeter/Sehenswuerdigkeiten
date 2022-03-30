@@ -59,12 +59,42 @@ export async function postRoute()
       map.removeLayer("route2");
       map.removeSource('route');
     }
+    //let colors = ['yellow', 'blue', 'orange', 'magenta', 'red'];
+
     for(let count = 1; count < coords.length; count++)
     {
       let rout = await getDataFromURL(getRouteURL("walking", `${coords[count].join(",")};${coords[count - 1].join(",")}`, "en"));
+      console.log(rout.routes[0].geometry.coordinates);
       out.push(rout.routes[0].geometry.coordinates);
+
+      /*map.addSource('route'+count+1, {
+        'type': 'geojson',
+        'data': {
+        'type': 'Feature',
+        'properties': {},
+        'geometry': {
+        'type': 'LineString',
+        'coordinates': rout.routes[0].geometry.coordinates,
+        }
+        }
+        });
+        map.addLayer({
+        'id': 'layer'+count+1,
+        'type': 'line',
+        'source': 'route'+count+1,
+        'layout': {
+        'line-join': 'round',
+        'line-cap': 'round'
+        },
+        'paint': {
+        'line-color': colors[count],
+        'line-width': 5
+        }
+        });*/
+
     }
     out = out.reduce((a, b) => a.concat(b));
+    console.log(out);
     map.addSource('route1', {
       'type': 'geojson',
       'data': {
@@ -139,8 +169,10 @@ const BaseMap = () => {
     //mapbox://styles/mapbox/satellite-v9
     //mapbox://styles/mapbox/light-v10
     let theme = "mapbox://styles/mapbox/navigation-night-v1";
+    let imageSrc = "";
   
     const [open, setOpen] = useState(false);
+    const [image, setImage] = useState("");
     
    /* useSelector(state => {
         try{
@@ -278,12 +310,15 @@ const BaseMap = () => {
             pdesc=desc.wikipedia_extracts.text
           }*/
           // create popup node
+          setImage("");
+          imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
+          setImage(imageSrc);
           const popupNode = document.createElement("div");
 
           ReactDOM.render(<Popup feature={feature} />, popupNode);
           // <img src="./kolosseum.jpg"></img>
           //ReactDOM.render(<Button variant="contained" style={{borderRadius: '20px'}} onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
-          ReactDOM.render(<div><img src={`https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`} style={{width:"100%", height:"50%"}}></img>
+          ReactDOM.render(<div><img src={imageSrc} style={{width:"100%", height:"50%"}}></img>
             <div style={{display: "flex", justifyContent: "space-between"}}><p style={{color:'black'}}>{feature.properties.name}</p>
             <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}} onClick={() => addToRoute(feature)}>Add</Button></div></div>, popupNode);
 
@@ -354,7 +389,7 @@ const BaseMap = () => {
         onOpen={() => {}}>
           <div>
             <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%"}}>
-            <div><img src="https://media.istockphoto.com/photos/colosseum-in-rome-during-sunrise-picture-id1271579758?b=1&k=20&m=1271579758&s=170667a&w=0&h=oyXB8ehFjbo5-9HDdSjI9hYZktLstV3Ixz4JUUynahU=" style={{maxWidth:"100%"}}></img></div>
+            <div><img src={image} style={{maxWidth:"100%"}}></img></div>
             <div style={{display: "flex", justifyContent: "space-between"}}>
               <h2 id="nameField" style={{color:'white'}}>{obj.properties.name}</h2>
               <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}} onClick={() => addToRoute(obj)}>Add</Button>
@@ -415,8 +450,5 @@ export function setRadiusForPointerSearch (newRadius){
   if(searchByMarker)
     flyToLocation(lastCoords, radiusForPointerSearch, false)
 }
-
-
-
 
 export default BaseMap;

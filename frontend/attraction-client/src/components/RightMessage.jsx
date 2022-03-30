@@ -23,6 +23,9 @@ function RightMessage (props) {
         }
     }, []);
 
+    const t = props.time.replace("T", " ").slice(0, 19);
+    const formattedTime = t;
+
     return (
 
         <Container  sx={{
@@ -47,7 +50,7 @@ function RightMessage (props) {
                 <p>{props.message}</p>
         }
         
-        <Card sx={{backgroundColor: "secondary.light", width: "3em"}}>{props.time}</Card>
+        <Card sx={{backgroundColor: "primary.dark", width: "19ch"}}>{formattedTime}</Card>
         </Container>
 
     );

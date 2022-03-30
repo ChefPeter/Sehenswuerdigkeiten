@@ -7,14 +7,16 @@ import { maxHeight } from "@mui/system";
 import StopIcon from '@mui/icons-material/Stop';
 import {useState} from 'react';
 
-let message = "";
+//let message = "";
 
 function ChatSendbar (props) {
 
     const [hideButton, setHideButton] = useState(true);
+    const [message, setMessage] = useState("");
 
     const checkMessageInput = (event) => {
-        message = event.target.value;
+        //message = event.target.value;
+        setMessage(event.target.value);
     };
 
     const sendMessage = (event) => {
@@ -28,7 +30,7 @@ function ChatSendbar (props) {
             body: formData,
             credentials: 'include'
         });
-
+        setMessage("");
     }
 
     const recordAudio = (event) => {
@@ -110,7 +112,7 @@ function ChatSendbar (props) {
                 id="chatMessageInput"
                 type="text"
                 label="Type a message!"
-                
+                value={message}
                 onChange={checkMessageInput}
                 InputProps={{endAdornment: <Button onClick={sendMessage}><SendIcon/></Button> }}
             />

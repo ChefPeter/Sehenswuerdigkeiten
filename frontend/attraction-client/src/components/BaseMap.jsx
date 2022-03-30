@@ -70,8 +70,9 @@
     {
 
       let rout = await getDataFromURL(getRouteURL("walking", `${coords[count].join(",")};${coords[count - 1].join(",")}`, "en"));
-      out = out.concat(rout.routes[0].geometry.coordinates.reverse());
+      out.push(rout.routes[0].geometry.coordinates);
     }
+    out = out.reverse().reduce((a, b) => a.concat(b));
     map.addSource('route1', {
         'type': 'geojson',
         'data': {

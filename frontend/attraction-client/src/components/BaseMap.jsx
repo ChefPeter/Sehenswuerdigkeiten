@@ -412,11 +412,13 @@
 
         if(!results){
             init=false;
-            if(currentGlobalResults === [])
-                return
+            if(currentGlobalResults.length === 0)
+                return;
             else
                 results = currentGlobalResults;
         }
+
+        console.log(results)
 
         let filteredResults = [], xx = false;
         for(let i = 0; i<results["features"].length; i++){

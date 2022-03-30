@@ -387,7 +387,7 @@
         open={open}
         onClose={() => setOpen(false)}
         onOpen={() => {}}>
-            <div style={{maxHeight:"70vh"}}>
+            <div style={{maxHeight:"60vh"}}>
                 <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                 <div>
                     <div>

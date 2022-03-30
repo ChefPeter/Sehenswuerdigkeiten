@@ -14,7 +14,7 @@ let map;
 let testRoute = [];
 let radiusForPointerSearch = 1;
 let searchByMarker = false;
-let globalCoords = [];
+let lastCoords = [];
 
 function getRouteURL(type, coords, language)
 {
@@ -327,10 +327,10 @@ const BaseMap = () => {
     setShowSearchHere(true)
     let coordinates = event.lngLat;
     setMarkerCoords([coordinates.lng, coordinates.lat])
-    globalCoords=[coordinates.lng, coordinates.lat];
     marker.setLngLat(coordinates).addTo(map);
   }
-  map.on('click', add_marker);
+  map.doubleClickZoom.disable()
+  map.on('dblclick', add_marker);
     
 
   }, 
@@ -371,20 +371,26 @@ const BaseMap = () => {
 
 
 function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowSearchHere){
+ // setLastSearchWasByClickOnMap(true)
+  lastCoords = markerCoords;
+
   setShowSearchHere(false)
   searchByMarker = true;
 
-  flyToLocation(markerCoords, radiusForPointerSearch, true)
+  flyToLocation(markerCoords, radiusForPointerSearch, false)
 
 }
 
 
-export async function flyToLocation (coords, radius, marker=false){
-  console.log("ff"+marker)
-  if(!marker)
-    searchByMarker = false;
-  else
-    coords = globalCoords;
+export async function flyToLocation (coords, radius, newCoordinates = false){
+
+
+
+  if(newCoordinates){
+    lastCoords = coords;
+  }else{
+    coords = lastCoords;
+  }
 
     map.flyTo({
       center: [
@@ -402,11 +408,12 @@ export async function flyToLocation (coords, radius, marker=false){
 
 }
 
+
 export function setRadiusForPointerSearch (newRadius){
   radiusForPointerSearch = newRadius;
   console.log(searchByMarker)
   if(searchByMarker)
-    flyToLocation(globalCoords, radiusForPointerSearch, true)
+    flyToLocation(lastCoords, radiusForPointerSearch, false)
 }
 
 

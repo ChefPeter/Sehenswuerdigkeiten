@@ -2,7 +2,6 @@
     width: 100vw;
     height: 100vh;
     position: relative;
-   
 }
 
   #navi,
@@ -11,6 +10,7 @@
     position: absolute;
     top: 0;
     left: 0;
+   
   }
   #infoi {
     z-index: 10;
@@ -22,3 +22,10 @@
     top: 100px;
     left: 0px;
   }
+
+  @media only screen and (max-width: 1000px) {
+    #navi {
+      
+      min-width: calc(95% - 1em);
+    }
+}

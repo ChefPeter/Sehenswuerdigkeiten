@@ -1,7 +1,7 @@
 import Header from "../components/header";
 import "./styles/start.css";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button, Card } from "@mui/material";
+import { Button, Card, Stack } from "@mui/material";
 import { useSelector } from 'react-redux';
 import BaseMap, {postRoute} from '../components/BaseMap';
 import React, { useState, useEffect } from 'react';
@@ -39,19 +39,20 @@ function Home(props) {
       return "de";
     }
   });
+  //  setMin width according to width!!!
     return (
       <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
        
         <Card id="container">
           
           <BaseMap />
-          
-          <Sidebar/>
-
-          <div id="navi" style={{ marginLeft: "3.625em", width:"100px"}}>
+        
+        <Sidebar/>
+                                                                                              
+          <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
             <MapSearch></MapSearch>
           </div>
-             
+
           <Button style={{marginTop: "100px"}} id="test" onClick={() => postRoute()}>Enter</Button>
 
         </Card>

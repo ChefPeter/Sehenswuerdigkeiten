@@ -7,6 +7,6 @@
 
 @media only screen and (max-width: 1000px) {
     #searchPaper {
-      width: calc(95% - 1em);
+      width: calc(95vw - 3.5em);
     }
 }

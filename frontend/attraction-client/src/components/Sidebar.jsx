@@ -117,13 +117,12 @@ export default function SwipeableTemporaryDrawer() {
     <div>
     <Box 
       onClick={toggleDrawer("left", true)}
-      
       sx={{backgroundColor: 'primary.dark', 
       border: '2px black',
       opacity: 0.9,
       '&:hover': {
       backgroundColor: 'primary.main',
-      },}} id="navi" style={{marginTop:"16.5px", borderRadius:"6px", width:"2.625em", marginLeft:"0.5em"}}>
+      },}} id="navi" style={{marginTop:"16.5px", borderRadius:"6px", width:"2.625em", minWidth:"2.625em", marginLeft:"0.5em"}}>
       <IconButton
             size="large"
             style={{padding: "10px 10px 10px 10px"}}

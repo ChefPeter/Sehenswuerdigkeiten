@@ -20,7 +20,6 @@ function MapSearch () {
     const [selectedCityCoords, setSelectedCityCoords] = useState([]);
     const [showLoading, setShowLoading] = useState(false);
 
-
     const handleSearchFriendInput = async (event)=>{
 
         setSelectedCityCoords([]);
@@ -46,7 +45,6 @@ function MapSearch () {
             
                 for(let i = 0; i<jsonRes["features"].length-1; i++){
 
-                    
                     if(jsonRes["features"][i] != "undefined"){
 
                         if(jsonRes["features"][i]["place_name"] != undefined && jsonRes["features"][i]["center"] != undefined){
@@ -123,7 +121,7 @@ function MapSearch () {
 
         if(coords != null){
             setSelectedCityCoords(coords);
-            flyToLocation(coords, radiusValue)
+            flyToLocation(coords, radiusValue, true)
         }
         
     }
@@ -134,16 +132,18 @@ function MapSearch () {
             console.log("Latitude is :", position.coords.latitude);
             console.log("Longitude is :", position.coords.longitude);
             setSelectedCityCoords([position.coords.longitude, position.coords.latitude]);
-            flyToLocation([position.coords.longitude, position.coords.latitude], radiusValue)
+            flyToLocation([position.coords.longitude, position.coords.latitude], radiusValue, true)
           });
        
     }
 
     function sliderChange(event, value){
+        console.log("halo")
+        console.log(selectedCityCoords)
         setRadiusValue(value);
         setRadiusForPointerSearch(value)
         if(selectedCityCoords.length !== 0){
-            flyToLocation(selectedCityCoords, value, true);
+            flyToLocation(selectedCityCoords, value, false);
         }
     }
 

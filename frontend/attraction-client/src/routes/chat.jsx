@@ -124,14 +124,16 @@ const Chat = (props) => {
     const friend = name;
 
     function func () {
-      setInterval( () => fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
+      const intervalID = setInterval( () => fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
         method: "GET",
         credentials: "include"
       })
       .then(res => res.json())
       .then(res => {
         setMessages(res);
-      }), 3000);
+      }), 500);
+
+      return (() => clearInterval(intervalID));
     }
 
     useEffect(func, []);
@@ -157,9 +159,6 @@ const Chat = (props) => {
                     paddingBottom: 1,
                     paddingRight: 1,
                     paddingLeft: 1}}>
- 
-                    <LeftMessage message ="Hallo" time="13:00"></LeftMessage>
-                    <RightMessage message ="Tschüss" time="13:01"></RightMessage>
                 
                     {messages.map((message, i) => {
                       if (message.is_file) {

@@ -59,42 +59,13 @@
         map.removeLayer("route2");
         map.removeSource('route');
     }
-    //let colors = ['yellow', 'blue', 'orange', 'magenta', 'red'];
 
     for(let count = 1; count < coords.length; count++)
     {
-        let rout = await getDataFromURL(getRouteURL("walking", `${coords[count].join(",")};${coords[count - 1].join(",")}`, "en"));
-        console.log(rout.routes[0].geometry.coordinates);
-        out.push(rout.routes[0].geometry.coordinates);
 
-        /*map.addSource('route'+count+1, {
-        'type': 'geojson',
-        'data': {
-        'type': 'Feature',
-        'properties': {},
-        'geometry': {
-        'type': 'LineString',
-        'coordinates': rout.routes[0].geometry.coordinates,
-        }
-        }
-        });
-        map.addLayer({
-        'id': 'layer'+count+1,
-        'type': 'line',
-        'source': 'route'+count+1,
-        'layout': {
-        'line-join': 'round',
-        'line-cap': 'round'
-        },
-        'paint': {
-        'line-color': colors[count],
-        'line-width': 5
-        }
-        });*/
-
+      let rout = await getDataFromURL(getRouteURL("walking", `${coords[count].join(",")};${coords[count - 1].join(",")}`, "en"));
+      out = out.concat(rout.routes[0].geometry.coordinates.reverse());
     }
-    out = out.reduce((a, b) => a.concat(b));
-    console.log(out);
     map.addSource('route1', {
         'type': 'geojson',
         'data': {
@@ -119,31 +90,7 @@
         'line-width': 5
         }
         });
-        map.addSource('route2', {
-        'type': 'geojson',
-        'data': {
-        'type': 'Feature',
-        'properties': {},
-        'geometry': {
-        'type': 'LineString',
-        'coordinates': coords
-        }
-        }
-        });
-        map.addLayer({
-        'id': 'route2',
-        'type': 'line',
-        'source': 'route2',
-        'layout': {
-        'line-join': 'round',
-        'line-cap': 'round'
-        },
-        'paint': {
-        'line-color': 'red',
-        'line-width': 5
-        }
-        });
-    }
+  }
 
     /*const response = await fetch("http://localhost:5000/route", {
             method: 'POST',
@@ -352,6 +299,7 @@
     map.on("click", "random-points-layer", e => {
         if (e.features.length) {
         setObj(e.features[0]);
+        console.log(e.features[0]);
         setOpen(true);
         }
     });
@@ -387,7 +335,7 @@
         open={open}
         onClose={() => setOpen(false)}
         onOpen={() => {}}>
-            <div style={{mayHeight:"20vh"}}>
+            <div style={{maxHeight:"60vh"}}>
                 <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                 <div>
                     <div>

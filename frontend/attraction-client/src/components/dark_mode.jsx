@@ -4,23 +4,23 @@ import Box from '@mui/material/Box';
 import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import rootReducer from '../reducers/rootReducer';
-import store from '../reducers/store';
 import { Pape, Card, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { useSelector } from 'react-redux';
+import {setCookie} from "../functions/cookieManager";
 
-const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
-
-function Mode() {
-  const theme = useTheme();
-  const colorMode = React.useContext(ColorModeContext);
+function Dark_Mode(props) {
   
+  function onModeSwitch(){
+    let newTheme = (props.t1 === "light" ? "dark" : "light");
+    props.t2(newTheme)
+    setCookie("theme",newTheme)
+  }
+
+
   return (
-    <ListItem button onClick={colorMode.toggleColorMode}>
+    <ListItem button onClick={() =>  onModeSwitch()}>
      
-      
         <ListItemIcon>
-        {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+        {props.t1 === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
 
             </ListItemIcon>
             
@@ -30,41 +30,4 @@ function Mode() {
   );
 }
 
-export default function Dark_Mode() {
-  const defaultTheme = useSelector(state => {
-    try{
-      return state.theme;
-    }catch(e){
-      return "dark";
-    }
-  });
-  const [mode, setMode] = React.useState(defaultTheme);
-  const colorMode = React.useMemo(
-    () => ({
-      toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-        const changeTheme = { type: 'CHANGE_THEME', theme: "unknown"};
-        store.dispatch(changeTheme)  
-      },
-    }),
-    [],
-  );
-
-  const theme = React.useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode,
-        },
-      }),
-    [mode],
-  );
-
-  return (
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <Mode />
-      </ThemeProvider>
-    </ColorModeContext.Provider>
-  );
-}
+export default Dark_Mode;

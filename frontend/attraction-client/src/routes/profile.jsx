@@ -1,9 +1,8 @@
-import { useSelector } from 'react-redux';
 import Sidebar from "../components/Sidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
-import { Button} from '@mui/material';
+import { Button, Card} from '@mui/material';
 import "../routes/styles/profile.css";
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
@@ -98,27 +97,12 @@ function Profile(props) {
   };
  
 
-  const theme = useSelector(state => {
-    try{
-      return state.theme;
-    }catch(e){
-      return "dark";
-    }
-  });
-  const language = useSelector(state => {
-    try{
-      return state.language;
-    }catch(e){
-      return "de";
-    }
-  });
-
-  
 
     return (
-      <div>
-        <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-        <Sidebar/>
+    
+        <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
+        <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
+        <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
         <div id='description' style={{marginTop: "calc(16.5px + 3.5em)"}}>
 
           { false ?
@@ -157,8 +141,9 @@ function Profile(props) {
         <ErrorSnackbar openSuccessSnack={showError} successMessage={"Upload fehlgeschlagen!"} handleClose={handleCloseErrorSnackbar}></ErrorSnackbar>
          
         </div>
+        </Card>
         </ThemeProvider>
-      </div>
+      
     );
   
 }

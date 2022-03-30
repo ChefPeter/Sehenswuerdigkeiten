@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux';
 import "../routes/styles/contact.css";
 import Sidebar from "../components/Sidebar";
 import React from "react";
@@ -27,20 +26,6 @@ function Groups(props) {
 
   let createGroupInput = "";
 
-  const theme = useSelector(state => {
-    try{
-      return state.theme;
-    }catch(e){
-      return "dark";
-    }
-  });
-  const language = useSelector(state => {
-    try{
-      return state.language;
-    }catch(e){
-      return "de";
-    }
-  });
 
   const handleCreateGroupInput = (event)=>{
     createGroupInput = event.target.value;
@@ -64,9 +49,11 @@ function Groups(props) {
   }, []);
 
   return (
-    <div>
-      <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-      <Sidebar/>
+    
+    <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
+      <Card style={{minHeight: "100vh", borderRadius:"0px"}} >
+
+      <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
       <Card  style={{marginTop: "calc(16.5px + 3.2em)"}}>
         <TextField
           id="createGroupField"
@@ -88,9 +75,9 @@ function Groups(props) {
         </List>
         
       </div>
+      </Card>
+    </ThemeProvider>
 
-      </ThemeProvider>
-    </div>
   );
   
 }

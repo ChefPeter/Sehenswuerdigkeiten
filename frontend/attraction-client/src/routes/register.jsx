@@ -2,16 +2,16 @@ import './styles/start.css';
 import "./styles/register.css";
 import './styles/app.css';
 import { Button, TextField, Alert, AlertTitle, Fade} from '@mui/material';
-import {useState , setState} from "react";
+import {useState , setState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
-
+import {setCookie, getCookie, checkCookie} from "../functions/cookieManager";
 
 let usernameInput = "";
 let emailInput = "";
 let passwordInput = "";
 let retypePasswordInput = "";
 
-function Register() {
+function Register(props) {
 
     const navigate = useNavigate();
 
@@ -31,6 +31,14 @@ function Register() {
     const [errorText, setErrorText] = useState("Error");
     const [showInfoAlert, setShowInfoAlert] = useState(false);
     const [showErrorAlert, setShowErrorAlert] = useState(false);
+
+    useEffect(() => {
+
+        props.t2(checkCookie("theme"))
+        props.l2(checkCookie("language"))
+    
+    });
+
 
   return (
       <div id='hintergrund'>

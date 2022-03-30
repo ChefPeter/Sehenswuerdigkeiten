@@ -1,13 +1,12 @@
-import Header from "../components/header";
 import "./styles/start.css";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Button, Card, Stack } from "@mui/material";
-import { useSelector } from 'react-redux';
 import BaseMap, {postRoute} from '../components/BaseMap';
 import React, { useState, useEffect } from 'react';
 import "./styles/home.css"
 import MapSearch from "../components/MapSearch";
 import Sidebar from "../components/Sidebar"
+import {setCookie, getCookie, checkCookie} from "../functions/cookieManager";
 
 // Define theme settings
 const light = {
@@ -25,29 +24,14 @@ const dark = {
 
 function Home(props) {
 
-  const theme = useSelector(state => {
-    try{
-      return state.theme;
-    }catch(e){
-      return "dark";
-    }
-  });
-  const language = useSelector(state => {
-    try{
-      return state.language;
-    }catch(e){
-      return "de";
-    }
-  });
-  //  setMin width according to width!!!
+ 
     return (
-      <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-       
-        <Card id="container">
-          
-          <BaseMap />
+      <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
         
-        <Sidebar/>
+        <Card id="container" style={{borderRadius:"0px"}}>
+          <BaseMap />
+          
+          <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
                                                                                               
           <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
             <MapSearch></MapSearch>

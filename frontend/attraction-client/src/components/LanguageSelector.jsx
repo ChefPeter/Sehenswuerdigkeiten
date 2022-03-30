@@ -1,42 +1,42 @@
 import { FormControl, MenuItem, Select, InputLabel, Box } from "@mui/material";
 import React from "react";
-import { useEffect } from "react/cjs/react.production.min";
-import { connect } from "react-redux";
-import store from "../reducers/store";
-import { useSelector } from "react-redux";
 import "./styles/languageselect.css"
+import {getCookie, setCookie} from "../functions/cookieManager";
+
+function LanguageSelector(props) {
 
 
-function LanguageSelector() {
-
-  const language_given = useSelector(state => {
-    try{
-      return state.language;
-    }catch(e){
-      return "de";
+  function LanguageLabel(){
+    if(props.l1 === "de"){
+      return <InputLabel id="demo-simple-select-label">Sprache</InputLabel>;
+    }else if(props.l1 === "it"){
+      return <InputLabel id="demo-simple-select-label">Lingua</InputLabel>;
+    }else{
+      return <InputLabel id="demo-simple-select-label">Language</InputLabel>;
     }
-  });
-    const [language, setLanguage] = React.useState(language_given);
+  }
 
-    const handleChange = (event) => {
-        setLanguage(event.target.value);
-        console.log(event.target.value)
-        const changeTheme = { type: 'CHANGE_LANGUAGE', language: event.target.value};
-        store.dispatch(changeTheme) 
-        console.log("change")
-    };
+    function onLanguageSelect(event){
+        props.l2(event.target.value);
+
+      //change Cookies
+      setCookie("language",event.target.value, 31)
+      console.log(getCookie("language"))
+    }
 
     return(
      <Box >
       <FormControl id="languageSelectorStyle" >
-        <InputLabel id="demo-simple-select-label">Language</InputLabel>
+
+        <LanguageLabel />
+      
         <Select
          
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={language}
+          value={props.l1}
           label="Language"
-          onChange={handleChange}
+          onChange={(event) => onLanguageSelect(event)}
         >
           <MenuItem value={"de"}>Deutsch</MenuItem>
           <MenuItem value={"en"}>English</MenuItem>
@@ -48,15 +48,6 @@ function LanguageSelector() {
 
 }
 
-const initState = {
-    language: "de"
-}
 
-const mapStatesToProps = (state = initState) => {
-    return {
-      language: state.language
-    }  
-}
-  
 
-export default connect(mapStatesToProps)(LanguageSelector);
+export default LanguageSelector;

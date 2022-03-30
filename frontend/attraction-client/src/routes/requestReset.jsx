@@ -1,9 +1,6 @@
 import { Link } from "react-router-dom";
-import Header from "../components/header";
 import "./styles/requestReset.css";
 import { Button, Container, Typography, Box, TextField, Alert, AlertTitle, Paper, getTableSortLabelUtilityClass } from '@mui/material';
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useSelector } from 'react-redux';
 import { useState } from "react";
 
 let input = "";

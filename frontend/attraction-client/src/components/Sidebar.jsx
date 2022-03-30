@@ -25,7 +25,7 @@ import PolicyIcon from '@mui/icons-material/Policy';
 import "./styles/sidebar.css"
 
 
-export default function SwipeableTemporaryDrawer() {
+export default function SwipeableTemporaryDrawer(props) {
   const [state, setState] = React.useState({
     left: false
   });
@@ -106,8 +106,8 @@ export default function SwipeableTemporaryDrawer() {
             <ListItemText primary={"Profile"} />
       </ListItem>
 
-      <Dark_Mode ></Dark_Mode>
-      <LanguageSelector></LanguageSelector>
+      <Dark_Mode t1={props.t1} t2={props.t2}></Dark_Mode>
+      <LanguageSelector l1={props.l1} l2={props.l2} ></LanguageSelector>
       
     </Box>
     </div>

@@ -1,6 +1,6 @@
-import { useSelector } from 'react-redux';
 import "../routes/styles/contact.css";
 import Sidebar from "../components/Sidebar";
+import { Card } from "@mui/material";
 import React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
@@ -19,25 +19,12 @@ const dark = {
 
 function LegalNotice(props) {
 
-  const theme = useSelector(state => {
-    try{
-      return state.theme;
-    }catch(e){
-      return "dark";
-    }
-  });
-  const language = useSelector(state => {
-    try{
-      return state.language;
-    }catch(e){
-      return "de";
-    }
-  });
-
+  
     return (
-      <div>
-        <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-        <Sidebar/>
+ 
+      <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
+        <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
+        <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
         <div id="rand" style={{marginTop: "calc(16.5px + 3em)"}}>
             <h1>Impressum</h1>
             <br />
@@ -79,8 +66,9 @@ function LegalNotice(props) {
             <h2>Verbraucher&shy;streit&shy;beilegung/Universal&shy;schlichtungs&shy;stelle</h2>
             <p>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
           </div>
+          </Card>
         </ThemeProvider>
-      </div>
+    
     );
   
 }

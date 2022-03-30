@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
-import Header from "../components/header";
 import "./styles/start.css";
 import { Button, Slider, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useSelector } from 'react-redux';
 import DeleteIcon from '@mui/icons-material/Delete';
 import React from "react";
 import BaseMap, {postRoute} from '../components/BaseMap';
@@ -27,20 +25,6 @@ const dark = {
 
 function App(props) {
  
-  const theme = useSelector(state => {
-    try{
-      return state.theme;
-    }catch(e){
-      return "dark";
-    }
-  });
-  const language = useSelector(state => {
-    try{
-      return state.language;
-    }catch(e){
-      return "de";
-    }
-  });
 
   function getDetailsFromMonument(id)
   {
@@ -48,8 +32,7 @@ function App(props) {
   }
 
     return (
-      <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-      <Header/>
+      <ThemeProvider theme={createTheme("dark" === "dark" ? dark : light)}>
       <BaseMap />
       <Slider></Slider>
       <a>index</a>

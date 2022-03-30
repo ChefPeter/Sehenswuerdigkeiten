@@ -1,8 +1,9 @@
 import './styles/app.css';
 import "./styles/login.css";
 import { Button, TextField, Alert, AlertTitle, Fade} from '@mui/material';
-import {useState , setState} from "react";
+import {useState , setState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
+import {setCookie, getCookie, checkCookie} from "../functions/cookieManager";
 
 let usernameInput = "";
 let passwordInput = "";
@@ -15,6 +16,16 @@ function Login(props) {
   const getPasswordValue = (event) => {
     passwordInput = event.target.value;
 };
+
+  
+ 
+
+  useEffect(() => {
+
+    props.t2(checkCookie("theme"))
+    props.l2(checkCookie("language"))
+
+  });
 
   const [errorText, setErrorText] = useState("Error");
   const [showErrorAlert, setShowErrorAlert] = useState(false);

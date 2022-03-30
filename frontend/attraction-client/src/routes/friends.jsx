@@ -3,7 +3,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import List from '@mui/material/List';
 import "./styles/friends.css";
-import { Button, Container, TextField, Typography, LinearProgress, Box } from "@mui/material";
+import { Button, Container, TextField, Typography, LinearProgress, Card } from "@mui/material";
 import FriendItem from "../components/FriendItem";
 import SearchFriend from "../components/SearchFriend";
 import IncomingRequest from "../components/IncomingRequest";
@@ -146,52 +146,52 @@ function Friends(props) {
   };
 
     return (
-      <ThemeProvider theme={createTheme(light)}>
+      <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
+        <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
+          <SideBar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
 
-      <SideBar/>
+          { showLoadingBar ? 
+          <LinearProgress color="inherit"/>
+            : null}
 
-      { showLoadingBar ? 
-      <LinearProgress color="inherit"/>
-        : null}
+          
+          <div id="alignSearchBar">
+          
+            <TextField
+              style={{ marginLeft: "3.625em"}}
+              id="searchBarFriends"
+              type="text"
+              label="Search friend"
+              variant="filled"
+              onChange={handleSearchFriendInput}
+              InputProps={{endAdornment: <Button onClick={() => handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage)}><PersonAddIcon/></Button>}}
+            />
 
-      
-      <div id="alignSearchBar">
-      
-        <TextField
-          style={{ marginLeft: "3.625em"}}
-          id="searchBarFriends"
-          type="text"
-          label="Search friend"
-          variant="filled"
-          onChange={handleSearchFriendInput}
-          InputProps={{endAdornment: <Button onClick={() => handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage)}><PersonAddIcon/></Button>}}
-        />
+              { friendRequests.length > 0 ?
+              <Typography >
+                Incoming Requests!
+              </Typography>
+            : null }
 
-          { friendRequests.length > 0 ?
-          <Typography >
-            Incoming Requests!
-          </Typography>
-        : null }
+          </div>
 
-      </div>
-
-      
-      {friendRequests.map(e => <IncomingRequest name={e} ></IncomingRequest>)}
+          
+          {friendRequests.map(e => <IncomingRequest name={e} ></IncomingRequest>)}
 
 
-      <div id="freunde" >
-      
-        <List>
+          <div id="freunde" >
+          
+            <List>
 
-          {friendsName.map((e,i) =>  <FriendItem name={e.name} description={e.description} key={e.name} profilePicture={profilePicture ? profilePicture[i] : null}></FriendItem>)}
-         
-        </List>
-        
-      </div>
+              {friendsName.map((e,i) =>  <FriendItem name={e.name} description={e.description} key={e.name} profilePicture={profilePicture ? profilePicture[i] : null}></FriendItem>)}
+            
+            </List>
+            
+          </div>
 
-      <ErrorSnackbar openErrorSnack={openErrorSnack} errorMessage={errorMessage} handleClose={handleCloseErrorSnackbar} ></ErrorSnackbar>
-      <SuccessSnackbar openSuccessSnack={openSuccessSnack} successMessage={successMessage} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
-      
+          <ErrorSnackbar openErrorSnack={openErrorSnack} errorMessage={errorMessage} handleClose={handleCloseErrorSnackbar} ></ErrorSnackbar>
+          <SuccessSnackbar openSuccessSnack={openSuccessSnack} successMessage={successMessage} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
+      </Card>
     </ThemeProvider>
     );
   

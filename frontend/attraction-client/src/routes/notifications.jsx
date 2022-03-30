@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux';
 import "../routes/styles/notifications.css";
 import Sidebar from "../components/Sidebar";
 import React from "react";
@@ -22,26 +21,12 @@ const dark = {
 
 function Notifications(props) {
 
-  const theme = useSelector(state => {
-    try{
-      return state.theme;
-    }catch(e){
-      return "dark";
-    }
-  });
-  const language = useSelector(state => {
-    try{
-      return state.language;
-    }catch(e){
-      return "de";
-    }
-  });
 
     return (
-      <div>
-        <ThemeProvider theme={createTheme(theme === "dark" ? dark : light)}>
-          
-          <Sidebar/>
+  
+        <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
+          <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
+          <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
         
           <div id='nachrichten' style={{marginTop: "calc(16.5px + 3.5em)"}}>
               <Stack spacing={1}>
@@ -49,8 +34,9 @@ function Notifications(props) {
                   <Alert onClose={() => {}} severity="warning">Auf deiner Strecke befindet sich eine Menschenansammlung</Alert>
               </Stack>
           </div>
+          </Card>
         </ThemeProvider>
-      </div>
+      
     );
   
 }

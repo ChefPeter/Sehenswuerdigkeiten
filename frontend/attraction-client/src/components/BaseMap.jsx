@@ -5,8 +5,7 @@
     import Popup from "./Popup";
     import "./styles/BaseMap.css";
     import ReactDOM from "react-dom";
-    import { useSelector } from 'react-redux';
-    import { Button } from "@mui/material";
+    import { Button, LinearProgress } from "@mui/material";
     import SwipeableDrawer from '@mui/material/SwipeableDrawer';
     const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
@@ -130,31 +129,6 @@
     const [open, setOpen] = useState(false);
     const [image, setImage] = useState("");
 
-    /* useSelector(state => {
-        try{
-            
-            if(state.theme == "light"){
-                
-                setTheme("mapbox://styles/mapbox/light-v10")
-                
-            }else{
-                setTheme("mapbox://styles/mapbox/navigation-night-v1")
-                
-            }
-            
-        }catch(e){
-            setTheme("mapbox://styles/mapbox/navigation-night-v1");
-        }
-    });*/
-
-        const language = useSelector(state => {
-        try{
-            return state.language;
-        }catch(e){
-            return "de";
-        }
-        });
-
 
     mapboxgl.accessToken = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
@@ -164,6 +138,7 @@
     const [obj, setObj] = useState({properties: {name: 'test'}});
     const [showSearchHere, setShowSearchHere] = useState(false);
     const [markerCoords, setMarkerCoords] = useState([]);
+    const [showLinearLoading, setShowLinearLoading] = useState(false)
 
     useEffect(() => {
 
@@ -190,8 +165,12 @@
         positionOptions: {
             enableHighAccuracy: true
         },
-        trackUserLocation: true
-        });
+            trackUserLocation: true,
+            // Draw an arrow next to the location dot to indicate which direction the device is heading.
+            showUserHeading: true
+    });
+
+    
         
         map.addControl(geolocate, "bottom-right");
 
@@ -338,13 +317,16 @@
             <Button onClick={() =>  handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowSearchHere)} style={{marginLeft:"600px", width:"100vw"}}>Search here?</Button>
         : null }
 
+        { showLinearLoading ?
+            <LinearProgress color="inherit"/>
+        : null }
 
         <div id="mapContainer" className="map" ref={map}></div>
 
         <SwipeableDrawer 
             anchor='bottom'
             open={open}
-            onClose={() => setOpen(false)}
+            onClose={() => setOpen(true)}
             onOpen={() => {}}>
                 <div style={{maxHeight:"60vh"}}>
                     <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
@@ -381,29 +363,57 @@
 
 
     export async function flyToLocation (coords, radius, newCoordinates = false){
-
+        
         if(newCoordinates){
             lastCoords = coords;
         }else{
             coords = lastCoords;
         }
 
+        let z = 12;
+        
+        if(radius < 5){z = 14}
+        else if(radius < 10){z = 10.3}
+        else if(radius < 15){z = 9.9}
+        else if(radius < 20){z = 9.1}
+        else if(radius < 25){z = 8.8}
+        else if(radius < 30){z = 8.5}
+        else if(radius < 35){z = 8.4}
+        else if(radius < 40){z = 8.2}
+        else if(radius < 45){z = 8}
+        else if(radius < 50){z = 7.9}
+        else if(radius < 55){z = 7.75}
+        else if(radius < 60){z = 7.55}
+        else if(radius < 65){z = 7.4}
+        else if(radius < 70){z = 7.3}
+        else if(radius < 75){z = 7.2}
+        else if(radius < 80){z = 7.1}
+        else if(radius < 85){z = 7}
+        else if(radius < 90){z = 6.9}
+        else if(radius < 95){z = 6.85}
+        else if(radius <= 100){z = 6.8}
+        
         map.flyTo({
             center: [
             coords[0],
             coords[1]
             ],
+            zoom: z,
+            speed: 1.5,
+           
             essential: true // this animation is considered essential with respect to prefers-reduced-motion
         });
+    
 
         lastRadius = radius;
         const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius, filterToUse: filter });
         currentGlobalResults = results;
-     
+        
+        
         // update "random-points-data" source with new data
         // all layers that consume the "random-points-data" data source will be updated automatically
         map.getSource("random-points-data").setData(results);
-
+        
     }
 
     //new Request has to be made

@@ -15,8 +15,10 @@
     let radiusForPointerSearch = 1;
     let searchByMarker = false;
     let lastCoords = [];
-    let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, touristFacilities: true, museums: true, palaces: true, malls: true, church: true}
+    let lastRadius = 1;
+    let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, tourist_facilities: true, museums: true, palaces: true, malls: true, churches: true}
     let currentGlobalResults = [];
+    let timerID;
 
     export function setFilter(newFilter){
         filter = newFilter;
@@ -393,56 +395,41 @@
             essential: true // this animation is considered essential with respect to prefers-reduced-motion
         });
 
-        const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius });
+        lastRadius = radius;
+        const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius, filterToUse: filter });
         currentGlobalResults = results;
-        let filteredResults = filterResults(results);
-        
-        console.log(filteredResults)
-        console.log(results)
      
         // update "random-points-data" source with new data
         // all layers that consume the "random-points-data" data source will be updated automatically
-        map.getSource("random-points-data").setData({"type": "FeatureCollection", "features": filteredResults});
+        map.getSource("random-points-data").setData(results);
 
     }
 
-    export function filterResults (results=false){
+    //new Request has to be made
+    export async function changedFilter(coords = false){
         
-        let init=true;
+        clearTimeout(timerID)
 
-        if(!results){
-            init=false;
-            if(currentGlobalResults.length === 0)
-                return;
-            else
-                results = currentGlobalResults;
-        }
+        //on filterchange call api only every 1 second 
+        //(otherwise there would betoo many requests to the api if someone spams filter buttons)
+        timerID = setTimeout(async () => {
 
-        console.log(results)
-
-        let filteredResults = [], xx = false;
-        for(let i = 0; i<results["features"].length; i++){
-            let kinds = results["features"][i]["properties"]["kinds"];
-            xx=false;
-            Object.keys(filter).forEach(function(k){
-                
-                if(filter[k] === true && !xx){
-                    if(kinds.includes(k.toString())){
-                        filteredResults.push(results["features"][i]);
-                        xx=true;
-                        //break doesnt work??
-                    }
-                }
-            });
-        }
-
-        if(init)
-            return filteredResults;
-        else{
+            let init=true;
+            if(!coords){
+                init=false;
+                if(lastCoords.length === 0)
+                    return;
+                else
+                    coords = lastCoords;
+            }
+            console.log("SEEEEEARCH")
+            const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: lastRadius, filterToUse: filter });
+            currentGlobalResults = results;
+     
             // update "random-points-data" source with new data
             // all layers that consume the "random-points-data" data source will be updated automatically
-            map.getSource("random-points-data").setData({"type": "FeatureCollection", "features": filteredResults});
-        }
+            map.getSource("random-points-data").setData(results);
+        }, 1000)
 
 
     }

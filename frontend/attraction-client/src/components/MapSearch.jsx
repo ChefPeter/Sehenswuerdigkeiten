@@ -19,7 +19,7 @@ import MuseumIcon from '@mui/icons-material/Museum';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import ChurchIcon from '@mui/icons-material/Church';
-import {setFilter, filterResults} from "./BaseMap";
+import {setFilter, changedFilter} from "./BaseMap";
 
 let locationInput = "";
 let timerID;
@@ -249,65 +249,75 @@ function MapSearch () {
     //Function for Chips!!!
     function handleClickArchitecture(){
         //opposite way on purpose
-        let obj = {architecture: !architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let s = !architecture;
+        let obj = {architecture: s, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setArchitecture(!architecture)
-        setFilter(obj);    
-        filterResults()
+        setFilter(obj);   
+        changedFilter();
     }
     function handleClickCulture(){
-        let obj = {architecture: architecture, cultural: !culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let s = !culture;
+        let obj = {architecture: architecture, cultural: s, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setCulture(!culture)
         setFilter(obj);  
-        filterResults()
+        changedFilter();
     }
 
     function handleClickHistorical(){
-        let obj = {architecture: architecture, cultural: culture, historic: !historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let s = !historical;
+        let obj = {architecture: architecture, cultural: culture, historic: s, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setHistorical(!historical)
         setFilter(obj);  
-        filterResults()
+        changedFilter();
     }
     function handleClickNatural(){
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: !natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let s = !natural;
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: s, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setNatural(!natural)
         setFilter(obj); 
-        filterResults() 
+        changedFilter();
     }
     function handleClickReligion(){
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: !religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let s = !religion;
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: s, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setReligion(!religion)
         setFilter(obj); 
-        filterResults() 
+        changedFilter();
     }
     function handleClickTouristFacilities(){
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: !touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let s = !touristFacilities;
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: s, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setTouristFacilities(!touristFacilities)
         setFilter(obj);  
-        filterResults()
+        changedFilter();
     }
     function handleClickMuseums(){
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: !museums, palaces: palaces, malls: malls, churches: churches}
+        let s = !museums;
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: s, palaces: palaces, malls: malls, churches: churches}
         setMuseums(!museums)
         setFilter(obj); 
-        filterResults() 
+        changedFilter();
     }
     function handleClickPalaces(){
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: !palaces, malls: malls, churches: churches}
+        let s = !palaces;
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: s, malls: malls, churches: churches}
         setPalaces(!palaces)
         setFilter(obj);  
-        filterResults()
+        changedFilter();
     }
     function handleClickMalls(){
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: !malls, churches: churches}
+        let s = !malls;
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: s, churches: churches}
         setMalls(!malls)
         setFilter(obj);  
-        filterResults()
+        changedFilter();
     }
     function handleClickChurch(){
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, touristFacilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: !churches}
+        let s = !churches;
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: s}
         setChurches(!churches)
         setFilter(obj);
-        filterResults() 
+        changedFilter();
     }
 
 }

@@ -29,14 +29,14 @@ const fetchFakeData = async centerCoordinates => {
   const API_KEY = "5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752";
 
   let points = [];
+
   let url = getURL(centerCoordinates.radius2*1000, centerCoordinates.latitude, centerCoordinates.longitude, centerCoordinates.filterToUse, 500);
   if(url === "")
     return {type: "FeatureCollection",features: [],};
-
+  //FETCHING DATA HERE
   let results = await getDataFromURL(url);
   
-  results = results.filter((item, index, self) =>
-  index === self.findIndex((x) => (x.wikidata === item.wikidata)));
+  results = results.filter((item, index, self) => index === self.findIndex((x) => (x.wikidata === item.wikidata)));
  
   for (let result of results)
   {

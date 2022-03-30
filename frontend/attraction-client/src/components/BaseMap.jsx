@@ -259,35 +259,42 @@ const BaseMap = () => {
     map.on("mouseenter", "random-points-layer", async e => {
 
       if (e.features.length) {
-        const feature = e.features[0];   
 
-        /*console.log(feature.properties.id)
-        console.log("asdfasdfasdfasdf");
-        console.log(feature.properties.wikidata);
-        let desc=await getDetail(feature.properties.id)
-        let pdesc="";
-        console.log("aa")
-        console.log(desc)*/
-        /*if(desc.hasOwnProperty('wikipedia_extracts')){
-          pdesc=desc.wikipedia_extracts.text
-        }*/
-        // create popup node
-        const popupNode = document.createElement("div");
+        var UserAgent = navigator.userAgent.toLowerCase();
 
-        ReactDOM.render(<Popup feature={feature} />, popupNode);
-        // <img src="./kolosseum.jpg"></img>
-        //ReactDOM.render(<Button variant="contained" style={{borderRadius: '20px'}} onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
-        ReactDOM.render(<div><img src={`https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`} style={{width:"100%", height:"50%"}}></img>
-          <div style={{display: "flex", justifyContent: "space-between"}}><p style={{color:'black'}}>{feature.properties.name}</p>
-          <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}} onClick={() => addToRoute(feature)}>Add</Button></div></div>, popupNode);
+        // Nur beim Computer
+        if (UserAgent.search(/(iphone|ipod|opera mini|fennec|palm|blackberry|android|symbian|series60)/) < 0) {
+                       
+          const feature = e.features[0];   
 
-        //popupNode  = document.createElement("div");
-        // set popup on map
-        popUpRef.current
-          .setLngLat(feature.geometry.coordinates)
-          .setDOMContent(popupNode)
-          .addTo(map);
-               
+          /*console.log(feature.properties.id)
+          console.log("asdfasdfasdfasdf");
+          console.log(feature.properties.wikidata);
+          let desc=await getDetail(feature.properties.id)
+          let pdesc="";
+          console.log("aa")
+          console.log(desc)*/
+          /*if(desc.hasOwnProperty('wikipedia_extracts')){
+            pdesc=desc.wikipedia_extracts.text
+          }*/
+          // create popup node
+          const popupNode = document.createElement("div");
+
+          ReactDOM.render(<Popup feature={feature} />, popupNode);
+          // <img src="./kolosseum.jpg"></img>
+          //ReactDOM.render(<Button variant="contained" style={{borderRadius: '20px'}} onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
+          ReactDOM.render(<div><img src={`https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`} style={{width:"100%", height:"50%"}}></img>
+            <div style={{display: "flex", justifyContent: "space-between"}}><p style={{color:'black'}}>{feature.properties.name}</p>
+            <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}} onClick={() => addToRoute(feature)}>Add</Button></div></div>, popupNode);
+
+          //popupNode  = document.createElement("div");
+          // set popup on map
+          popUpRef.current
+            .setLngLat(feature.geometry.coordinates)
+            .setDOMContent(popupNode)
+            .addTo(map);
+                
+        }
       }
     });
 

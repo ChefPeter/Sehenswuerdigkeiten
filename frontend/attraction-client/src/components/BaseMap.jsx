@@ -320,7 +320,7 @@ const BaseMap = () => {
           //ReactDOM.render(<Button variant="contained" style={{borderRadius: '20px'}} onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
           ReactDOM.render(<div><img src={imageSrc} style={{width:"100%", height:"50%"}}></img>
             <div style={{display: "flex", justifyContent: "space-between"}}><p style={{color:'black'}}>{feature.properties.name}</p>
-            <Button variant="contained" style={{borderRadius: '20px', backgroundColor: "white", color: "black"}} onClick={() => addToRoute(feature)}>Add</Button></div></div>, popupNode);
+            </div></div>, popupNode);
 
           //popupNode  = document.createElement("div");
           // set popup on map

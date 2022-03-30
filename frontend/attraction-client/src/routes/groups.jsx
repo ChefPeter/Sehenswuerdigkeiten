@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import GroupItem from "../components/GroupItem";
 import List from '@mui/material/List';
 import { useState } from 'react';
+import { useEffect } from 'react';
 
 // Define theme settings
 const light = {

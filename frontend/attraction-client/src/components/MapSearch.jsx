@@ -2,12 +2,13 @@ import React from "react";
 import "./styles/mapsearch.css";
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-import { Paper, Button, TextField, Container, Card, Box, Divider, Stack, Autocomplete, Slider, Typography, CircularProgress } from "@mui/material";
+import { Paper, Fade, Button, TextField, Container, Card, Box, Divider, Stack, Autocomplete, Slider, Typography, CircularProgress } from "@mui/material";
 import "./styles/mapsearch.css";
 import { fontSize, minWidth } from "@mui/system";
 import {useState , setState , useRef} from "react";
 import {flyToLocation} from "./BaseMap";
 import {setRadiusForPointerSearch} from "./BaseMap";
+import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 
 
 let locationInput = "";
@@ -19,6 +20,8 @@ function MapSearch () {
     const [radiusValue, setRadiusValue] = useState(1);
     const [selectedCityCoords, setSelectedCityCoords] = useState([]);
     const [showLoading, setShowLoading] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false)
+
 
     const handleSearchFriendInput = async (event)=>{
 
@@ -173,7 +176,8 @@ function MapSearch () {
                 />
                 )}
             />
-            <Stack spacing={0.5} direction="row" sx={{ mb: 1 }} alignItems="center"><Typography
+
+        <Stack spacing={0.5} direction="row" sx={{ mb: 1 }} alignItems="center"><Typography
                 marginTop={0.7}
                 fontSize="small"
                 marginLeft={"10px"}
@@ -182,22 +186,25 @@ function MapSearch () {
                 >Searchradius: {radiusValue} km</Typography>
                 
 
-            <Slider 
-                step={1}
-                min={0.5}
-                max={100}
-                
-                valueLabelDisplay="auto"
-                onChangeCommitted={sliderChange}
-                
-                size="small" style={{marginRight: "16px"}}>
-            </Slider>
+                <Slider 
+                    step={1}
+                    min={0.5}
+                    max={100}
+                    valueLabelDisplay="auto"
+                    onChangeCommitted={sliderChange}
+                    size="small">
+                </Slider>
+
+               <Button onClick={() => setShowDropdown(!showDropdown)}> <ArrowDropDownCircleIcon  /> </Button>
 
             </Stack>
             
-
-
-
+            
+            { showDropdown ? 
+                <Fade in={showDropdown} timeout={200}>
+                    <Button>Hallo</Button>
+                </Fade>
+            : null}
 
         </Paper>
 

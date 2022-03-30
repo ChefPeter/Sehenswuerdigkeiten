@@ -5,8 +5,9 @@ import React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Button, Container, TextField, Typography, LinearProgress, Box, Card } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
-import GroupItem from "../components/FriendItem";
+import GroupItem from "../components/GroupItem";
 import List from '@mui/material/List';
+import { useState } from 'react';
 
 // Define theme settings
 const light = {
@@ -53,10 +54,13 @@ function Groups(props) {
       method: "POST",
       credentials: "include",
       body: formData
-    })
+    });
   }
 
-  const friendsName = ["daniel", "peter", "olli"];
+  const [groups, setGroups] = useState([]);
+  useEffect(() => {
+    fetch("http://localhost.com/groups")
+  }, []);
 
   return (
     <div>
@@ -78,7 +82,7 @@ function Groups(props) {
       
         <List>
 
-          {friendsName.map((e,i) =>  <GroupItem name={e.name} description={e.description} key={"group_"+i} profilePicture={null}></GroupItem>)}
+          {groups.map((e,i) =>  <GroupItem name={e.name} description={e.description} key={"group_"+i} profilePicture={null}></GroupItem>)}
          
         </List>
         

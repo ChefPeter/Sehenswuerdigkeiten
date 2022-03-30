@@ -22,6 +22,7 @@ const getProfilePicture = require("./get-profile-picture");
 const getFile = require("./get-file");
 const getBestRoute = require("./get-best-route");
 const getUsers = require("./get-users");
+const getGroups = require("./get-groups");
 
 const express = require("express");
 const session = require("express-session");
@@ -91,6 +92,7 @@ app.get("/pending-friends", isAuthenticated, async (req, res) => sendGetResponse
 app.get("/profile-picture", isAuthenticated, async (req, res) => await getProfilePicture(req, res));
 app.get("/file", (req, res) => getFile(req, res));
 app.get("/username", isAuthenticated, (req, res) => res.status(200).send(req.session.username));
+app.get("/groups", isAuthenticated, async(req, res) => sendGetResponse(await getGroups(req), res));
 
 
 //app.get("/logged-in", (req, res) => res.send(req.session));

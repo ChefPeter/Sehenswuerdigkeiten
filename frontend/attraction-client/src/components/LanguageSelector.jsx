@@ -1,7 +1,7 @@
-import { FormControl, MenuItem, Select, InputLabel, Box } from "@mui/material";
+import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import React from "react";
-import "./styles/languageselect.css"
-import {getCookie, setCookie} from "../functions/cookieManager";
+import { setCookie } from "../functions/cookieManager";
+import "./styles/languageselect.css";
 
 function LanguageSelector(props) {
 

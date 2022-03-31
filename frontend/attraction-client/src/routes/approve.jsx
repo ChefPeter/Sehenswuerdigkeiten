@@ -1,8 +1,7 @@
-import { Link, useSearchParams } from "react-router-dom";
-import "./styles/start.css";
-import { Button, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
+import { Button, Paper } from '@mui/material';
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import "./styles/start.css";
 
 
 function Approve(props) {

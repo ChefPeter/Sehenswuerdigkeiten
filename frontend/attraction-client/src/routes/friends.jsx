@@ -1,17 +1,14 @@
-import SideBar from "../components/Sidebar"
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { Button, Card, LinearProgress, TextField, Typography } from "@mui/material";
+import List from '@mui/material/List';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
-import List from '@mui/material/List';
-import "./styles/friends.css";
-import { Button, Container, TextField, Typography, LinearProgress, Card } from "@mui/material";
-import FriendItem from "../components/FriendItem";
-import SearchFriend from "../components/SearchFriend";
-import IncomingRequest from "../components/IncomingRequest";
-import "./styles/friends.css";
 import ErrorSnackbar from "../components/ErrorSnackbar";
+import FriendItem from "../components/FriendItem";
+import IncomingRequest from "../components/IncomingRequest";
+import SideBar from "../components/Sidebar";
 import SuccessSnackbar from "../components/SuccessSnackbar";
-import { Snackbar, Alert } from "@mui/material";
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import "./styles/friends.css";
 
 let searchFriendInput = "";
 // Define theme settings

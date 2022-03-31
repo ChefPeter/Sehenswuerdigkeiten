@@ -1,27 +1,25 @@
-import * as React from 'react';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import ContactPageIcon from '@mui/icons-material/ContactPage';
+import GroupIcon from '@mui/icons-material/Group';
+import MenuIcon from '@mui/icons-material/Menu';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PolicyIcon from '@mui/icons-material/Policy';
+import TravelExploreIcon from '@mui/icons-material/TravelExplore';
+import { IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import Button from '@mui/material/Button';
-import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
+import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import MenuIcon from '@mui/icons-material/Menu';
-import { IconButton } from '@mui/material';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import GroupIcon from '@mui/icons-material/Group';
-import ContactPageIcon from '@mui/icons-material/ContactPage';
-import TravelExploreIcon from '@mui/icons-material/TravelExplore';
-import HomeIcon from '@mui/icons-material/Home';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
-import LanguageSelector from './LanguageSelector';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import PolicyIcon from '@mui/icons-material/Policy';
-import "./styles/sidebar.css"
-import { useEffect, useState} from 'react';
 import Dark_Mode from './dark_mode';
+import LanguageSelector from './LanguageSelector';
+import "./styles/sidebar.css";
 
 export default function SwipeableTemporaryDrawer(props) {
 

@@ -1,11 +1,9 @@
-import React from "react";
-import SendIcon from '@mui/icons-material/Send';
-import { Button, TextField, Container, Box } from "@mui/material";
-import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
-import { maxHeight } from "@mui/system";
+import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
+import SendIcon from '@mui/icons-material/Send';
 import StopIcon from '@mui/icons-material/Stop';
-import {useState} from 'react';
+import { Button, Container, TextField } from "@mui/material";
+import React, { useState } from "react";
 
 //let message = "";
 

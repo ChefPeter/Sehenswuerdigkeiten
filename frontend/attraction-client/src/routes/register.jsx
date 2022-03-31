@@ -1,11 +1,10 @@
-import './styles/start.css';
-import "./styles/register.css";
-import './styles/app.css';
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button, TextField, Alert, AlertTitle, Fade, Box, CircularProgress} from '@mui/material';
-import {useState , setState, useEffect} from "react";
+import { Alert, AlertTitle, Box, Button, CircularProgress, Fade, TextField } from '@mui/material';
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {setCookie, getCookie, checkCookie} from "../functions/cookieManager";
+import { checkCookie } from "../functions/cookieManager";
+import './styles/app.css';
+import "./styles/register.css";
+import './styles/start.css';
 
 let usernameInput = "";
 let emailInput = "";
@@ -55,7 +54,7 @@ function Register(props) {
   
     useEffect(() => {
 
-    if(props.l1 == "de") {
+    if(props.l1 === "de") {
       setUsernameTextfieldTag("Benutzername");
       setPasswordTextfieldTag("Passwort");
       setRetypePasswordTextfieldTag("Passwort wiederholen");
@@ -64,7 +63,7 @@ function Register(props) {
       setErrorFieldTitleTag("Fehler");
       setInfoTag1("Eine Bestätigungsemail wurde versandt — ");
       setInfoTag2("Kontrolliere dein Email Postfach!")
-    } else if(props.l1 == "it") {
+    } else if(props.l1 === "it") {
       setUsernameTextfieldTag("Nome utente");
       setPasswordTextfieldTag("Password");
       setRetypePasswordTextfieldTag("Ridigitare la password")

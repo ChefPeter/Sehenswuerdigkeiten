@@ -1,10 +1,9 @@
+import { Alert, AlertTitle, Box, Button, CircularProgress, Fade, TextField } from '@mui/material';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { checkCookie } from "../functions/cookieManager";
 import './styles/app.css';
 import "./styles/login.css";
-import { Button, TextField, Alert, AlertTitle, Fade, CircularProgress, Box} from '@mui/material';
-import {useState , setState, useEffect} from "react";
-import { useNavigate } from "react-router-dom";
-import {setCookie, getCookie, checkCookie} from "../functions/cookieManager";
-import { textAlign } from '@mui/system';
 
 let usernameInput = "";
 let passwordInput = "";

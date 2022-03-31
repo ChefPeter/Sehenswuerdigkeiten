@@ -1,7 +1,6 @@
-import { Link } from "react-router-dom";
-import "./styles/requestReset.css";
-import { Button, Container, Typography, Box, TextField, Alert, AlertTitle, Paper, getTableSortLabelUtilityClass } from '@mui/material';
+import { Alert, AlertTitle, Button, TextField } from '@mui/material';
 import { useState } from "react";
+import "./styles/requestReset.css";
 
 let input = "";
 

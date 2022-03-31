@@ -1,8 +1,6 @@
-import React from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button, Card, Container, TextField, Typography, LinearProgress, Box } from "@mui/material";
-import "./styles/rightmessagestyle.css"
-import { useEffect, useState } from 'react';
+import { Card, Container } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import "./styles/rightmessagestyle.css";
 
 function RightMessage (props) {
 

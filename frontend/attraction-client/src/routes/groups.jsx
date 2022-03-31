@@ -1,13 +1,11 @@
-import "../routes/styles/contact.css";
-import Sidebar from "../components/Sidebar";
-import React from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button, Container, TextField, Typography, LinearProgress, Box, Card, OutlinedInput, InputAdornment } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
-import GroupItem from "../components/GroupItem";
+import { Button, Card, TextField } from "@mui/material";
 import List from '@mui/material/List';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import React, { useEffect, useState } from "react";
+import GroupItem from "../components/GroupItem";
+import Sidebar from "../components/Sidebar";
+import "../routes/styles/contact.css";
 
 // Define theme settings
 const light = {

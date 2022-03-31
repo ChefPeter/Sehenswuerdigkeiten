@@ -1,10 +1,8 @@
-import React from "react";
-import { Typography, ListItemText, Avatar, ListItem, Grid } from "@mui/material";
-import { ListItemAvatar, Card, Container, Button } from "@mui/material";
-import { useState } from "react";
-import PersonIcon from '@mui/icons-material/Person';
 import CheckIcon from '@mui/icons-material/Check';
+import PersonIcon from '@mui/icons-material/Person';
 import RemoveIcon from '@mui/icons-material/Remove';
+import { ListItem, ListItemAvatar, ListItemText } from "@mui/material";
+import React from "react";
 
 
 function IncomingRequest(props) {

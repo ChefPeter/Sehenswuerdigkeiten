@@ -1,10 +1,8 @@
-import React from "react";
-import { Typography, ListItemText, Avatar, ListItem, Grid } from "@mui/material";
-import { ListItemAvatar, Card, Container, Button } from "@mui/material";
-import { useState, useEffect } from "react";
 import ClearIcon from '@mui/icons-material/Clear';
-import "./styles/friendItem.css";
+import { Avatar, Button, Card, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./styles/friendItem.css";
 
 
 function FriendItem(props) {

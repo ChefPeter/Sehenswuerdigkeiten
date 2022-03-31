@@ -1,8 +1,8 @@
-import "../routes/styles/contact.css";
-import Sidebar from "../components/Sidebar";
 import { Card } from "@mui/material";
-import React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import React from "react";
+import Sidebar from "../components/Sidebar";
+import "../routes/styles/contact.css";
 
 // Define theme settings
 const light = {

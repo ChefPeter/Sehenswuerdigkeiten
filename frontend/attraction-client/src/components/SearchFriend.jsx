@@ -4,8 +4,6 @@ import { Grid } from '@mui/material';
 function SearchFriend (){
 
     return (
-    
-        
             <Grid container direction="row" alignItems="center">
             <Grid item>
               <SearchIcon />

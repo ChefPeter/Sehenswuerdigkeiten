@@ -1,12 +1,12 @@
-    import React, { useEffect, useRef } from "react";
-    import { useState } from 'react';
-    import mapboxgl, { DoubleClickZoomHandler } from "mapbox-gl";
-    import fetchFakeData from "./fetchFakeData";
-    import Popup from "./Popup";
-    import "./styles/BaseMap.css";
-    import ReactDOM from "react-dom";
-    import { Button, LinearProgress } from "@mui/material";
-    import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import { Button } from "@mui/material";
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import mapboxgl from "mapbox-gl";
+import React, { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom";
+import fetchFakeData from "./fetchFakeData";
+import Popup from "./Popup";
+import "./styles/BaseMap.css";
+
     const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
     let map;
@@ -125,7 +125,7 @@ function BaseMap (props) {
 
     mapboxgl.accessToken = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
-    const mapContainerRef = useRef(null);
+   // const mapContainerRef = useRef(null);
     const popUpRef = useRef(new mapboxgl.Popup({ offset: 15 }));
         
     const [obj, setObj] = useState({properties: {name: 'test'}});
@@ -245,7 +245,7 @@ useEffect(() => {
                     ReactDOM.render(<Popup feature={feature} />, popupNode);
                     // <img src="./kolosseum.jpg"></img>
                     //ReactDOM.render(<Button variant="contained" style={{borderRadius: '20px'}} onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
-                    ReactDOM.render(<div><img src={imageSrc} style={{ width: "100%", height: "50%" }}></img>
+                    ReactDOM.render(<div><img src={imageSrc} alt="" style={{ width: "100%", height: "50%" }}></img>
                         <div style={{ display: "flex", justifyContent: "space-between" }}><p style={{ color: 'black' }}>{feature.properties.name}</p>
                         </div></div>, popupNode);
 
@@ -354,7 +354,7 @@ useEffect(() => {
                                 <Button variant="contained" style={{color: "black", marginBottom:"20px"}} onClick={() => addToRoute(obj)}>{addButtonTag}</Button>
                                 <h2 id="nameField" style={{color:'white', marginBottom:"20px"}}>{obj.properties.name}</h2>
                             </div>
-                            <div><img src={image} style={{maxWidth:"100%", marginBottom:"20px"}}></img></div>
+                            <div><img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img></div>
                             <div>
                                 <h3 style={{marginBottom:"20px"}}>Hallo hier kommen Infos hin</h3>
                             </div>
@@ -444,7 +444,6 @@ useEffect(() => {
 
             let init=true;
             if(!coords){
-                init=false;
                 if(lastCoords.length === 0)
                     return;
                 else

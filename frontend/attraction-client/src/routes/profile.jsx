@@ -1,14 +1,12 @@
-import Sidebar from "../components/Sidebar";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { Button, Card } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TextField from '@mui/material/TextField';
-import { Button, Card} from '@mui/material';
-import "../routes/styles/profile.css";
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
 import React, { useEffect, useState } from "react";
+import ErrorSnackbar from "../components/ErrorSnackbar";
+import Sidebar from "../components/Sidebar";
 import SuccessSnackbar from '../components/SuccessSnackbar';
-import ErrorSnackbar from "../components/ErrorSnackbar"
+import "../routes/styles/profile.css";
 
 // Define theme settings
 const light = {
@@ -64,7 +62,6 @@ function Profile(props) {
       if(descriptionLabel !== "") setDescriptionLabel("Description");
     }
 
-    console.log("xxxx")
   }, [props.l1]);
 
 

@@ -1,8 +1,6 @@
-import React from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button, Card, Container, TextField, Typography, LinearProgress, Box } from "@mui/material";
+import { Card, Container } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import "./styles/leftmessagestyle.css";
-import { useEffect, useState } from 'react';
 
 
 function LeftMessage (props) {

@@ -1,13 +1,12 @@
-import React from "react";
-import Sidebar from "../components/Sidebar";
+import { Card } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button, Card, Container, TextField, Typography, LinearProgress, Box } from "@mui/material";
-import "./styles/chat.css"
-import LeftMessage from "../components/LeftMessage";
-import RightMessage from "../components/RightMessage"
-import ChatSendbar from "../components/ChatSendbar"
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import {useState , setState, useEffect} from "react";
+import ChatSendbar from "../components/ChatSendbar";
+import LeftMessage from "../components/LeftMessage";
+import RightMessage from "../components/RightMessage";
+import Sidebar from "../components/Sidebar";
+import "./styles/chat.css";
 
 
 let searchFriendInput = "";

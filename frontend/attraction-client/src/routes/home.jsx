@@ -1,12 +1,11 @@
-import "./styles/start.css";
+import { Button, Card } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button, Card, Stack } from "@mui/material";
-import BaseMap, {postRoute} from '../components/BaseMap';
-import React, { useState, useEffect } from 'react';
-import "./styles/home.css"
+import React from 'react';
+import BaseMap, { postRoute } from '../components/BaseMap';
 import MapSearch from "../components/MapSearch";
-import Sidebar from "../components/Sidebar"
-import {setCookie, getCookie, checkCookie} from "../functions/cookieManager";
+import Sidebar from "../components/Sidebar";
+import "./styles/home.css";
+import "./styles/start.css";
 
 // Define theme settings
 const light = {

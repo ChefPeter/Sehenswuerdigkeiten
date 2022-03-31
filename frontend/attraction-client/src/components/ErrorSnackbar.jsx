@@ -1,5 +1,5 @@
+import { Alert, Fade, Snackbar } from "@mui/material";
 import React from "react";
-import { Snackbar, Alert, Fade } from "@mui/material";
 
 
 function ErrorSnackbar (props){

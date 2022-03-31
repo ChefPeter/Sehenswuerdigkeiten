@@ -1,10 +1,10 @@
-import "../routes/styles/notifications.css";
-import Sidebar from "../components/Sidebar";
-import React from "react";
 import { Card } from '@mui/material';
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import React from "react";
+import Sidebar from "../components/Sidebar";
+import "../routes/styles/notifications.css";
 
 // Define theme settings
 const light = {

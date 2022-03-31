@@ -1,11 +1,11 @@
-import TextareaAutosize from '@mui/material/TextareaAutosize';
-import "../routes/styles/contact.css";
-import Sidebar from "../components/Sidebar";
+import { Button, Card } from '@mui/material';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button, Card, cardClasses} from '@mui/material';
-import ErrorSnackbar from '../components/ErrorSnackbar';
-import SuccessSnackbar from '../components/SuccessSnackbar';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
 import React, { useEffect, useState } from "react";
+import ErrorSnackbar from '../components/ErrorSnackbar';
+import Sidebar from "../components/Sidebar";
+import SuccessSnackbar from '../components/SuccessSnackbar';
+import "../routes/styles/contact.css";
 
 
 // Define theme settings

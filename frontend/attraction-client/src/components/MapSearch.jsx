@@ -1,29 +1,24 @@
-import React from "react";
-import "./styles/mapsearch.css";
-import TravelExploreIcon from '@mui/icons-material/TravelExplore';
-import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-import { Paper, Button, TextField, Container, Chip, Fade, Card, Box, Divider, Stack, Autocomplete, Slider, Typography, CircularProgress } from "@mui/material";
-import "./styles/mapsearch.css";
-import { fontSize, minWidth } from "@mui/system";
-import {useState , setState , useRef} from "react";
-import {flyToLocation} from "./BaseMap";
-import {setRadiusForPointerSearch} from "./BaseMap";
-import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
-import ApartmentIcon from '@mui/icons-material/Apartment';
-import AlignVerticalBottomIcon from '@mui/icons-material/AlignVerticalBottom';
-import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
-import LandscapeIcon from '@mui/icons-material/Landscape';
-import PeopleIcon from '@mui/icons-material/People';
-import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
-import MuseumIcon from '@mui/icons-material/Museum';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import LocalMallIcon from '@mui/icons-material/LocalMall';
+import AlignVerticalBottomIcon from '@mui/icons-material/AlignVerticalBottom';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ChurchIcon from '@mui/icons-material/Church';
-import {setFilter, changedFilter, setDirectionGlobally} from "./BaseMap";
-import {useEffect} from "react";
+import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
 import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
-import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
+import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
+import GpsFixedIcon from '@mui/icons-material/GpsFixed';
+import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+import LandscapeIcon from '@mui/icons-material/Landscape';
+import LocalMallIcon from '@mui/icons-material/LocalMall';
+import MuseumIcon from '@mui/icons-material/Museum';
+import PeopleIcon from '@mui/icons-material/People';
+import TravelExploreIcon from '@mui/icons-material/TravelExplore';
+import { Autocomplete, Button, Chip, CircularProgress, Container, Divider, Fade, Paper, Slider, Stack, TextField, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { changedFilter, flyToLocation, setDirectionGlobally, setFilter, setRadiusForPointerSearch } from "./BaseMap";
+import "./styles/mapsearch.css";
 
 let locationInput = "";
 let timerID;
@@ -309,7 +304,7 @@ function MapSearch (props) {
                     size="small">
                 </Slider>
 
-               <Button onClick={() => setShowDropdown(!showDropdown)}> <ArrowDropDownCircleIcon  /> </Button>
+               <Button onClick={() => setShowDropdown(!showDropdown)}> {showDropdown ? <ArrowDropUpIcon /> : <ArrowDropDownIcon /> }</Button>
 
             </Stack>
             

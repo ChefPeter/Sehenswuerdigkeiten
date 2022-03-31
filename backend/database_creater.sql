@@ -89,3 +89,8 @@ CREATE TABLE IF NOT EXISTS sights (
     latitude DOUBLE,
     longtitude DOUBLE
 );
+
+# Alter table users to include a column latitude as double and a column longtitude as double and a column share_position as BOOLEAN
+ALTER TABLE users ADD COLUMN latitude DOUBLE;
+ALTER TABLE users ADD COLUMN longtitude DOUBLE;
+ALTER TABLE users ADD COLUMN share_position BOOLEAN;

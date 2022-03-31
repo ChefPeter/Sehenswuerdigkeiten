@@ -67,7 +67,7 @@ function MapSearch (props) {
     const [filterLanguage, setFilterLanguage] = useState("Filter")
     const [directionsMode, setDirectionsMode] = useState("driving");
 
-    
+    //reacts only to language change
     useEffect(() => {
         
         if(props.l1 == "de"){
@@ -127,9 +127,7 @@ function MapSearch (props) {
             setWalkingTag("Walking")
             setCyclingTag("Cycling")
         }
-
-    });
-    
+    }, [props.l1]);
 
 
     const handleSearchFriendInput = async (event)=>{

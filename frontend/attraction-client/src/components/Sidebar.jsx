@@ -35,6 +35,7 @@ export default function SwipeableTemporaryDrawer(props) {
   const [legalNoticeTag, setLegalNoticeTag] = useState("Legal Notice");
   const [profileTag, setProfileTag] = useState("Profile");
 
+  //reacts only to language changes
   useEffect(() => {
     
     if(props.l1 == "de") {
@@ -66,7 +67,7 @@ export default function SwipeableTemporaryDrawer(props) {
 
     }
 
-  });
+  }, [props.l1]);
   
 
 

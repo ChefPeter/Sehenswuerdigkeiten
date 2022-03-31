@@ -128,7 +128,6 @@ const BaseMap = () => {
 
 useEffect(() => {
 
-
         //Brixen
         let coordinates = [11.65598, 46.71503];
         if (navigator.geolocation) {

@@ -1,19 +1,32 @@
 import React from "react";
 import { Typography, ListItemText, Avatar, ListItem, Grid } from "@mui/material";
 import { ListItemAvatar, Card, Container, Button } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ClearIcon from '@mui/icons-material/Clear';
 import "./styles/friendItem.css";
 import { useNavigate } from "react-router-dom";
-import Link from "@mui/material/Link";
+
 
 function FriendItem(props) {
 
     const navigate = useNavigate();
     
     const [showDescription, setShowDescription] = useState(false);    
+    const [followPositionTag, setFollowPositionTag] = useState("FOLLOW POSITION");
 
-    console.log("prop" + props.profilePicture)
+
+    useEffect(() => {
+      if(props.l1 == "de") {
+        setFollowPositionTag("POSITON FOLGEN");
+      } else if(props.l1 == "it") {
+        setFollowPositionTag("SEGUI POSIZIONE");
+      } else {
+        setFollowPositionTag("FOLLOW POSITION");
+      }
+
+    }, [props.l1]);
+    
+
   
     return (
       <div>
@@ -44,9 +57,8 @@ function FriendItem(props) {
       {showDescription ? 
       <Card id="friendCard"> 
         
-        <Button variant="conatined" onClick={() => navigate("/chat?"+new URLSearchParams({name: props.name}))}>Open Chat</Button> 
-        <Button variant="conatined" onClick={() => handleFollowPosition()}>Follow Position</Button> 
-        <Button variant="conatined" onClick={() => handleReport()}>Report</Button>
+        <Button variant="conatined" onClick={() => navigate("/chat?"+new URLSearchParams({name: props.name}))}>CHAT</Button> 
+        <Button variant="conatined" onClick={() => handleFollowPosition()}>{followPositionTag}</Button> 
         <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleRemoveFriend(props.name)}><ClearIcon/></Button>
         
       </Card> : null}
@@ -60,9 +72,6 @@ function FriendItem(props) {
 }
 
 
-function handleReport(){
-
-}
 function handleRemoveFriend(name){
 
     let formData = new FormData();

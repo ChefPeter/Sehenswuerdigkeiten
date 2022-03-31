@@ -35,7 +35,6 @@ function Friends(props) {
 
   const [friendsName, setFriendsName] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
-  const [triedToFetch, setTriedToFetch] = useState(false);
   const [profilePicture, setProfilePicture] = useState();
   const [showLoadingBar, setShowLoadingBar] = useState(true);
   const [openSuccessSnack, setOpenSuccessSnack] = useState(false);
@@ -43,15 +42,28 @@ function Friends(props) {
   const [successMessage, setSuccessMessage] = useState("Success");
   const [errorMessage, setErrorMessage] = useState("Error");
 
+   //Language Tags
+   const [incomingRequestTag, setIncomingRequestTag] = useState("Friend requests");
+   const [searchTextTag, setSearchTextTag] = useState("Search a friend")
+
+  useEffect(() => {
+    if(props.l1 == "de") {
+      setIncomingRequestTag("Freundschaftsanfragen");
+      setSearchTextTag("Suche einen Freund");
+
+ } else if(props.l1 == "it") {
+      setIncomingRequestTag("Richiesti di amicizia");
+      setSearchTextTag("Cerca un amico")
+
+ } else {
+      setIncomingRequestTag("Friend requests");
+      setSearchTextTag("Search a friend");
+
+ }
+  }, [props.l1]);
 
   useEffect(async() => {
-    
-    console.log("efffect")
 
-    if(!triedToFetch){
-
-      setTriedToFetch(true)
-      console.log("dwq")
       const resultFriends = await fetch("http://localhost:5000/friends", {
         method: "get",
         credentials: 'include'
@@ -122,10 +134,9 @@ function Friends(props) {
       setShowLoadingBar(false)
 
 
-    }
+    
 
-  });
-  
+  }, []);
 
   const handleSearchFriendInput = (event)=>{
     searchFriendInput = event.target.value;
@@ -151,8 +162,8 @@ function Friends(props) {
           <SideBar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
 
           { showLoadingBar ? 
-          <LinearProgress color="inherit"/>
-            : null}
+               <LinearProgress color="inherit"/>
+          : null}
 
           
           <div id="alignSearchBar">
@@ -161,15 +172,15 @@ function Friends(props) {
               style={{ marginLeft: "3.625em"}}
               id="searchBarFriends"
               type="text"
-              label="Search friend"
+              label={searchTextTag}
               variant="filled"
               onChange={handleSearchFriendInput}
-              InputProps={{endAdornment: <Button onClick={() => handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage)}><PersonAddIcon/></Button>}}
+              InputProps={{endAdornment: <Button onClick={() => handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage, props.l1)}><PersonAddIcon/></Button>}}
             />
 
               { friendRequests.length > 0 ?
               <Typography >
-                Incoming Requests!
+                {incomingRequestTag}
               </Typography>
             : null }
 
@@ -183,7 +194,7 @@ function Friends(props) {
           
             <List>
 
-              {friendsName.map((e,i) =>  <FriendItem name={e.name} description={e.description} key={e.name} profilePicture={profilePicture ? profilePicture[i] : null}></FriendItem>)}
+              {friendsName.map((e,i) =>  <FriendItem name={e.name} description={e.description} key={e.name} profilePicture={profilePicture ? profilePicture[i] : null} l1={props.l1}></FriendItem>)}
             
             </List>
             
@@ -191,6 +202,7 @@ function Friends(props) {
 
           <ErrorSnackbar openErrorSnack={openErrorSnack} errorMessage={errorMessage} handleClose={handleCloseErrorSnackbar} ></ErrorSnackbar>
           <SuccessSnackbar openSuccessSnack={openSuccessSnack} successMessage={successMessage} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
+
       </Card>
     </ThemeProvider>
     );
@@ -198,7 +210,7 @@ function Friends(props) {
 }
 
 
-function handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage){
+function handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage, language){
 
   console.log(searchFriendInput);
 
@@ -218,7 +230,13 @@ function handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessa
           setOpenErrorSnack(true);
       } else {
           // Infofeld sichtbar machen
-         setSuccessMessage("Friend request sent!");
+          if(language = "de")
+               setSuccessMessage("Freundschaftsanfrage verschickt!");
+          else if(language = "it")
+               setSuccessMessage("Richiesta di amicizia inviata!");
+          else
+               setSuccessMessage("Friend request sent!");
+          
          setOpenSuccessSnack(true);
       }
   });

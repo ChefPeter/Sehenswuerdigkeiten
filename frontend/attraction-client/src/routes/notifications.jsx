@@ -21,7 +21,6 @@ const dark = {
 
 function Notifications(props) {
 
-
     return (
   
         <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>

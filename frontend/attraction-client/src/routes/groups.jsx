@@ -25,7 +25,18 @@ const dark = {
 function Groups(props) {
 
   let createGroupInput = "";
+  const [textfieldTextTag, setTextfieldTextTag] = useState("Create Group");
 
+  useEffect(() => {
+      if(props.l1 == "de") {
+        setTextfieldTextTag("Gruppe erstellen");
+      } else if(props.l1 == "it") {
+          setTextfieldTextTag("Crea gruppo");
+      } else {
+        setTextfieldTextTag("Create Group");
+      }
+
+  }, [props.l1])
 
   const handleCreateGroupInput = (event)=>{
     createGroupInput = event.target.value;
@@ -62,7 +73,7 @@ function Groups(props) {
         <TextField
           id="createGroupField"
           type="text"
-          label="Create Group"
+          label={textfieldTextTag}
           variant="filled"
           onChange={handleCreateGroupInput}
         >

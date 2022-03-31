@@ -5,7 +5,6 @@ import {getCookie, setCookie} from "../functions/cookieManager";
 
 function LanguageSelector(props) {
 
-
   function LanguageLabel(){
     if(props.l1 === "de"){
       return <InputLabel id="demo-simple-select-label">Sprache</InputLabel>;

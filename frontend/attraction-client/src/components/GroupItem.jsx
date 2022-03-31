@@ -7,11 +7,11 @@ import "./styles/friendItem.css";
 import { useNavigate } from "react-router-dom";
 import Link from "@mui/material/Link";
 
-function FriendItem(props) {
+function GroupItem(props) {
 
     const navigate = useNavigate();
     
-    const [showDescription, setShowDescription] = useState(false);    
+    const [showDescription, setShowDescription] = useState(false); 
 
     return (
       <div>
@@ -41,7 +41,7 @@ function FriendItem(props) {
 
       {showDescription ? 
       <Card id="friendCard"> 
-        <Button variant="conatined" onClick={ () => navigate("/chat?"+new URLSearchParams({name: props.name, group_id: props.groupID}))}>Open Chat</Button>
+        <Button variant="conatined" onClick={ () => navigate("/chat?"+new URLSearchParams({name: props.name, group_id: props.groupID}))}>Chat</Button>
         <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleLeaveGroup(props.groupID)}><ClearIcon/></Button>
       </Card> : null}
         
@@ -54,9 +54,6 @@ function FriendItem(props) {
 }
 
 
-function handleReport(){
-
-}
 function handleLeaveGroup(groupID){
 
     let formData = new FormData();
@@ -74,11 +71,6 @@ function handleLeaveGroup(groupID){
 
 }
 
-function handleFollowPosition(){
-  console.log("hallo")
-}
-
-
 function openFriendMenu(setShowDescription, state){
 
  
@@ -86,4 +78,4 @@ function openFriendMenu(setShowDescription, state){
 
 }
 
-export default FriendItem;
+export default GroupItem;

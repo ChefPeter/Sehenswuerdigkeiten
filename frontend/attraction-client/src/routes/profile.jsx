@@ -34,8 +34,9 @@ function Profile(props) {
   const [showInfo, setShowInfo] = useState(false);
   const [showError, setShowError] = useState(false);
   const [didChangeDescription, setDidChangeDescription] = useState(false);
-  const [usedEffect, setUsedEffect] = useState(false)
   const [successDescription, setSuccessDescription] = useState("Success!");
+  const [errorDescription, setErrorDescription] = useState("Error!");
+  const [buttonTextTag, setButtonTextTag] = useState("SAVE")
 
   const  handleCloseSuccessSnackbar = (event, reason) =>  {
     if (reason === 'clickaway') {
@@ -50,10 +51,26 @@ function Profile(props) {
     setShowError(false);
   };
 
-  useEffect(async() => {
+  useEffect(() => {
+    //language was changed
+    if(props.l1 == "de") {
+      setButtonTextTag("SPEICHERN");
+      if(descriptionLabel !== "") setDescriptionLabel("Beschreibung");
+    } else if(props.l1 == "it") {
+      setButtonTextTag("SALVARE");
+      if(descriptionLabel !== "") setDescriptionLabel("Discrizione");
+    } else {
+      setButtonTextTag("SAVE");
+      if(descriptionLabel !== "") setDescriptionLabel("Description");
+    }
 
-    if(!usedEffect){
-      //fetch friend requests
+    console.log("xxxx")
+  }, [props.l1]);
+
+
+  useEffect(async() => {
+    console.log("hallalaop")
+   
       const resultUsername = await fetch("http://localhost:5000/username", {
         method: "get",
         credentials: 'include'
@@ -62,33 +79,28 @@ function Profile(props) {
         method: "get",
         credentials: 'include'
       });
-
       const fileProfilePicture = await fetch("http://localhost:5000/profile-picture", {
         method: "get",
         credentials: 'include'
       });
 
-
-      let username = (await resultUsername.text());
       let description2 = (await resultDescription.text());
       let file = (await fileProfilePicture.blob());
-    
 
-      setUsername(username);
+      setUsername(await resultUsername.text());
       setDescription(description2);
+      if(description2.length === 0){
+        if(props.l1 == "de") {
+          setDescriptionLabel("Beschreibung");
+        } else if(props.l1 == "it") {
+          setDescriptionLabel("Discrizione");
+        } else {
+          setDescriptionLabel("Description");
+        }
+      }
       setProfilePicture(URL.createObjectURL(file));
-      setUsedEffect(true);
 
-    }
-
-    if(description.length === 0){
-      setDescriptionLabel("Description");
-    }else{
-      setDescriptionLabel("");
-    }
-
-    
-  });
+  },[]);
   
 
   const getDescriptionValue = (event) => {
@@ -108,7 +120,7 @@ function Profile(props) {
           { false ?
             <TextField type="file" ></TextField>
           : null}
-           <input type="file" id="fileInputUpload" hidden onChange={() => handleFileUpload(setShowInfo, setShowError, setSuccessDescription)} ></input>
+           <input type="file" id="fileInputUpload" hidden onChange={() => handleFileUpload(setShowInfo, setShowError, setSuccessDescription, setErrorDescription, props.l1)} ></input>
         
             <div id='profil'>
               
@@ -131,14 +143,14 @@ function Profile(props) {
                         onChange={getDescriptionValue}/>
                 </div>
                 <div>
-                    <Button fullWidth style={{height: "43px"}} onClick={() => handleSaveNewDescription(descriptionInput ,setShowInfo,setShowError, setSuccessDescription, didChangeDescription)} variant="contained">Speichern</Button>
+                    <Button fullWidth style={{height: "43px"}} onClick={() => handleSaveNewDescription(descriptionInput ,setShowInfo,setShowError, setSuccessDescription, setErrorDescription, didChangeDescription,  setDidChangeDescription, props.l1)} variant="contained">{buttonTextTag}</Button>
                 </div>
             </div>
         </div>
         <div id='notice'>
 
         <SuccessSnackbar openSuccessSnack={showInfo} successMessage={successDescription} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
-        <ErrorSnackbar openSuccessSnack={showError} successMessage={"Upload fehlgeschlagen!"} handleClose={handleCloseErrorSnackbar}></ErrorSnackbar>
+        <ErrorSnackbar openSuccessSnack={showError} successMessage={errorDescription} handleClose={handleCloseErrorSnackbar}></ErrorSnackbar>
          
         </div>
         </Card>
@@ -148,7 +160,7 @@ function Profile(props) {
   
 }
 
-function handleFileUpload(setShowInfo, setShowError, setSuccessDescription){
+function handleFileUpload(setShowInfo, setShowError, setSuccessDescription, setErrorDescription, language){
   setShowInfo(false);
   setShowError(false)
 
@@ -161,23 +173,39 @@ function handleFileUpload(setShowInfo, setShowError, setSuccessDescription){
       body: formData,
       credentials: 'include'
   }).then(res => {
-    if (res.status == 400 || res.status == 401) {
+    if (res.status == 400 || res.status == 401) { //error
+
+      if(language === "de")
+        setErrorDescription("Fehler beim Ändern des Profilbilds!");
+      else if(language === "it")
+        setErrorDescription("Errore durante la modifica dell'immagine del profilo!");
+      else
+        setErrorDescription("Error while changing the profile picture!");
       setShowError(true)
+
     } else{
-        setSuccessDescription("Profilbild aktualisiert!")
+        
+        if(language === "de")
+          setSuccessDescription("Profilbild geändert!");
+        else if(language === "it")
+          setSuccessDescription("La foto del profilo è cambiata!");
+        else
+          setSuccessDescription("Description updated!");
+
         setShowInfo(true);
     }
   });
 
+  
+
 }
 
-function handleSaveNewDescription(description, setShowInfo, setShowError, setSuccessDescription, didChangeDescription) {
+function handleSaveNewDescription(description, setShowInfo, setShowError, setSuccessDescription, setErrorDescription, didChangeDescription, setDidChangeDescription, language) {
+
   setShowError(false);
   setShowInfo(false);
-  if(!didChangeDescription){
-    
+  if(!didChangeDescription)
     return;
-  }
 
   let formData = new FormData();
   
@@ -189,12 +217,32 @@ function handleSaveNewDescription(description, setShowInfo, setShowError, setSuc
       credentials: 'include'
   }).then(res => {
     if (res.status != 400 && res.status != 401) {
+
+        setDidChangeDescription(false)
+        
+        if(language === "de")
+          setSuccessDescription("Beschreibung aktualisiert!");
+        else if(language === "it")
+          setSuccessDescription("Descrizione aggiornata!");
+        else
+          setSuccessDescription("Description updated!");
+
         setShowInfo(true);
-        setSuccessDescription("Beschreibung aktualisiert!")
+
+    }else{
+      
+      if(language === "de")
+        setErrorDescription("Fehler beim Ändern der Beschreibung!");
+      else if(language === "it")
+        setErrorDescription("Errore durante la modifica della descrizione!");
+      else
+        setErrorDescription("Error while changing the description!");
+      setShowError(true)
+
     } 
   });
  
- 
+  
 
 }
 

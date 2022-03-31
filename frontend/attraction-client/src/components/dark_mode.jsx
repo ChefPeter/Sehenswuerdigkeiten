@@ -24,7 +24,7 @@ function Dark_Mode(props) {
 
             </ListItemIcon>
             
-            <ListItemText primary={"Switch Mode"} />
+            <ListItemText primary={"Theme"} />
    
     </ListItem>
   );

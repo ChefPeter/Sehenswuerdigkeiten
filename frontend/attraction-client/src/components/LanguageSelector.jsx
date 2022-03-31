@@ -18,10 +18,8 @@ function LanguageSelector(props) {
 
     function onLanguageSelect(event){
         props.l2(event.target.value);
-
       //change Cookies
       setCookie("language",event.target.value, 31)
-      console.log(getCookie("language"))
     }
 
     return(

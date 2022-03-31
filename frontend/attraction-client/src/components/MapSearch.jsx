@@ -2,7 +2,7 @@ import React from "react";
 import "./styles/mapsearch.css";
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-import { Paper, Fade, Button, TextField, Container, Chip, Box, Divider, Stack, Autocomplete, Slider, Typography, CircularProgress, IconButton } from "@mui/material";
+import { Paper, Button, TextField, Container, Chip, Fade, Card, Box, Divider, Stack, Autocomplete, Slider, Typography, CircularProgress } from "@mui/material";
 import "./styles/mapsearch.css";
 import { fontSize, minWidth } from "@mui/system";
 import {useState , setState , useRef} from "react";
@@ -19,8 +19,11 @@ import MuseumIcon from '@mui/icons-material/Museum';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import ChurchIcon from '@mui/icons-material/Church';
-import {setFilter, changedFilter} from "./BaseMap";
+import {setFilter, changedFilter, setDirectionGlobally} from "./BaseMap";
 import {useEffect} from "react";
+import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
+import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
+import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
 
 let locationInput = "";
 let timerID;
@@ -46,20 +49,84 @@ function MapSearch (props) {
 
     const [searchText, setSearchText] = useState("Search a city");
     const [searchRadiusTag, setSearchRadiusTag] = useState("Searchradius: ")
+    const [architectureTag, setArchitectureTag] = useState("Architecture");
+    const [culturalTag, setCulturalTag] = useState("Culture");
+    const [churchesTag, setChurchesTag] = useState("Churches");
+    const [historicalTag, setHistoricalTag] = useState("Historical");
+    const [naturalTag, setNaturalTag] = useState("Nature");
+    const [religionTag, setReligionTag] = useState("Religion");
+    const [touristTag, setTouristTag] = useState("Tourist facilities");
+    const [museumsTag, setMuseumsTag] = useState("Museums");
+    const [palacesTag, setPalacesTag] = useState("Palaces");
+    const [mallsTag, setMallsTag] = useState("Malls");
+
+    const[drivingTag, setDrivingTag] = useState("Driving");
+    const[walkingTag, setWalkingTag] = useState("Walking");
+    const[cyclingTag, setCyclingTag] = useState("Cycling");
+
+    const [filterLanguage, setFilterLanguage] = useState("Filter")
+    const [directionsMode, setDirectionsMode] = useState("driving");
+
     
     useEffect(() => {
         
         if(props.l1 == "de"){
             setSearchText("Suche eine Stadt");
             setSearchRadiusTag("Suchradius: ");
+            setArchitectureTag("Architektur");
+            setCulturalTag("Kultur");
+            setChurchesTag("Kirchen");
+            setHistoricalTag("Geschichte");
+            setNaturalTag("Natur");
+            setReligionTag("Religion");
+            setTouristTag("Touristisch");
+            setMuseumsTag("Museen");
+            setPalacesTag("Paläste");
+            setMallsTag("Einkaufszentren");
+            setFilterLanguage("Filter");
+
+            setDrivingTag("Auto")
+            setWalkingTag("Zu Fuß")
+            setCyclingTag("Rad")
+
         }else if(props.l1 == "it"){
             setSearchText("Cerca una città");
-            setSearchRadiusTag("Raggio di ricerca: ")
+            setSearchRadiusTag("Raggio di ricerca: ");
+            setArchitectureTag("Architettura");
+            setCulturalTag("Cultura");
+            setChurchesTag("Chiese");
+            setHistoricalTag("Storia");
+            setNaturalTag("Natura");
+            setReligionTag("Religione");
+            setTouristTag("Turismo");
+            setMuseumsTag("Musei");
+            setPalacesTag("Palazzi");
+            setMallsTag("Centri commerciali");
+            setFilterLanguage("Filtro");
+
+            setDrivingTag("Auto")
+            setWalkingTag("A Piedi")
+            setCyclingTag("Bici")
+
         }else{
             setSearchText("Search a city");
-            setSearchRadiusTag("Searchradius: ")
-        }
+            setSearchRadiusTag("Searchradius: ");
+            setArchitecture("Architektur af walsch");
+            setCulturalTag("Culture");
+            setChurchesTag("Churches");
+            setHistoricalTag("Historical");
+            setNaturalTag("Nature");
+            setReligionTag("Religion");
+            setTouristTag("Tourist facilities");
+            setMuseumsTag("Museums");
+            setPalacesTag("Palaces");
+            setMallsTag("Malls");
+            setFilterLanguage("Filter");
 
+            setDrivingTag("Driving")
+            setWalkingTag("Walking")
+            setCyclingTag("Cycling")
+        }
 
     });
     
@@ -72,7 +139,11 @@ function MapSearch (props) {
         clearTimeout(timerID)
 
         let jsonRes = "";
-        let language = "de";
+        let language = props.l1;
+        if(language !== "de" && language !== "it" && language!== "en")
+            language = "en"
+        
+
 
         if(event.target.value.length > 1){
             setShowLoading(true)
@@ -144,7 +215,9 @@ function MapSearch (props) {
 
     async function explore(locationName, coords = null){
 
-        let language = "de";
+        let language = props.l1;
+        if(language !== "de" && language !== "it" && language!== "en")
+            language = "en";
 
         if(coords === null){
             let jsonRes = "";
@@ -246,18 +319,23 @@ function MapSearch (props) {
             { showDropdown ? 
                 <Fade in={showDropdown} timeout={200}>
                   <div style={{paddingLeft:"10px", paddingBottom:"10px", paddingRight:"10px"}}>
-                    <Typography style={{marginLeft:"5px"}}>Filter</Typography>
+                    
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<DirectionsCarFilledIcon fontSize="small" />} label={drivingTag} variant={directionsMode === "driving" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("driving")}></Chip>
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<DirectionsWalkIcon fontSize="small" />} label={walkingTag} variant={directionsMode === "walking" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("walking")}></Chip>
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<DirectionsBikeIcon fontSize="small" />} label={cyclingTag} variant={directionsMode === "cycling" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("cycling")}></Chip>
 
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<ApartmentIcon/>} variant={architecture ? "filled" : "outlined"} label="Architecture" onClick={() => handleClickArchitecture()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<AlignVerticalBottomIcon/>} variant={culture ? "filled" : "outlined"} label="Cultural" onClick={() => handleClickCulture()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<ChurchIcon/>} variant={churches ? "filled" : "outlined"} label="Churches" onClick={() => handleClickChurch()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<HistoryEduIcon/>} variant={historical ? "filled" : "outlined"} label="Historical" onClick={() => handleClickHistorical()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<LandscapeIcon/>} variant={natural ? "filled" : "outlined"} label="Natural" onClick={() => handleClickNatural()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<PeopleIcon/>} variant={religion ? "filled" : "outlined"} label="Religion" onClick={() => handleClickReligion()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<EmojiPeopleIcon/>} variant={touristFacilities ? "filled" : "outlined"} label="Tourist facilities" onClick={() => handleClickTouristFacilities()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<MuseumIcon/>} variant={museums ? "filled" : "outlined"} label="Museums" onClick={() => handleClickMuseums()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<AccountBalanceIcon/>} variant={palaces ? "filled" : "outlined"} label="palaces" onClick={() => handleClickPalaces()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1px 1px 1px 1px"}} icon={<LocalMallIcon/>} variant={malls ? "filled" : "outlined"} label="malls" onClick={() => handleClickMalls()} />
+                    <Typography style={{marginLeft:"5px", marginTop:"7px"}}>{filterLanguage}</Typography>
+
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<ApartmentIcon fontSize="small" />} variant={architecture ? "filled" : "outlined"} label={architectureTag} onClick={() => handleClickArchitecture()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<AlignVerticalBottomIcon fontSize="small" />} variant={culture ? "filled" : "outlined"} label={culturalTag} onClick={() => handleClickCulture()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<ChurchIcon fontSize="small" />} variant={churches ? "filled" : "outlined"} label={churchesTag} onClick={() => handleClickChurch()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<HistoryEduIcon fontSize="small" />} variant={historical ? "filled" : "outlined"} label={historicalTag} onClick={() => handleClickHistorical()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<LandscapeIcon fontSize="small" />} variant={natural ? "filled" : "outlined"} label={naturalTag} onClick={() => handleClickNatural()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<PeopleIcon fontSize="small" />} variant={religion ? "filled" : "outlined"} label={religionTag} onClick={() => handleClickReligion()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<EmojiPeopleIcon fontSize="small" />} variant={touristFacilities ? "filled" : "outlined"} label={touristTag} onClick={() => handleClickTouristFacilities()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<MuseumIcon fontSize="small" />} variant={museums ? "filled" : "outlined"} label={museumsTag} onClick={() => handleClickMuseums()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<AccountBalanceIcon fontSize="small" />} variant={palaces ? "filled" : "outlined"} label={palacesTag} onClick={() => handleClickPalaces()} />
+                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<LocalMallIcon fontSize="small" />} variant={malls ? "filled" : "outlined"} label={mallsTag} onClick={() => handleClickMalls()} />
 
                 </div>
                 </Fade>
@@ -267,7 +345,10 @@ function MapSearch (props) {
 
     );
 
-
+    function handleDirectionModeClick(mode){
+        setDirectionsMode(mode);
+        setDirectionGlobally(mode);
+    }
 
     //Function for Chips!!!
     function handleClickArchitecture(){
@@ -343,9 +424,8 @@ function MapSearch (props) {
         changedFilter();
     }
 
+
+
 }
-
-
-
 
 export default MapSearch;

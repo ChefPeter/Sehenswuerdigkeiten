@@ -34,7 +34,7 @@ function Home(props) {
           <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
                                                                                               
           <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
-            <MapSearch></MapSearch>
+            <MapSearch l1={props.l1}></MapSearch>
           </div>
 
           <Button style={{marginTop: "100px"}} id="test" onClick={() => postRoute()}>Enter</Button>

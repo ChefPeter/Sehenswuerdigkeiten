@@ -20,11 +20,12 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import ChurchIcon from '@mui/icons-material/Church';
 import {setFilter, changedFilter} from "./BaseMap";
+import {useEffect} from "react";
 
 let locationInput = "";
 let timerID;
 
-function MapSearch () {
+function MapSearch (props) {
 
     const [locations, setLocations] = useState([]);
     const [radiusValue, setRadiusValue] = useState(1);
@@ -42,6 +43,27 @@ function MapSearch () {
     const [museums, setMuseums] = useState(true)
     const [palaces, setPalaces] = useState(true)
     const [malls, setMalls] = useState(true)
+
+    const [searchText, setSearchText] = useState("Search a city");
+    const [searchRadiusTag, setSearchRadiusTag] = useState("Searchradius: ")
+    
+    useEffect(() => {
+        
+        if(props.l1 == "de"){
+            setSearchText("Suche eine Stadt");
+            setSearchRadiusTag("Suchradius: ");
+        }else if(props.l1 == "it"){
+            setSearchText("Cerca una città");
+            setSearchRadiusTag("Raggio di ricerca: ")
+        }else{
+            setSearchText("Search a city");
+            setSearchRadiusTag("Searchradius: ")
+        }
+
+
+    });
+    
+
 
     const handleSearchFriendInput = async (event)=>{
 
@@ -188,7 +210,7 @@ function MapSearch () {
                 <TextField
                     onChange={handleSearchFriendInput}
                     {...params}
-                    label="Search a city"
+                    label={searchText}
                     InputProps={{
                     ...params.InputProps,
                     endAdornment: <Container id="btnContainerSearchbar" style={{display:"flex", marginRight:"1.2vw", maxWidth:"130px"}}>  <Button onClick={() => explore(locationInput)} > {showLoading ? <CircularProgress size={25} /> :null} {!showLoading ? <TravelExploreIcon/> : null} </Button>  <Divider orientation="vertical" flexItem /> <Button onClick={() => getGPSLocation()}><GpsFixedIcon/></Button></Container> 
@@ -201,9 +223,10 @@ function MapSearch () {
                 marginTop={0.7}
                 fontSize="small"
                 marginLeft={"10px"}
-                minWidth={"18.5ch"}
+                minWidth={searchRadiusTag == "Raggio di ricerca: " ? "21ch" : "18.5ch"}
+           
                 marginBottom={0.7}
-                >Searchradius: {radiusValue} km</Typography>
+                >{searchRadiusTag} {radiusValue} km</Typography>
                 
 
                 <Slider 

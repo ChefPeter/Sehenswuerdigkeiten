@@ -296,9 +296,7 @@ useEffect(() => {
             ReactDOM.render(<Popup2 feature2={feature2} />, popupNode);
             ReactDOM.render(<div><Button onClick={() => handleSearchByMarkerButton(array, radiusForPointerSearch)} >Search here?</Button></div>, popupNode);
 
-            
             // set popup on map
-
             popUpRef.current
                 .setLngLat(array)
                 .setDOMContent(popupNode)

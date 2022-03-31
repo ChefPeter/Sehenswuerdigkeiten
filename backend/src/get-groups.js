@@ -12,7 +12,7 @@ async function getGroups(request) {
         });
         const query = util.promisify(conn.query).bind(conn);
         return Array.from(await query(
-            `SELECT g.group_id, g.groupname FROM users_usergroups AS ug
+            `SELECT g.group_id, g.groupname, g.profile_picture FROM users_usergroups AS ug
                 JOIN usergroups AS g ON ug.group_id = g.group_id
                 WHERE ug.username = '${request.session.username}'`
         ));

@@ -13,8 +13,6 @@ function FriendItem(props) {
     
     const [showDescription, setShowDescription] = useState(false);    
 
-    console.log("prop" + props.profilePicture)
-  
     return (
       <div>
         
@@ -44,7 +42,7 @@ function FriendItem(props) {
       {showDescription ? 
       <Card id="friendCard"> 
         <Button variant="conatined" onClick={ () => navigate("/chat?"+new URLSearchParams({name: props.name}))}>Open Chat</Button>
-        <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleRemoveFriend(props.name)}><ClearIcon/></Button>
+        <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleLeaveGroup(props.groupID)}><ClearIcon/></Button>
       </Card> : null}
         
         <br></br>
@@ -59,25 +57,20 @@ function FriendItem(props) {
 function handleReport(){
 
 }
-function handleRemoveFriend(name){
+function handleLeaveGroup(groupID){
 
     let formData = new FormData();
-    formData.append('friend', name);
+    formData.append('group_id', groupID);
   
-    fetch("http://localhost:5000/reject-friend", {
+    fetch("http://localhost:5000/leave-group", {
         method: "post",
         body: formData,
         credentials: 'include'
     }).then(res => {
-        if (res.status == 400) {
-            
-        } else {
-            // Infofeld sichtbar machen
-           window.location.reload();
-           
+        if (res.status == 200) {
+          window.location.reload();
         }
     });
-
 
 }
 

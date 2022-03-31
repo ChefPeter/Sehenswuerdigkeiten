@@ -163,9 +163,9 @@ const Chat = (props) => {
                     {messages.map((message, i) => {
                       if (message.is_file) {
                         if (message.sender === friend) {
-                          return <LeftMessage key={"message_"+i} path={message.content}></LeftMessage>
+                          return <LeftMessage key={"message_"+i} path={message.content} time={message["message_timestamp"]}></LeftMessage>
                         } else {
-                          return <RightMessage key={"message_"+i} path={message.content}></RightMessage>
+                          return <RightMessage key={"message_"+i} path={message.content} time={message["message_timestamp"]}></RightMessage>
                         }
                       } else {
                         if (message.sender === friend) {

@@ -119,20 +119,45 @@ const Chat = (props) => {
   
     const [searchParams, setSearchParams] = useSearchParams();
     const name = searchParams.get("name");
+    const groupID = searchParams.get("group_id");
 
     const [messages, setMessages] = useState([]);
     const friend = name;
 
+    const [username, setUsername] = useState("");
+
+
     function func () {
-      const intervalID = setInterval( () => fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
+
+      fetch("http://localhost:5000/username", {
         method: "GET",
         credentials: "include"
-      })
-      .then(res => res.json())
+      }).then(res => res.text())
       .then(res => {
-        setMessages(res);
-      }), 500);
+        setUsername(res);
+      });
 
+      let intervalID;
+      if (groupID) {
+        intervalID = setInterval( () => fetch("http://localhost:5000/group-conversation?"+new URLSearchParams({group_id: groupID}).toString(), {
+          method: "GET",
+          credentials: "include"
+        })
+        .then(res => res.json())
+        .then(res => {
+          setMessages(res);
+        }), 500);
+      }
+      else {
+        intervalID = setInterval( () => fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
+          method: "GET",
+          credentials: "include"
+        })
+        .then(res => res.json())
+        .then(res => {
+          setMessages(res);
+        }), 500);
+      }
       return (() => clearInterval(intervalID));
     }
 
@@ -159,16 +184,18 @@ const Chat = (props) => {
                     paddingBottom: 1,
                     paddingRight: 1,
                     paddingLeft: 1}}>
-                
+                    
                     {messages.map((message, i) => {
                       if (message.is_file) {
-                        if (message.sender === friend) {
+                        if (message.sender !== username) {
                           return <LeftMessage key={"message_"+i} path={message.content} time={message["message_timestamp"]}></LeftMessage>
                         } else {
                           return <RightMessage key={"message_"+i} path={message.content} time={message["message_timestamp"]}></RightMessage>
                         }
                       } else {
-                        if (message.sender === friend) {
+                        if (message.sender !== username) {
+                          return <LeftMessage key={"message_"+i} message={message.content} time={message["message_timestamp"]}></LeftMessage>
+                        } else if (!message.sender) {
                           return <LeftMessage key={"message_"+i} message={message.content} time={message["message_timestamp"]}></LeftMessage>
                         } else {
                           return <RightMessage key={"message_"+i} message={message.content} time={message["message_timestamp"]}></RightMessage>

@@ -41,7 +41,7 @@ function FriendItem(props) {
 
       {showDescription ? 
       <Card id="friendCard"> 
-        <Button variant="conatined" onClick={ () => navigate("/chat?"+new URLSearchParams({name: props.name}))}>Open Chat</Button>
+        <Button variant="conatined" onClick={ () => navigate("/chat?"+new URLSearchParams({name: props.name, group_id: props.groupID}))}>Open Chat</Button>
         <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleLeaveGroup(props.groupID)}><ClearIcon/></Button>
       </Card> : null}
         

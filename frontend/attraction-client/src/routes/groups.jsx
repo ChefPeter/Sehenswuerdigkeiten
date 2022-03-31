@@ -74,7 +74,7 @@ function Groups(props) {
       
         <List>
 
-          {groups.map((e,i) =>  <GroupItem name={e.groupname} groupID={e.group_id} key={"group_"+i} profilePicture={null}></GroupItem>)}
+          {groups.map((e,i) =>  <GroupItem name={e.groupname} groupID={e.group_id} key={"group_"+i} profilePicture={e.profilePicture}></GroupItem>)}
          
         </List>
         

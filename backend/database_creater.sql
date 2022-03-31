@@ -82,3 +82,10 @@ CREATE TABLE IF NOT EXISTS group_messages (
     FOREIGN KEY (sender) REFERENCES users(username),
     FOREIGN KEY (group_id) REFERENCES usergroups(group_id)
 );
+
+CREATE TABLE IF NOT EXISTS sights (
+    sight_id INT PRIMARY KEY AUTO_INCREMENT,
+    sightname VARCHAR(100),
+    latitude DOUBLE,
+    longtitude DOUBLE
+);

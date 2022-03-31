@@ -1,0 +1,43 @@
+const mysql = require("mysql");
+const util = require("util");
+
+async function addSight(request) {
+    // Schauen ob Pflichtfelder ausgefüllt sind
+    if (!checkMandatoryFields(request.body)) return "Nicht alle Pflichtfelder sind ausgefüllt!";
+    // Sehenswürdigkeit in die Datenbank einfügen
+    return await insertSight(request);
+}
+
+function checkMandatoryFields(params) {
+    const fields = [
+        "sightname",
+        "latitude",
+        "longtitude"
+    ];
+    return fields.every(field => params[field]);
+}
+
+async function insertSight(request) {
+    let conn;
+    try {
+        conn = mysql.createConnection({
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_DATABASE
+        });
+        const query = util.promisify(conn.query).bind(conn);
+        const result = await query(
+            `INSERT INTO sights (sightname, latitude, longtitude)
+                VALUES ('${request.body.sightname}', '${request.body.latitude}', '${request.body.longtitude}')`
+        );
+        return null;
+    } catch(e) {
+        console.error(e);
+        return "Fehler mit der Datenbank!";
+    } finally {
+        conn.end();
+    }
+}
+
+module.exports = addSight;

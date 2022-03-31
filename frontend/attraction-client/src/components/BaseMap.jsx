@@ -326,8 +326,8 @@
         <SwipeableDrawer 
             anchor='bottom'
             open={open}
-            onClose={() => setOpen(true)}
-            onOpen={() => {}}>
+            onClose={() => setOpen(!open)}
+            onOpen={() =>  console.log()}>
                 <div style={{maxHeight:"60vh"}}>
                     <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                     <div>

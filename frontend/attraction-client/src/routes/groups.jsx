@@ -45,7 +45,11 @@ function Groups(props) {
 
   const [groups, setGroups] = useState([]);
   useEffect(() => {
-    fetch("http://localhost.com/groups")
+    fetch("http://localhost:5000/groups", {
+      method: "GET",
+      credentials: "include"
+    }).then(res => res.json())
+    .then(res => setGroups(res));
   }, []);
 
   return (
@@ -66,11 +70,11 @@ function Groups(props) {
         <Button onClick={createGroup}><AddIcon></AddIcon></Button>
       </Card>
 
-      <div id="freunde" >
+      <div id="freunde">
       
         <List>
 
-          {groups.map((e,i) =>  <GroupItem name={e.name} description={e.description} key={"group_"+i} profilePicture={null}></GroupItem>)}
+          {groups.map((e,i) =>  <GroupItem name={e.groupname} groupID={e.group_id} key={"group_"+i} profilePicture={null}></GroupItem>)}
          
         </List>
         

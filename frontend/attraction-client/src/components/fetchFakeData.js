@@ -8,7 +8,8 @@ const fetchFakeData = async centerCoordinates => {
   }
 
   function getURL(radius, lat, lon, filterLink, limit, fame = "3") {
-    let filterAttributeLink = "kinds="
+    let filterAttributeLink = `kinds=${Object.keys(filterLink).filter(function(x) { return filterLink[x]; }).join(',')}`;
+    /*let filterAttributeLink = "kinds=";
     Object.keys(filterLink).forEach(function(k){
         if(filterLink[k] == true){
             if(filterAttributeLink.charAt(filterAttributeLink.length - 1) != "=")
@@ -17,6 +18,7 @@ const fetchFakeData = async centerCoordinates => {
                 filterAttributeLink+=k;
         }
     });
+    console.log(filterAttributeLink);*/
     //docs https://opentripmap.io/docs#/Objects%20list/getListOfPlacesByRadius
     if(filterAttributeLink.length>8)
         return `https://api.opentripmap.com/0.1/en/places/radius?radius=${radius}&lon=${lon}&lat=${lat}&rate=${fame}&${filterAttributeLink}&format=json&limit=${limit}&apikey=${API_KEY}`

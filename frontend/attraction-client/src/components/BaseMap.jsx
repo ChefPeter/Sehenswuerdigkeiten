@@ -15,7 +15,8 @@
     let searchByMarker = false;
     let lastCoords = [];
     let lastRadius = 1;
-    let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, tourist_facilities: true, museums: true, palaces: true, malls: true, churches: true}
+    let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, tourist_facilities: true, museums: true, palaces: true, malls: true, churches: true};
+    let filterMethods = {walking: true, cycling: false, driving: false};
     let currentGlobalResults = [];
     let timerID;
 
@@ -23,9 +24,14 @@
         filter = newFilter;
     }
 
+    function getTravelingMethod()
+    {
+      return Object.keys(filterMethods).filter(function(x) { return filterMethods[x]; });
+    }
+
     function getRouteURL(type, coords, language)
     {
-    return `https://api.mapbox.com/directions/v5/mapbox/${type}/${(new URLSearchParams(coords).toString()).slice(0,-1)}?alternatives=true&geometries=geojson&language=${language}&overview=simplified&steps=true&access_token=${API_KEY}`;
+      return `https://api.mapbox.com/directions/v5/mapbox/${type}/${(new URLSearchParams(coords).toString()).slice(0,-1)}?alternatives=true&geometries=geojson&language=${language}&overview=simplified&steps=true&access_token=${API_KEY}`;
     }
 
     async function getDataFromURL(url)
@@ -63,17 +69,13 @@
     {
         map.removeLayer("layer1");
         map.removeSource('route1');
-        map.removeLayer("route2");
-        map.removeSource('route');
     }
-
+    let travelMethod = getTravelingMethod();
     for(let count = 1; count < coords.length; count++)
     {
-
-      let rout = await getDataFromURL(getRouteURL("walking", `${coords[count].join(",")};${coords[count - 1].join(",")}`, "en"));
-      out.push(rout.routes[0].geometry.coordinates);
+      let rout = await getDataFromURL(getRouteURL(travelMethod, `${coords[count - 1].join(",")};${coords[count].join(",")}`, "en"));
+      out = out.concat(rout.routes[0].geometry.coordinates);
     }
-    out = out.reverse().reduce((a, b) => a.concat(b));
     map.addSource('route1', {
         'type': 'geojson',
         'data': {

@@ -50,16 +50,13 @@ function Friends(props) {
     if(props.l1 == "de") {
       setIncomingRequestTag("Freundschaftsanfragen");
       setSearchTextTag("Suche einen Freund");
-
- } else if(props.l1 == "it") {
+    } else if(props.l1 == "it") {
       setIncomingRequestTag("Richiesti di amicizia");
       setSearchTextTag("Cerca un amico")
-
- } else {
+    } else {
       setIncomingRequestTag("Friend requests");
       setSearchTextTag("Search a friend");
-
- }
+   }
   }, [props.l1]);
 
   useEffect(async() => {

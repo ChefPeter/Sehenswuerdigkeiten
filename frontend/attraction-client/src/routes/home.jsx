@@ -29,12 +29,12 @@ function Home(props) {
       <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
         
         <Card id="container" style={{borderRadius:"0px"}}>
-          <BaseMap />
+          <BaseMap l1={props.l1} />
           
           <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
                                                                                               
           <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
-            <MapSearch l1={props.l1}></MapSearch>
+            <MapSearch l1={props.l1} ></MapSearch>
           </div>
 
           <Button style={{marginTop: "100px"}} id="test" onClick={() => postRoute()}>Enter</Button>

@@ -2,7 +2,7 @@ import "../routes/styles/contact.css";
 import Sidebar from "../components/Sidebar";
 import React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Button, Container, TextField, Typography, LinearProgress, Box, Card } from "@mui/material";
+import { Button, Container, TextField, Typography, LinearProgress, Box, Card, OutlinedInput, InputAdornment } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import GroupItem from "../components/GroupItem";
 import List from '@mui/material/List';
@@ -39,6 +39,7 @@ function Groups(props) {
   }, [props.l1])
 
   const handleCreateGroupInput = (event)=>{
+    console.log(event.target.value)
     createGroupInput = event.target.value;
   };
 
@@ -63,23 +64,24 @@ function Groups(props) {
     .then(res => setGroups(res));
   }, []);
 
+  
   return (
     
     <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
       <Card style={{minHeight: "100vh", borderRadius:"0px"}} >
 
       <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
-      <Card  style={{marginTop: "calc(16.5px + 3.2em)"}}>
-        <TextField
-          id="createGroupField"
-          type="text"
-          label={textfieldTextTag}
-          variant="filled"
-          onChange={handleCreateGroupInput}
-        >
-        </TextField>
-        <Button onClick={createGroup}><AddIcon></AddIcon></Button>
-      </Card>
+    
+          <TextField
+              style={{width: "40vw", minWidth:"250px", marginLeft:"0.625em", marginTop:"4.5em"}}
+              id="createGroupField"
+              type="text"
+              label={textfieldTextTag}
+              variant="filled"
+              onChange={handleCreateGroupInput}
+              InputProps={{endAdornment:<Button onClick={createGroup}><AddIcon></AddIcon></Button>}}
+            />
+ 
 
       <div id="freunde">
       

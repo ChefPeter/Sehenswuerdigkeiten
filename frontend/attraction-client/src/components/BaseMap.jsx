@@ -100,8 +100,21 @@
     }
 
 
-const BaseMap = () => {
+function BaseMap (props) {
 
+
+    const [addButtonTag, setAddButtonTag] = useState("ADD TO ROUTE");
+    useEffect(() =>{
+        console.log(props.l1)
+        if(props.l1 === "de"){
+            setAddButtonTag("ZUR ROUTE HINZUFÜGEN");
+        }else if(props.l1 === "it"){
+            setAddButtonTag("AGGIUNGI AL PERCORSO");
+        }else{
+            setAddButtonTag("ADD TO ROUTE");
+        }
+
+    },[props.l1]);
     //mapbox://styles/mapbox/satellite-v9
     //mapbox://styles/mapbox/light-v10
     let theme = "mapbox://styles/mapbox/navigation-night-v1";
@@ -157,7 +170,6 @@ useEffect(() => {
         });
 
 
-
         map.addControl(geolocate, "bottom-right");
 
 
@@ -182,7 +194,7 @@ useEffect(() => {
                     features: []
                 }
             });
-
+            
             // now add the layer, and reference the data source above by name
             map.addLayer({
                 id: "random-points-layer",
@@ -247,7 +259,7 @@ useEffect(() => {
                 }
             }
         });
-
+        
         async function getDetail(id) {
             let result = await fetch('https://api.opentripmap.com/0.1/en/places/xid/' + id + '?apikey=5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752');
             let answer = null;
@@ -319,36 +331,36 @@ useEffect(() => {
         }
         map.doubleClickZoom.disable()
         //map.on('dblclick', add_marker);
-
+       
 },[]);
 
 
     return (
     
         <div>
+        
+            <div id="mapContainer" className="map" ref={map}></div>
 
-        <div id="mapContainer" className="map" ref={map}></div>
-
-        <SwipeableDrawer 
-            anchor='bottom'
-            open={open}
-            onClose={() => setOpen(!open)}
-            onOpen={() =>  console.log()}>
-                <div style={{maxHeight:"60vh"}}>
-                    <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
-                    <div>
+            <SwipeableDrawer 
+                anchor='bottom'
+                open={open}
+                onClose={() => setOpen(!open)}
+                onOpen={() =>  console.log()}>
+                    <div style={{maxHeight:"60vh", minHeight:"100px"}}>
+                        <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                         <div>
-                            <Button variant="contained" style={{color: "black", marginBottom:"20px"}} onClick={() => addToRoute(obj)}>Add</Button>
-                            <h2 id="nameField" style={{color:'white', marginBottom:"20px"}}>{obj.properties.name}</h2>
+                            <div>
+                                <Button variant="contained" style={{color: "black", marginBottom:"20px"}} onClick={() => addToRoute(obj)}>{addButtonTag}</Button>
+                                <h2 id="nameField" style={{color:'white', marginBottom:"20px"}}>{obj.properties.name}</h2>
+                            </div>
+                            <div><img src={image} style={{maxWidth:"100%", marginBottom:"20px"}}></img></div>
+                            <div>
+                                <h3 style={{marginBottom:"20px"}}>Hallo hier kommen Infos hin</h3>
+                            </div>
                         </div>
-                        <div><img src={image} style={{maxWidth:"100%", marginBottom:"20px"}}></img></div>
-                        <div>
-                            <h3 style={{marginBottom:"20px"}}>Hallo hier kommen Infos hin</h3>
                         </div>
                     </div>
-                    </div>
-                </div>
-            </SwipeableDrawer>
+                </SwipeableDrawer>
             
         </div>
     );

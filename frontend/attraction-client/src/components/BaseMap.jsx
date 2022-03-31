@@ -238,7 +238,8 @@ useEffect(() => {
                     // create popup node
                     setImage("");
                     imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
-                    setImage(imageSrc);
+                    if(imageSrc != undefined)
+                        setImage(imageSrc);
                     const popupNode = document.createElement("div");
 
                     ReactDOM.render(<Popup feature={feature} />, popupNode);
@@ -339,7 +340,7 @@ useEffect(() => {
     
         <div>
         
-            <div id="mapContainer" className="map" ref={map}></div>
+            <div id="mapContainer" className="map"></div>
 
             <SwipeableDrawer 
                 anchor='bottom'

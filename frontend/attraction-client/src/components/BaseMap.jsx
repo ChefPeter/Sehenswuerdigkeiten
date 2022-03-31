@@ -19,6 +19,7 @@
     let directionsMode = "driving";
     let currentGlobalResults = [];
     let timerID;
+    let globalPopup = "", globalPopup2 = "";
 
     export function setFilter(newFilter){
         filter = newFilter;
@@ -115,7 +116,6 @@ const BaseMap = () => {
     const popUpRef = useRef(new mapboxgl.Popup({ offset: 15 }));
         
     const [obj, setObj] = useState({properties: {name: 'test'}});
-    const [showSearchHere, setShowSearchHere] = useState(false);
     const [markerCoords, setMarkerCoords] = useState([]);
 
     const Popup2 = ({ feature2 }) => {
@@ -224,16 +224,6 @@ useEffect(() => {
 
                     const feature = e.features[0];
 
-                    /*console.log(feature.properties.id)
-                    console.log("asdfasdfasdfasdf");
-                    console.log(feature.properties.wikidata);
-                    let desc=await getDetail(feature.properties.id)
-                    let pdesc="";
-                    console.log("aa")
-                    console.log(desc)*/
-                    /*if(desc.hasOwnProperty('wikipedia_extracts')){
-                    pdesc=desc.wikipedia_extracts.text
-                    }*/
                     // create popup node
                     setImage("");
                     imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
@@ -266,8 +256,6 @@ useEffect(() => {
                 answer = await result.json();
             return answer;
         }
-
-
 
 
         // reset cursor to default when user is no longer hovering over a clickable feature
@@ -310,7 +298,11 @@ useEffect(() => {
         let marker = new mapboxgl.Marker();
 
         function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch) {
-            // setLastSearchWasByClickOnMap(true)
+            if(globalPopup2 !== ""){
+                globalPopup2.remove()
+                globalPopup2 = "";
+            }
+            
             lastCoords = markerCoords;
 
             searchByMarker = true;
@@ -324,7 +316,7 @@ useEffect(() => {
         function add_marker(coords) {
             setMarkerCoords(coords)
             marker.setLngLat(coords).addTo(map);
-
+            globalPopup = marker;
         }
         map.doubleClickZoom.disable()
         //map.on('dblclick', add_marker);
@@ -335,10 +327,6 @@ useEffect(() => {
     return (
     
         <div>
-
-        { showSearchHere ?
-            <Button onClick={() =>  handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowSearchHere)} style={{marginLeft:"600px", width:"100vw"}}>Search here?</Button>
-        : null }
 
         <div id="mapContainer" className="map" ref={map}></div>
 
@@ -365,26 +353,25 @@ useEffect(() => {
             
         </div>
     );
-
-    };
-
-
-    function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowSearchHere){
-         //setLastSearchWasByClickOnMap(true)
-        lastCoords = markerCoords;
-
-        setShowSearchHere(false)
-        searchByMarker = true;
-
-        flyToLocation(markerCoords, radiusForPointerSearch, false)
-
-    }
+};
 
 
     export async function flyToLocation (coords, radius, newCoordinates = false){
         
         if(newCoordinates){
             lastCoords = coords;
+            if(globalPopup !== ""){
+                globalPopup.remove()
+                globalPopup = "";
+            }
+            if(globalPopup2 !== ""){
+                globalPopup2.remove()
+            }
+            let marker2 = new mapboxgl.Marker();
+           // setMarkerCoords(coords)
+            marker2.setLngLat(coords).addTo(map);
+            globalPopup2 = marker2;
+
         }else{
             coords = lastCoords;
         }
@@ -419,7 +406,6 @@ useEffect(() => {
             ],
             zoom: z,
             speed: 1.5,
-           
             essential: true // this animation is considered essential with respect to prefers-reduced-motion
         });
     
@@ -452,14 +438,14 @@ useEffect(() => {
                 else
                     coords = lastCoords;
             }
-            console.log("SEEEEEARCH")
+            
             const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: lastRadius, filterToUse: filter });
             currentGlobalResults = results;
      
             // update "random-points-data" source with new data
             // all layers that consume the "random-points-data" data source will be updated automatically
             map.getSource("random-points-data").setData(results);
-        }, 1000)
+        }, 900)
 
 
     }

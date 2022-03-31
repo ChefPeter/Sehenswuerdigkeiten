@@ -1,7 +1,7 @@
 const fetch = require("cross-fetch");
 
 async function getBestRoute(request, res) {
-    
+
     // Schauen, ob Pflichtfelder ausgefüllt sind
     if (!request.body.points || !request.body.vehicle) {
         res.status(400).send("Es sind nicht alle Pflichtfelder ausgefüllt!");
@@ -10,8 +10,9 @@ async function getBestRoute(request, res) {
 
     //console.log(request.body);
     // DEBUG ONLY
-    /*request.body.vehicle = "driving";
-    request.body.points = [
+    //request.body.vehicle = "driving";
+    //let data = {body: {poins: {geometry: {coordinate: [[11.636887, 46.712631], [11.659419, 46.71291], [11.657669, 46.715897], [11.655903, 46.714851]]}}};
+    /*request.body.points = [
         {geometry: [60, 30.2]},
         {geometry: [60.1, 30.3]},
         {geometry: [60.4, 30.4]},
@@ -19,9 +20,33 @@ async function getBestRoute(request, res) {
         {geometry: [60, 30.6]},
     ];*/
 
+/*[
+    {
+        geometry: {
+            coordinates: [11.636887, 46.712631]
+        }
+    },
+    {
+        geometry: {
+            coordinates: [11.659419, 46.71291]
+        }
+    },
+    {
+        geometry: {
+            coordinates: [11.657669, 46.715897]
+        }
+    },
+    {
+        geometry: {
+            coordinates: [11.655903, 46.714851]
+        }
+    }
+]*/
+
     // Adjazenzmatrix aufbauen
     const p = JSON.parse(request.body.points);
     const l = p.length;
+    let out = [];
     
     //console.log(p);
 
@@ -33,10 +58,19 @@ async function getBestRoute(request, res) {
             matrix[x][i] = distance;
         }
     }
+    const reihenfolge = tsp(matrix);
+    console.log(reihenfolge);
+    const coords = tsp(matrix).map(e => p[e].geometry.coordinates);
+    console.log(coords);
+    for(let count = 1; count < coords.length; count++)
+    {
+      let rout = await getDataFromURL(getRouteURL(request.body.vehicle, `${coords[count - 1].join(",")};${coords[count].join(",")}`, "en"));
+      out = out.concat(rout.routes[0].geometry.coordinates);
+    }
 
     //console.log(JSON.stringify(tsp(matrix).map(e => p[e])));
 
-    res.status(200).send(JSON.stringify(tsp(matrix).map(e => p[e])));
+    res.status(200).send(JSON.stringify(out));
     //res.status(200).send(tsp(matrix).map(e => p[e]));
 
     // Gefährlich wegen ban auf mapbox -> 
@@ -101,5 +135,20 @@ function getDistance(p1, p2) {
     const d = R * c;
     return d;
 };
+
+function getRouteURL(type, coords, language)
+{
+    const API_KEY="pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
+    return `https://api.mapbox.com/directions/v5/mapbox/${type}/${(new URLSearchParams(coords).toString()).slice(0,-1)}?alternatives=true&geometries=geojson&language=${language}&overview=simplified&steps=true&access_token=${API_KEY}`;
+}
+
+async function getDataFromURL(url)
+{
+let result = await fetch(url);
+let answer = null;
+if(result.ok)
+answer = await result.json();
+return answer;
+}
 
 module.exports = getBestRoute;

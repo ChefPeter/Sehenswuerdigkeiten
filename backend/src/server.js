@@ -13,6 +13,7 @@ const insertReport = require("./insert-report");
 const createGroup = require("./create-group");
 const leaveGroup = require("./leave-group");
 const addToGroup = require("./add-to-group");
+const sendSights = require("./send-sights");
 
 const getDescription = require("./get-description");
 const getFriends = require("./get-friends");
@@ -82,6 +83,7 @@ app.post("/route", async(req, res) => await getBestRoute(req, res));
 app.post("/create-group", isAuthenticated, async(req, res) => sendResponse(await createGroup(req), res));
 app.post("/leave-group", isAuthenticated, async(req, res) => sendResponse(await leaveGroup(req), res));
 app.post("/add-to-group", isAuthenticated, async(req, res) => sendResponse(await addToGroup(req), res));
+app.post("/sights", /*isAuthenticated,*/ async(req, res) => await sendSights(req, res));
 
 // GET REQUESTS
 app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req), res));

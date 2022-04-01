@@ -1,4 +1,5 @@
 import ClearIcon from '@mui/icons-material/Clear';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { Avatar, Button, Card, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +40,7 @@ function GroupItem(props) {
       {showDescription ? 
       <Card id="friendCard"> 
         <Button variant="conatined" onClick={ () => navigate("/chat?"+new URLSearchParams({name: props.name, group_id: props.groupID}))}>Chat</Button>
+        <Button variant="conatined" onClick={ () => navigate("/groupSettings?"+new URLSearchParams({name: props.name, group_id: props.groupID}))}><SettingsIcon/></Button>
         <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleLeaveGroup(props.groupID)}><ClearIcon/></Button>
       </Card> : null}
         

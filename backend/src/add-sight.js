@@ -5,7 +5,7 @@ async function addSight(request) {
     // Schauen ob Pflichtfelder ausgefüllt sind
     if (!checkMandatoryFields(request.body)) return "Nicht alle Pflichtfelder sind ausgefüllt!";
     // Sehenswürdigkeit in die Datenbank einfügen
-    return await insertSight(request);
+    return await insertSight(request.body.sightname, request.body.latitude, request.body.longtitude);
 }
 
 function checkMandatoryFields(params) {
@@ -17,7 +17,7 @@ function checkMandatoryFields(params) {
     return fields.every(field => params[field]);
 }
 
-async function insertSight(request) {
+async function insertSight(sightname, latitude, longtitude) {
     let conn;
     try {
         conn = mysql.createConnection({
@@ -29,7 +29,7 @@ async function insertSight(request) {
         const query = util.promisify(conn.query).bind(conn);
         const result = await query(
             `INSERT INTO sights (sightname, latitude, longtitude)
-                VALUES ('${request.body.sightname}', '${request.body.latitude}', '${request.body.longtitude}')`
+                VALUES ('${sightname}', '${latitude}', '${longtitude}')`
         );
         return null;
     } catch(e) {
@@ -40,4 +40,4 @@ async function insertSight(request) {
     }
 }
 
-module.exports = addSight;
+module.exports = { addSight, insertSight };

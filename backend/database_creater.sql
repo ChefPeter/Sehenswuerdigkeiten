@@ -87,8 +87,25 @@ CREATE TABLE IF NOT EXISTS group_messages (
 );
 
 CREATE TABLE IF NOT EXISTS sights (
-    sight_id INT PRIMARY KEY AUTO_INCREMENT,
+    sight_id VARCHAR(20) PRIMARY KEY,
     sightname VARCHAR(100),
     latitude DOUBLE,
     longtitude DOUBLE
+);
+
+CREATE TABLE IF NOT EXISTS ratings (
+    username VARCHAR(100),
+    sight_id VARCHAR(20),
+    rating DOUBLE,
+    FOREIGN KEY (username) REFERENCES users(username),
+    FOREIGN KEY (sight_id) REFERENCES sights(sight_id),
+    PRIMARY KEY (username, sight_id)
+);
+
+CREATE TABLE IF NOT EXISTS users_sights (
+    username VARCHAR(100),
+    sight_id VARCHAR(20),
+    FOREIGN KEY (username) REFERENCES users(username),
+    FOREIGN KEY (sight_id) REFERENCES sights(sight_id),
+    PRIMARY KEY (username, sight_id)
 );

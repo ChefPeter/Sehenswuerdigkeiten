@@ -27,12 +27,19 @@ async function insertPosition(request) {
             database: process.env.DB_DATABASE
         });
         const query = util.promisify(conn.query).bind(conn);
-        const result = await query(
+        await query(
             `UPDATE users
                 SET latitude=${request.body.latitude},
                     longtitude=${request.body.longtitude}
                 WHERE username='${request.session.username}'`
         );
+        const result = await query(
+            `SELECT sight_id FROM sights 
+            WHERE abs(latitude-${request.body.latitude}) < 0.001 AND abs(longtitude-${request.body.longtitude}) < 0.001`
+        );
+        for (let i = 0; i < result.length; i++) {
+            await query(`INSERT INTO users_sights (username, sight_id) values ('${request.session.username}', '${result[i].sight_id}')`);
+        }
         return null;
     } catch(e) {
         console.error(e);

@@ -1,4 +1,5 @@
 const fetch = require("cross-fetch");
+const mysql = require("mysql");
 
 async function sendSights(req, res) {
     
@@ -20,6 +21,9 @@ async function sendSights(req, res) {
 
     results = results.filter((item, index, self) => index === self.findIndex((x) => (x.wikidata === item.wikidata)));
     
+    //insertSight(result.wikidata, result.name.replace(/"/g, '\\"').replace(/'/g, "\\'"), lat, lon);
+    insertSights(results);
+
     for (let result of results)
     {
         const lon = result.point.lon;
@@ -37,9 +41,34 @@ async function sendSights(req, res) {
                 kinds: result.kinds,
             }
         });
+        
     }
     res.status(200).send(JSON.stringify(points));
     return;
+}
+
+function insertSights(data) {
+    const conn = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_DATABASE
+    });
+    conn.connect((err) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        data.forEach(sight => {
+            conn.query(`INSERT INTO sights (sight_id, sightname, latitude, longtitude)
+                        VALUES ('${sight.wikidata}',
+                         '${sight.name.replace(/"/g, '\\"').replace(/'/g, "\\'")}',
+                         '${sight.point.lat}',
+                         '${sight.point.lon}')`,
+                         (err, _) => {});
+        });
+        conn.end();
+    })
 }
 
 function checkMandatoryFields(params) {

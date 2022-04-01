@@ -14,7 +14,7 @@ const createGroup = require("./create-group");
 const leaveGroup = require("./leave-group");
 const addToGroup = require("./add-to-group");
 const sendSights = require("./send-sights");
-const addSight = require("./add-sight");
+const  { addSight } = require("./add-sight");
 const addPosition = require("./add-position");
 
 const getDescription = require("./get-description");

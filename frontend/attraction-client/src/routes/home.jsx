@@ -6,6 +6,8 @@ import MapSearch from "../components/MapSearch";
 import Sidebar from "../components/Sidebar";
 import "./styles/home.css";
 import "./styles/start.css";
+import RouteComponent from "../components/RouteComponent";
+import DirectionsIcon from '@mui/icons-material/Directions';
 
 // Define theme settings
 const light = {
@@ -32,13 +34,14 @@ function Home(props) {
           
           <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
                                                                                               
-          <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
-            <MapSearch l1={props.l1} ></MapSearch>
-          </div>
+          
+          <Button style={{marginTop: "65.5%", marginLeft:"92.8%", backgroundColor:"red"}} variant="filled" id="test" onClick={() => postRoute()}><DirectionsIcon fontSize="large" /></Button>
 
+          
           <Button style={{marginTop: "100px"}} id="test" onClick={() => postRoute()}>Enter</Button>
 
         </Card>
+
       </ThemeProvider>
     );
   

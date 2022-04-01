@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
-import "./styles/start.css";
-import { Button, Slider, Typography, TextField, Paper, getTableSortLabelUtilityClass } from '@mui/material';
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Button, Slider } from '@mui/material';
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React from "react";
-import BaseMap, {postRoute} from '../components/BaseMap';
+import { Link } from "react-router-dom";
+import BaseMap from '../components/BaseMap';
+import "./styles/start.css";
 
 const API_KEY = "5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752";
 

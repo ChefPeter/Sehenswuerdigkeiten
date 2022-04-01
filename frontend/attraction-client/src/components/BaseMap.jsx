@@ -54,7 +54,7 @@ import "./styles/BaseMap.css";
     {
         let formData = new FormData();
         let coords = [];
-        let out = [];
+        let out;
     
         formData.append('points', JSON.stringify(testRoute));
         formData.append('vehicle', 'driving');
@@ -64,15 +64,12 @@ import "./styles/BaseMap.css";
             body: formData,
             credentials: 'include',
         }).then(res => res.json())
-            .then(res => res.forEach(x => coords.push(x.geometry.coordinates)));
+            .then(res => out = res);
         if (map.getSource('route1')) {
             map.removeLayer("layer1");
             map.removeSource('route1');
         }
-        for (let count = 1; count < coords.length; count++) {
-            let rout = await getDataFromURL(getRouteURL(directionsMode, `${coords[count - 1].join(",")};${coords[count].join(",")}`, "en"));
-            out = out.concat(rout.routes[0].geometry.coordinates);
-        }
+
         map.addSource('route1', {
             'type': 'geojson',
             'data': {
@@ -365,9 +362,29 @@ useEffect(() => {
     );
 };
 
+    async function getLocationData(lon, lat, radius, filters)
+    {
+        let locationData = new FormData();
+        let data;
+        locationData.append('radius', radius);
+        locationData.append('lat', lat);
+        locationData.append('lon', lon);
+        locationData.append('filters', JSON.stringify(filters));
+
+        await fetch('http://localhost:5000/sights', {
+          method: 'post',
+          body: locationData,
+          credentials: 'include',
+      }).then(res => res.json())
+        .then(res => data = res);
+
+        return {type: "FeatureCollection",features: data,};
+    }
 
     export async function flyToLocation (coords, radius, newCoordinates = false){
         
+        let locationData = new FormData();
+
         if(newCoordinates){
             lastCoords = coords;
             if(globalPopup !== ""){
@@ -421,14 +438,14 @@ useEffect(() => {
     
 
         lastRadius = radius;
-        const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius, filterToUse: filter });
+
+        //const results1 = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius, filterToUse: filter });
+        const results = await getLocationData(coords[0], coords[1], radius, filter);
+        
         currentGlobalResults = results;
-        
-        
         // update "random-points-data" source with new data
         // all layers that consume the "random-points-data" data source will be updated automatically
         map.getSource("random-points-data").setData(results);
-        
     }
 
     //new Request has to be made
@@ -448,7 +465,10 @@ useEffect(() => {
                     coords = lastCoords;
             }
             
-            const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: lastRadius, filterToUse: filter });
+            //const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: lastRadius, filterToUse: filter });
+            console.log(filter);
+            
+            const results = await getLocationData(coords[0], coords[1], lastRadius, filter);
             currentGlobalResults = results;
      
             // update "random-points-data" source with new data

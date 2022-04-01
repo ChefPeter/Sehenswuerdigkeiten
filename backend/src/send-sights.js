@@ -7,18 +7,17 @@ async function sendSights(req, res) {
         res.status(400).send("Nicht alle Pflichtfelder sind ausgefüllt!")
         return;
     }
-
     let points = [];
     let centerCoordinates = req.body;
-    let url = getURL(parseFloat(centerCoordinates.radius)*1000, centerCoordinates.lat, centerCoordinates.lon, JSON.parse(centerCoordinates.filterAttributeLink), 500);
+    let url = getURL(parseFloat(centerCoordinates.radius)*1000, centerCoordinates.lat, centerCoordinates.lon, JSON.parse(centerCoordinates.filters), 500);
     if(url === "") {
-        res.status(200).send("");
+        res.status(200).send(JSON.stringify({}));
         return;
-        //return {type: "FeatureCollection",features: [],};
     }
+    
     //FETCHING DATA HERE
     let results = await getDataFromURL(url);
-    
+
     results = results.filter((item, index, self) => index === self.findIndex((x) => (x.wikidata === item.wikidata)));
     
     for (let result of results)
@@ -48,24 +47,34 @@ function checkMandatoryFields(params) {
         "radius",
         "lon",
         "lat",
-        "filterAttributeLink",
+        "filters",
     ];
-    return fields.every(field => params[field]);
+    return fields.every(field => {
+        if (params[field]) {
+            return true;
+        } else {
+            console.log(field);
+            return false;
+        }
+    });
 }
 
 async function getDataFromURL(url) {
-    let result = await fetch(url);
     let answer = null;
-    if (result.ok)
-        answer = await result.json();
+    if(url !== "")
+    {
+        let result = await fetch(url);
+        if (result.ok)
+            answer = await result.json();
+    }
     return answer;
 }
 
 function getURL(radius, lat, lon, filterLink, limit, fame = "3") {
     const API_KEY = "5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752";
-    let filterAttributeLink = `kinds=${Object.keys(filterLink).filter(function(x) { return filterLink[x]; }).join(',')}`;
-    if(filterAttributeLink.length>8)
-        return `https://api.opentripmap.com/0.1/en/places/radius?radius=${radius}&lon=${lon}&lat=${lat}&rate=${fame}&${filterAttributeLink}&format=json&limit=${limit}&apikey=${API_KEY}`
+    let filters = `kinds=${Object.keys(filterLink).filter(function(x) { return filterLink[x]; }).join(',')}`;
+    if(filters.length>8)
+        return `https://api.opentripmap.com/0.1/en/places/radius?radius=${radius}&lon=${lon}&lat=${lat}&rate=${fame}&${filters}&format=json&limit=${limit}&apikey=${API_KEY}`
     return "";
 }
 

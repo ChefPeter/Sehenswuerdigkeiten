@@ -59,15 +59,12 @@ async function getBestRoute(request, res) {
         }
     }
     const reihenfolge = tsp(matrix);
-    console.log(reihenfolge);
     const coords = tsp(matrix).map(e => p[e].geometry.coordinates);
-    console.log(coords);
     for(let count = 1; count < coords.length; count++)
     {
       let rout = await getDataFromURL(getRouteURL(request.body.vehicle, `${coords[count - 1].join(",")};${coords[count].join(",")}`, "en"));
       out = out.concat(rout.routes[0].geometry.coordinates);
     }
-
     //console.log(JSON.stringify(tsp(matrix).map(e => p[e])));
 
     res.status(200).send(JSON.stringify(out));

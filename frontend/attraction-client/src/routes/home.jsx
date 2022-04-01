@@ -2,12 +2,9 @@ import { Button, Card } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React from 'react';
 import BaseMap, { postRoute } from '../components/BaseMap';
-import MapSearch from "../components/MapSearch";
 import Sidebar from "../components/Sidebar";
 import "./styles/home.css";
 import "./styles/start.css";
-import RouteComponent from "../components/RouteComponent";
-import DirectionsIcon from '@mui/icons-material/Directions';
 
 // Define theme settings
 const light = {

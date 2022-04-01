@@ -8,14 +8,13 @@ import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
 import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
-import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import LandscapeIcon from '@mui/icons-material/Landscape';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import MuseumIcon from '@mui/icons-material/Museum';
 import PeopleIcon from '@mui/icons-material/People';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
-import { Autocomplete, Button, Chip, CircularProgress, Container, Divider, Fade, Paper, Slider, Stack, TextField, Typography, Card } from "@mui/material";
+import { Autocomplete, Button, Chip, CircularProgress, Container, Divider, Fade, Paper, Slider, Stack, TextField, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { changedFilter, flyToLocation, setDirectionGlobally, setFilter, setRadiusForPointerSearch } from "./BaseMap";
 import "./styles/mapsearch.css";
@@ -306,25 +305,25 @@ function MapSearch (props) {
 
                     <Divider  sx={{ mb: 1, mt:1}} />
                    
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<DirectionsCarFilledIcon fontSize="small" />} label={drivingTag} variant={directionsMode === "driving" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("driving")}></Chip>
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<DirectionsWalkIcon fontSize="small" />} label={walkingTag} variant={directionsMode === "walking" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("walking")}></Chip>
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<DirectionsBikeIcon fontSize="small" />} label={cyclingTag} variant={directionsMode === "cycling" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("cycling")}></Chip>
+                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsCarFilledIcon fontSize="small" />} label={drivingTag} variant={directionsMode === "driving" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("driving")}></Chip>
+                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsWalkIcon fontSize="small" />} label={walkingTag} variant={directionsMode === "walking" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("walking")}></Chip>
+                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsBikeIcon fontSize="small" />} label={cyclingTag} variant={directionsMode === "cycling" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("cycling")}></Chip>
                     
 
                     <Divider  sx={{ mb: 1, mt:1}} />
 
                     <Typography style={{marginLeft:"5px", marginTop:"0px"}}>{filterLanguage}</Typography>
 
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<ApartmentIcon fontSize="small" />} variant={architecture ? "filled" : "outlined"} label={architectureTag} onClick={() => handleClickArchitecture()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<AlignVerticalBottomIcon fontSize="small" />} variant={culture ? "filled" : "outlined"} label={culturalTag} onClick={() => handleClickCulture()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<ChurchIcon fontSize="small" />} variant={churches ? "filled" : "outlined"} label={churchesTag} onClick={() => handleClickChurch()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<HistoryEduIcon fontSize="small" />} variant={historical ? "filled" : "outlined"} label={historicalTag} onClick={() => handleClickHistorical()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<LandscapeIcon fontSize="small" />} variant={natural ? "filled" : "outlined"} label={naturalTag} onClick={() => handleClickNatural()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<PeopleIcon fontSize="small" />} variant={religion ? "filled" : "outlined"} label={religionTag} onClick={() => handleClickReligion()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<EmojiPeopleIcon fontSize="small" />} variant={touristFacilities ? "filled" : "outlined"} label={touristTag} onClick={() => handleClickTouristFacilities()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<MuseumIcon fontSize="small" />} variant={museums ? "filled" : "outlined"} label={museumsTag} onClick={() => handleClickMuseums()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<AccountBalanceIcon fontSize="small" />} variant={palaces ? "filled" : "outlined"} label={palacesTag} onClick={() => handleClickPalaces()} />
-                    <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<LocalMallIcon fontSize="small" />} variant={malls ? "filled" : "outlined"} label={mallsTag} onClick={() => handleClickMalls()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<ApartmentIcon fontSize="small" />} variant={architecture ? "filled" : "outlined"} label={architectureTag} onClick={() => handleClickArchitecture()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<AlignVerticalBottomIcon fontSize="small" />} variant={culture ? "filled" : "outlined"} label={culturalTag} onClick={() => handleClickCulture()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<ChurchIcon fontSize="small" />} variant={churches ? "filled" : "outlined"} label={churchesTag} onClick={() => handleClickChurch()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<HistoryEduIcon fontSize="small" />} variant={historical ? "filled" : "outlined"} label={historicalTag} onClick={() => handleClickHistorical()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<LandscapeIcon fontSize="small" />} variant={natural ? "filled" : "outlined"} label={naturalTag} onClick={() => handleClickNatural()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<PeopleIcon fontSize="small" />} variant={religion ? "filled" : "outlined"} label={religionTag} onClick={() => handleClickReligion()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<EmojiPeopleIcon fontSize="small" />} variant={touristFacilities ? "filled" : "outlined"} label={touristTag} onClick={() => handleClickTouristFacilities()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<MuseumIcon fontSize="small" />} variant={museums ? "filled" : "outlined"} label={museumsTag} onClick={() => handleClickMuseums()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<AccountBalanceIcon fontSize="small" />} variant={palaces ? "filled" : "outlined"} label={palacesTag} onClick={() => handleClickPalaces()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<LocalMallIcon fontSize="small" />} variant={malls ? "filled" : "outlined"} label={mallsTag} onClick={() => handleClickMalls()} />
 
                 </div>
                 </Fade>

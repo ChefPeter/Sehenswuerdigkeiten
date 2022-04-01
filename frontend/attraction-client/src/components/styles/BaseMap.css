@@ -28,3 +28,42 @@
 .mapboxgl-ctrl-geolocate{
     display: none !important;
 }
+
+
+
+#routeSwipeableDrawerDiv{
+    width: 40vw;
+    max-width: 40vw;
+    min-width: 200px;
+    margin: 5px 5px 5px 5px;
+}
+@media only screen and (max-width: 1500px) {
+    #routeSwipeableDrawerDiv {
+      width:42vw;
+      max-width: 42vw;
+    }
+}
+@media only screen and (max-width: 1200px) {
+    #routeSwipeableDrawerDiv {
+      width:48vw;
+      max-width: 48vw;
+    }
+}
+@media only screen and (max-width: 1000px) {
+    #routeSwipeableDrawerDiv {
+      width:56vw;
+      max-width: 56vw;
+    }
+}
+@media only screen and (max-width: 800px) {
+    #routeSwipeableDrawerDiv {
+      width:70vw;
+      max-width: 70vw;
+    }
+}
+@media only screen and (max-width: 600px) {
+    #routeSwipeableDrawerDiv {
+      width:80vw;
+      max-width: 80vw;
+    }
+}

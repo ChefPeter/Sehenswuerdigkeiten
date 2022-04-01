@@ -1,19 +1,16 @@
-import { Button, Typography, Drawer } from "@mui/material";
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DirectionsIcon from '@mui/icons-material/Directions';
+import GpsFixedIcon from '@mui/icons-material/GpsFixed';
+import SendIcon from '@mui/icons-material/Send';
+import { Button, Card, Box, Container, Drawer, SwipeableDrawer, OutlinedInput, InputAdornment, Typography, Divider } from "@mui/material";
 import mapboxgl from "mapbox-gl";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import fetchFakeData from "./fetchFakeData";
+import MapSearch from "./MapSearch";
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
-import SendIcon from '@mui/icons-material/Send';
-import DeleteIcon from '@mui/icons-material/Delete';
-import RouteComponent from "./RouteComponent";
-import MapSearch from "./MapSearch";
-import DirectionsIcon from '@mui/icons-material/Directions';
-import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-import { height } from "@mui/system";
-
+import SaveIcon from '@mui/icons-material/Save';
+import RouteIcon from '@mui/icons-material/Route';
 
 const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
@@ -130,9 +127,15 @@ function BaseMap (props) {
     const [addButtonTag, setAddButtonTag] = useState("ADD TO ROUTE");
     const [showAddButton, setShowAddButton] = useState(true);
     const [removeButtonTag, setRemoveButtonTag] = useState("REMOVE FROM ROUTE");
-    const [searchHereTag, setSearchHereTag] = useState("SEARCH HERE?")
+    const [searchHereTag, setSearchHereTag] = useState("SEARCH HERE?");
+    const [openRouteDrawer, setOpenRouteDrawer] = useState(false);
+
+    useEffect(() => {
+        console.log("rerender")
+    })
 
     useEffect(() =>{
+        
         console.log("hallo")
         console.log(props.l1)
         if(props.l1 === "de"){
@@ -167,7 +170,6 @@ function BaseMap (props) {
     const [obj, setObj] = useState({properties: {name: 'test'}});
     const [markerCoords, setMarkerCoords] = useState([]);
     const [userEnabledLocation, setUserEnabledLocation] = useState(false);
-    
 
     const Popup2 = ({ feature2 }) => {
         const { } = feature2;
@@ -403,12 +405,9 @@ useEffect(() => {
             <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
             <MapSearch l1={props.l1}></MapSearch>
             
-            <div  id="test" style={{position: "fixed",top: "100px", left:"calc(100vw - 75px)"}}>
-            <Button variant="filled" style={{color:"white"}}>{showAddButton ? "JA" : "NEIN"}</Button>
-         </div>
             <div  id="test" style={{position: "fixed",top: "calc(100% - 150px)", left:"calc(100vw - 75px)"}}>
                
-                <Button style={{width:"60px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled"><DirectionsIcon fontSize="large" style={{color:"#2979ff"}} /></Button>
+                <Button style={{width:"60px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => setOpenRouteDrawer(!openRouteDrawer)}><DirectionsIcon fontSize="large" style={{color:"#2979ff"}} /></Button>
                 <Button style={{width:"60px",marginTop:"15px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled"  onClick={() => locationButtonClick()}><GpsFixedIcon  style={{color:"#2979ff"}} fontSize="large" /></Button>
             </div>
 
@@ -430,8 +429,47 @@ useEffect(() => {
                         </div>
                         </div>
                     </div>
-                </Drawer>
-            
+            </Drawer>
+
+            <SwipeableDrawer 
+                anchor='right'
+                transitionDuration	= {280}
+               
+                open={openRouteDrawer}
+                onClose={() => setOpenRouteDrawer(!openRouteDrawer)}>
+                    
+                    <div id="routeSwipeableDrawerDiv" >
+                        <Card  sx={{mt:1.5, ml:1, mr:1}} >
+                        <OutlinedInput
+                            id="outlined-adornment-weight"
+                            fullWidth
+                            placeholder={"Route name"}
+                            onChange={(e) => console.log(e.value)}
+                            endAdornment={<Button><SaveIcon/></Button>}
+                           
+                            
+                            inputProps={{
+                            'aria-label': 'weight',}}/>
+                        </Card>
+                        
+
+                        <Box  sx={{mt:2, ml:1, mr:1}}>
+                            <Button variant="contained" sx={{minHeight: 50}} fullWidth><RouteIcon />Calculate best route</Button>
+                        </Box>
+
+                        <Card sx={{mt:3, mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={"6"}><Typography variant='h5' fontWeight={500} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>Your Route - Step by Step</Typography></Card>
+                        <Card sx={{ mb:3, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={"4"}><Typography variant='h6' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>25 Minutes, 20km by Car, 20 POIs</Typography></Card>
+                        <div style={{maxWidth:"100%", wordBreak:"break-all"}}>
+                            {testRoute.map((item, i) => <Card sx={{mt:1.5, ml:1, mr:1, pt:0.65, pb:0.65}} elevation={"3"} style={{display:"flex", justifyContent:"space-between", borderRadius:"15px"}}><Typography sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}> {i+1}. {(item["properties"]["name"])}</Typography>  <Button style={{minHeight: "42px", minWidth:"50px", maxHeight:"42px", margin:"auto", marginLeft:"15px", marginRight:"10px",  borderRadius:"15px"}} color="error" variant="contained"><DeleteIcon /></Button></Card>)}                            
+                        </div>
+
+                        <Box  sx={{mt:2, ml:1, mr:1}}>
+                            <Button color="error" variant="contained"><DeleteIcon />Delete the hole Route</Button>
+                        </Box>
+
+                    </div>
+
+            </SwipeableDrawer>
         </div>
     );
 };

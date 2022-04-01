@@ -21,3 +21,10 @@
 .mapboxgl-popup-close-button{
     display: none !important;
 }
+
+.mapboxgl-ctrl-icon{
+    display: none !important;
+}
+.mapboxgl-ctrl-geolocate{
+    display: none !important;
+}

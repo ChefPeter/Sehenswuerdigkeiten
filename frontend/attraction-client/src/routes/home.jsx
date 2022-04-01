@@ -32,12 +32,8 @@ function Home(props) {
         <Card id="container" style={{borderRadius:"0px"}}>
           <BaseMap l1={props.l1} />
           
-          <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
+          <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2} />
                                                                                               
-          
-          <Button style={{marginTop: "65.5%", marginLeft:"92.8%", backgroundColor:"red"}} variant="filled" id="test" onClick={() => postRoute()}><DirectionsIcon fontSize="large" /></Button>
-
-          
           <Button style={{marginTop: "100px"}} id="test" onClick={() => postRoute()}>Enter</Button>
 
         </Card>

@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material";
+import { Button, Typography, Drawer } from "@mui/material";
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import mapboxgl from "mapbox-gl";
 import React, { useEffect, useRef, useState } from "react";
@@ -10,10 +10,15 @@ import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RouteComponent from "./RouteComponent";
 import MapSearch from "./MapSearch";
+import DirectionsIcon from '@mui/icons-material/Directions';
+import GpsFixedIcon from '@mui/icons-material/GpsFixed';
+import { height } from "@mui/system";
 
-    const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
+
+const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
     let map;
+    let marker;
     let testRoute = [];
     let radiusForPointerSearch = 1;
     let searchByMarker = false;
@@ -25,6 +30,7 @@ import MapSearch from "./MapSearch";
     let timerID;
     let globalPopup = "", globalPopup2 = "";
     let geolocate;
+    let lastPosition;
 
     export function setFilter(newFilter){
         filter = newFilter;
@@ -48,22 +54,28 @@ import MapSearch from "./MapSearch";
         return answer;
     }
 
-    function pointIsInRoute(object)
+    function pointIsInRoute(id)
     {
-        let returnBool = false;
-        if(testRoute.filter(x => x.properties.id === object.properties.id).length === 0)
-            returnBool = true;
-        
-        return returnBool;
+        for(let i = 0; i<testRoute.length; i++){
+            if(id===testRoute[i]["properties"]["id"])
+                return true;
+        }
+        return false;
     }
 
     function removePointFromRoute(id)
     {
-        let index = testRoute.map(x => { return x.Id }).indexOf(id);
-        if(!index)
-            testRoute.splice(index, 1);
-
-        console.log(testRoute.length);
+        let index = null;
+        for(let i = 0; i<testRoute.length; i++){
+            if(id===testRoute[i]["properties"]["id"]){
+                index=i;
+                break;
+            }
+        }
+        if(index !== null)
+            testRoute.splice(index,1)
+            
+        console.log(testRoute);
     }
 
     export async function postRoute()
@@ -116,23 +128,29 @@ function BaseMap (props) {
 
 
     const [addButtonTag, setAddButtonTag] = useState("ADD TO ROUTE");
-    const [addButtonClicked, setAddButtonClicked] = useState(false);
+    const [showAddButton, setShowAddButton] = useState(true);
     const [removeButtonTag, setRemoveButtonTag] = useState("REMOVE FROM ROUTE");
+    const [searchHereTag, setSearchHereTag] = useState("SEARCH HERE?")
 
     useEffect(() =>{
+        console.log("hallo")
         console.log(props.l1)
         if(props.l1 === "de"){
             setAddButtonTag("ZUR ROUTE HINZUFÜGEN");
             setRemoveButtonTag("VON ROUTE LÖSCHEN");
+            setSearchHereTag("HIER SUCHEN?");
         }else if(props.l1 === "it"){
             setAddButtonTag("AGGIUNGI AL itinerario");
             setRemoveButtonTag("RIMUOVERE DAl itinerario");
+            setSearchHereTag("CERCARE QUI?");
         }else{
             setAddButtonTag("ADD TO ROUTE");
             setRemoveButtonTag("REMOVE FROM ROUTE");
+            setSearchHereTag("SEARCH HERE?")
         }
 
     },[props.l1]);
+
     //mapbox://styles/mapbox/satellite-v9
     //mapbox://styles/mapbox/light-v10
     let theme = "mapbox://styles/mapbox/navigation-night-v1";
@@ -149,7 +167,7 @@ function BaseMap (props) {
     const [obj, setObj] = useState({properties: {name: 'test'}});
     const [markerCoords, setMarkerCoords] = useState([]);
     const [userEnabledLocation, setUserEnabledLocation] = useState(false);
-
+    
 
     const Popup2 = ({ feature2 }) => {
         const { } = feature2;
@@ -160,9 +178,10 @@ function BaseMap (props) {
     };
 
 useEffect(() => {
-
+        
         //Brixen
         let coordinates = [11.65598, 46.71503];
+        lastCoords = coordinates;
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 coordinates = [position.coords.longitude, position.coords.latitude];
@@ -178,7 +197,7 @@ useEffect(() => {
             zoom: 12,
         });
 
-        map.addControl(new mapboxgl.ScaleControl({ position: 'top-right' }));    
+        map.addControl(new mapboxgl.ScaleControl({ position: 'bottom-left' }));    
     
         geolocate = new mapboxgl.GeolocateControl({
             positionOptions: {
@@ -191,14 +210,15 @@ useEffect(() => {
 
         geolocate.on('geolocate', function(e) {
             var lon = e.coords.longitude;
-            var lat = e.coords.latitude
-           // var position = [lon, lat];
+            var lat = e.coords.latitude;
+            lastCoords = [lon, lat];
             console.log("position: " +  e.coords.longitude);
         });
 
         map.addControl(geolocate);
-
-
+        
+       
+        lastCoords = coordinates;
         map.on("load", () => {
             map.flyTo({
                 center: coordinates,
@@ -299,6 +319,7 @@ useEffect(() => {
             if (e.features.length) {
                 setObj(e.features[0]);
                 console.log(e.features[0]);
+                setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
                 setOpen(true);
             }
         });
@@ -308,22 +329,21 @@ useEffect(() => {
             console.log(e);
 
             const feature2 = e;
-            let array = [e.lngLat.lng, e.lngLat.lat]
+            let coords = [e.lngLat.lng, e.lngLat.lat]
 
             let popupNode  = document.createElement("div");
             ReactDOM.render(<Popup2 feature2={feature2} />, popupNode);
-            ReactDOM.render(<div><Button variant="contained" onClick={() => handleSearchByMarkerButton(array, radiusForPointerSearch)} >Search here?</Button></div>, popupNode);
+            ReactDOM.render(<div><Button variant="contained" onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch)} >Search here?</Button></div>, popupNode);
 
             // set popup on map
             popUpRef.current
-                .setLngLat(array)
+                .setLngLat(coords)
                 .setDOMContent(popupNode)
                 .addTo(map);
 
         });
 
-
-        let marker = new mapboxgl.Marker();
+        marker = new mapboxgl.Marker();
 
         function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch) {
             if(globalPopup2 !== ""){
@@ -348,36 +368,69 @@ useEffect(() => {
         }
         map.doubleClickZoom.disable()
         //map.on('dblclick', add_marker);
-       
+    
+
 },[]);
 
+    function locationButtonClick(){
+        
+        geolocate._geolocateButton.click();
 
+    }
+
+    function removePointFromRouteButtonClicked(obj){
+        removePointFromRoute(obj["properties"]["id"]);
+        setShowAddButton(true);
+    }
+
+    function addPointToRouteButtonClicked(obj){
+        //first check if object isnt already in the route!
+        for(let i = 0; i<testRoute.length; i++){
+            if(obj["properties"]["id"]===testRoute[i]["properties"]["id"])
+                return;
+        }
+        testRoute.push(obj);
+        setShowAddButton(false);
+        console.log(testRoute)
+    }
+
+  
     return (
     
         <div>
-        
+            <div id="test" style={{marginBottom:"100px"}}>opkkp</div>
             <div id="mapContainer" className="map"></div>
             <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
-            <MapSearch l1={props.l1} ></MapSearch>
+            <MapSearch l1={props.l1}></MapSearch>
+            
+            <div  id="test" style={{position: "fixed",top: "100px", left:"calc(100vw - 75px)"}}>
+            <Button variant="filled" style={{color:"white"}}>{showAddButton ? "JA" : "NEIN"}</Button>
+         </div>
+            <div  id="test" style={{position: "fixed",top: "calc(100% - 150px)", left:"calc(100vw - 75px)"}}>
+               
+                <Button style={{width:"60px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled"><DirectionsIcon fontSize="large" style={{color:"#2979ff"}} /></Button>
+                <Button style={{width:"60px",marginTop:"15px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled"  onClick={() => locationButtonClick()}><GpsFixedIcon  style={{color:"#2979ff"}} fontSize="large" /></Button>
+            </div>
+
           </div>
-            <SwipeableDrawer 
+            <Drawer 
                 anchor='bottom'
                 transitionDuration	= {280}
-
+                
                 open={open}
                 onClose={() => setOpen(!open)}>
                     <div style={{maxHeight:"60vh", minHeight:"100px"}}>
                         <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                         <div>
-                            <div>
-                                {pointIsInRoute(obj) ? <Button variant="contained" endIcon={<SendIcon />} style={{color: "black", marginBottom:"20px"}} onClick={() => testRoute.push(obj)}>{addButtonTag}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{color: "black"}} onClick={() => removePointFromRoute(obj.properties.Id)}>{removeButtonTag}</Button>}
-                                <h2 id="nameField" style={{color:'white', marginBottom:"20px"}}>{obj.properties.name}</h2>
+                            <div> 
+                                {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{addButtonTag}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{removeButtonTag}</Button>}
+                                <h2 id="nameField" style={{marginBottom:"10px"}}>{obj.properties.name}</h2>
                             </div>
                             <div><img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img></div>
                         </div>
                         </div>
                     </div>
-                </SwipeableDrawer>
+                </Drawer>
             
         </div>
     );

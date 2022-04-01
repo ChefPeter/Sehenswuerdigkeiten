@@ -15,7 +15,7 @@ import LocalMallIcon from '@mui/icons-material/LocalMall';
 import MuseumIcon from '@mui/icons-material/Museum';
 import PeopleIcon from '@mui/icons-material/People';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
-import { Autocomplete, Button, Chip, CircularProgress, Container, Divider, Fade, Paper, Slider, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Button, Chip, CircularProgress, Container, Divider, Fade, Paper, Slider, Stack, TextField, Typography, Card } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { changedFilter, flyToLocation, setDirectionGlobally, setFilter, setRadiusForPointerSearch } from "./BaseMap";
 import "./styles/mapsearch.css";
@@ -136,7 +136,6 @@ function MapSearch (props) {
         if(language !== "de" && language !== "it" && language!== "en")
             language = "en"
         
-
 
         if(event.target.value.length > 1){
             setShowLoading(true)
@@ -279,45 +278,52 @@ function MapSearch (props) {
                     label={searchText}
                     InputProps={{
                     ...params.InputProps,
-                    endAdornment: <Container id="btnContainerSearchbar" style={{display:"flex", marginRight:"1.2vw", maxWidth:"130px"}}>  <Button onClick={() => explore(locationInput)} > {showLoading ? <CircularProgress size={25} /> :null} {!showLoading ? <TravelExploreIcon/> : null} </Button>  <Divider orientation="vertical" flexItem /> <Button onClick={() => getGPSLocation()}><GpsFixedIcon/></Button></Container> 
+                    endAdornment: <Container id="btnContainerSearchbar" style={{display:"flex", marginRight:"1.2vw", maxWidth:"130px"}}>  <Button onClick={() => explore(locationInput)} > {showLoading ? <CircularProgress size={25} /> :null} {!showLoading ? <TravelExploreIcon/> : null} </Button>  <Divider orientation="vertical" flexItem /> <Button onClick={() => setShowDropdown(!showDropdown)}> {showDropdown ? <ArrowDropUpIcon /> : <ArrowDropDownIcon /> }</Button></Container> 
                     }}
                 />
                 )}
             />
 
-        <Stack spacing={0.5} direction="row" sx={{ mb: 1 }} alignItems="center"><Typography
-                marginTop={0.7}
-                fontSize="small"
-                marginLeft={"10px"}
-                minWidth={searchRadiusTag == "Raggio di ricerca: " ? "21ch" : "18.5ch"}
-           
-                marginBottom={0.7}
-                >{searchRadiusTag} {radiusValue} km</Typography>
-                
-
-                <Slider 
-                    step={1}
-                    min={0.5}
-                    max={100}
-                    valueLabelDisplay="auto"
-                    onChangeCommitted={sliderChange}
-                    size="small">
-                </Slider>
-
-               <Button onClick={() => setShowDropdown(!showDropdown)}> {showDropdown ? <ArrowDropUpIcon /> : <ArrowDropDownIcon /> }</Button>
-
-            </Stack>
+        
             
             
             { showDropdown ? 
-                <Fade in={showDropdown} timeout={200}>
+                <Fade in={showDropdown} timeout={222}>
+
                   <div style={{paddingLeft:"10px", paddingBottom:"10px", paddingRight:"10px"}}>
+                   
+                  <Stack direction="row" sx={{ mb: 0, mt:0.7 }} alignItems="center"><Typography
+                                    marginTop={1.2}
+                                    
+                                    marginLeft={"5px"}
+                                    minWidth={searchRadiusTag == "Raggio di ricerca: " ? "21ch" : "18.5ch"}
+                            
+                                    marginBottom={0.7}
+                                    >{searchRadiusTag} {radiusValue} km</Typography>
+                                    
+                                    <Slider 
+                                        style={{marginRight:"12px"}}
+                                        step={1}
+                                        min={0.5}
+                                        max={100}
+                                        valueLabelDisplay="auto"
+                                        onChangeCommitted={sliderChange}
+                                        size="small">
+                                    </Slider>
+
+                    </Stack>
                     
+
+                    <Divider  sx={{ mb: 1, mt:1}} />
+                   
                     <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<DirectionsCarFilledIcon fontSize="small" />} label={drivingTag} variant={directionsMode === "driving" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("driving")}></Chip>
                     <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<DirectionsWalkIcon fontSize="small" />} label={walkingTag} variant={directionsMode === "walking" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("walking")}></Chip>
                     <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<DirectionsBikeIcon fontSize="small" />} label={cyclingTag} variant={directionsMode === "cycling" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("cycling")}></Chip>
+                    
 
-                    <Typography style={{marginLeft:"5px", marginTop:"7px"}}>{filterLanguage}</Typography>
+                    <Divider  sx={{ mb: 1, mt:1}} />
+
+                    <Typography style={{marginLeft:"5px", marginTop:"0px"}}>{filterLanguage}</Typography>
 
                     <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<ApartmentIcon fontSize="small" />} variant={architecture ? "filled" : "outlined"} label={architectureTag} onClick={() => handleClickArchitecture()} />
                     <Chip style={{margin: "2.5px 2.5px 2.5px 2.5px", padding:"1.5px 1px 1px 1.5px"}} icon={<AlignVerticalBottomIcon fontSize="small" />} variant={culture ? "filled" : "outlined"} label={culturalTag} onClick={() => handleClickCulture()} />

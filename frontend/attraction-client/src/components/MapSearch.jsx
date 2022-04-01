@@ -134,7 +134,7 @@ function MapSearch (props) {
         let jsonRes = "";
         let language = props.l1;
         if(language !== "de" && language !== "it" && language!== "en")
-            language = "en"
+            language = "en";
         
 
         if(event.target.value.length > 1){
@@ -188,7 +188,6 @@ function MapSearch (props) {
     };
 
 
-
     function handleInputChange(event, value) { //on autocomplete click
     
         setSelectedCityCoords([]);
@@ -205,8 +204,10 @@ function MapSearch (props) {
 
     }
 
-    async function explore(locationName, coords = null){
 
+
+    async function explore(locationName, coords = null){
+   
         let language = props.l1;
         if(language !== "de" && language !== "it" && language!== "en")
             language = "en";
@@ -219,15 +220,14 @@ function MapSearch (props) {
             });
 
             jsonRes = await result.json();
-            console.log(jsonRes)
+          
             try{
-            coords = jsonRes["features"][0]["center"];
+                coords = jsonRes["features"][0]["center"];
             } catch (e){}
             
         }
 
         setLocations([])
-        console.log(coords)
 
         if(coords != null){
             setSelectedCityCoords(coords);
@@ -236,20 +236,7 @@ function MapSearch (props) {
         
     }
 
-    function getGPSLocation(){
-        
-        navigator.geolocation.getCurrentPosition(function(position) {
-            console.log("Latitude is :", position.coords.latitude);
-            console.log("Longitude is :", position.coords.longitude);
-            setSelectedCityCoords([position.coords.longitude, position.coords.latitude]);
-            flyToLocation([position.coords.longitude, position.coords.latitude], radiusValue, true)
-          });
-       
-    }
-
     function sliderChange(event, value){
-        console.log("halo")
-        console.log(selectedCityCoords)
         setRadiusValue(value);
         setRadiusForPointerSearch(value)
         if(selectedCityCoords.length !== 0){
@@ -273,6 +260,11 @@ function MapSearch (props) {
                 options={locations.map((option) => option.name)}
                 renderInput={(params) => (
                 <TextField
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          explore(locationInput);
+                          e.preventDefault();
+                    }}}
                     onChange={handleSearchFriendInput}
                     {...params}
                     label={searchText}
@@ -285,8 +277,6 @@ function MapSearch (props) {
             />
 
         
-            
-            
             { showDropdown ? 
                 <Fade in={showDropdown} timeout={222}>
 

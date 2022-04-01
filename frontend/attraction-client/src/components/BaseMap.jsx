@@ -127,6 +127,8 @@ function BaseMap (props) {
         
     const [obj, setObj] = useState({properties: {name: 'test'}});
     const [markerCoords, setMarkerCoords] = useState([]);
+    const [userEnabledLocation, setUserEnabledLocation] = useState(false);
+
 
     const Popup2 = ({ feature2 }) => {
         const { } = feature2;
@@ -166,6 +168,14 @@ useEffect(() => {
             showUserHeading: true
         });
 
+        geolocate.on('geolocate', function(e) {
+            var lon = e.coords.longitude;
+            var lat = e.coords.latitude
+           // var position = [lon, lat];
+            console.log("position: " +  e.coords.longitude);
+            
+          
+        });
 
         map.addControl(geolocate, "bottom-right");
 
@@ -457,7 +467,6 @@ useEffect(() => {
         //(otherwise there would betoo many requests to the api if someone spams filter buttons)
         timerID = setTimeout(async () => {
 
-            let init=true;
             if(!coords){
                 if(lastCoords.length === 0)
                     return;

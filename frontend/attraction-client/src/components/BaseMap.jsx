@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import mapboxgl from "mapbox-gl";
 import React, { useEffect, useRef, useState } from "react";
@@ -8,6 +8,8 @@ import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
+import RouteComponent from "./RouteComponent";
+import MapSearch from "./MapSearch";
 
     const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
@@ -22,6 +24,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
     let currentGlobalResults = [];
     let timerID;
     let globalPopup = "", globalPopup2 = "";
+    let geolocate;
 
     export function setFilter(newFilter){
         filter = newFilter;
@@ -113,14 +116,20 @@ function BaseMap (props) {
 
 
     const [addButtonTag, setAddButtonTag] = useState("ADD TO ROUTE");
+    const [addButtonClicked, setAddButtonClicked] = useState(false);
+    const [removeButtonTag, setRemoveButtonTag] = useState("REMOVE FROM ROUTE");
+
     useEffect(() =>{
         console.log(props.l1)
         if(props.l1 === "de"){
             setAddButtonTag("ZUR ROUTE HINZUFÜGEN");
+            setRemoveButtonTag("VON ROUTE LÖSCHEN");
         }else if(props.l1 === "it"){
-            setAddButtonTag("AGGIUNGI AL PERCORSO");
+            setAddButtonTag("AGGIUNGI AL itinerario");
+            setRemoveButtonTag("RIMUOVERE DAl itinerario");
         }else{
             setAddButtonTag("ADD TO ROUTE");
+            setRemoveButtonTag("REMOVE FROM ROUTE");
         }
 
     },[props.l1]);
@@ -169,9 +178,9 @@ useEffect(() => {
             zoom: 12,
         });
 
-        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-        map.addControl(new mapboxgl.ScaleControl({ position: 'bottom-right' }));
-        const geolocate = new mapboxgl.GeolocateControl({
+        map.addControl(new mapboxgl.ScaleControl({ position: 'top-right' }));    
+    
+        geolocate = new mapboxgl.GeolocateControl({
             positionOptions: {
                 enableHighAccuracy: true
             },
@@ -185,11 +194,9 @@ useEffect(() => {
             var lat = e.coords.latitude
            // var position = [lon, lat];
             console.log("position: " +  e.coords.longitude);
-            
-          
         });
 
-        map.addControl(geolocate, "bottom-right");
+        map.addControl(geolocate);
 
 
         map.on("load", () => {
@@ -350,23 +357,23 @@ useEffect(() => {
         <div>
         
             <div id="mapContainer" className="map"></div>
-
+            <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
+            <MapSearch l1={props.l1} ></MapSearch>
+          </div>
             <SwipeableDrawer 
                 anchor='bottom'
+                transitionDuration	= {280}
+
                 open={open}
-                onClose={() => setOpen(!open)}
-                onOpen={() =>  console.log()}>
+                onClose={() => setOpen(!open)}>
                     <div style={{maxHeight:"60vh", minHeight:"100px"}}>
                         <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                         <div>
                             <div>
-                                {pointIsInRoute(obj) ? <Button variant="contained" endIcon={<SendIcon />} style={{color: "black", marginBottom:"20px"}} onClick={() => testRoute.push(obj)}>{addButtonTag}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{color: "black"}} onClick={() => removePointFromRoute(obj.properties.Id)}>Remove</Button>}
+                                {pointIsInRoute(obj) ? <Button variant="contained" endIcon={<SendIcon />} style={{color: "black", marginBottom:"20px"}} onClick={() => testRoute.push(obj)}>{addButtonTag}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{color: "black"}} onClick={() => removePointFromRoute(obj.properties.Id)}>{removeButtonTag}</Button>}
                                 <h2 id="nameField" style={{color:'white', marginBottom:"20px"}}>{obj.properties.name}</h2>
                             </div>
                             <div><img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img></div>
-                            <div>
-                                <h3 style={{marginBottom:"20px"}}>Hallo hier kommen Infos hin</h3>
-                            </div>
                         </div>
                         </div>
                     </div>
@@ -393,6 +400,7 @@ useEffect(() => {
         .then(res => data = res);
 
         return {type: "FeatureCollection",features: data,};
+
     }
 
     export async function flyToLocation (coords, radius, newCoordinates = false){

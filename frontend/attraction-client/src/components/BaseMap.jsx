@@ -6,6 +6,8 @@ import ReactDOM from "react-dom";
 import fetchFakeData from "./fetchFakeData";
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
+import SendIcon from '@mui/icons-material/Send';
+import DeleteIcon from '@mui/icons-material/Delete';
 
     const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
@@ -43,33 +45,43 @@ import "./styles/BaseMap.css";
         return answer;
     }
 
-    function addToRoute(object)
+    function pointIsInRoute(object)
     {
+        let returnBool = false;
         if(testRoute.filter(x => x.properties.id === object.properties.id).length === 0)
-            testRoute.push(object);
+            returnBool = true;
+        
+        return returnBool;
+    }
+
+    function removePointFromRoute(id)
+    {
+        let index = testRoute.map(x => { return x.Id }).indexOf(id);
+        if(!index)
+            testRoute.splice(index, 1);
+
         console.log(testRoute.length);
     }
 
     export async function postRoute()
     {
         let formData = new FormData();
-        let coords = [];
-        let out;
+        let route;
     
         formData.append('points', JSON.stringify(testRoute));
-        formData.append('vehicle', 'driving');
-    
+        formData.append('vehicle', directionsMode);
         await fetch('http://localhost:5000/route', {
             method: 'post',
             body: formData,
             credentials: 'include',
         }).then(res => res.json())
-            .then(res => out = res);
+            .then(res => route = res);
         if (map.getSource('route1')) {
             map.removeLayer("layer1");
             map.removeSource('route1');
         }
-
+        
+        console.log(" duration: " + Math.round(route.duration / 60 * 100) / 100 + " min distance: " + Math.round(route.distance / 1000 * 100) / 100 + " km");
         map.addSource('route1', {
             'type': 'geojson',
             'data': {
@@ -77,7 +89,7 @@ import "./styles/BaseMap.css";
                 'properties': {},
                 'geometry': {
                     'type': 'LineString',
-                    'coordinates': out
+                    'coordinates': route.coords
                 }
             }
         });
@@ -267,14 +279,6 @@ useEffect(() => {
                 }
             }
         });
-        
-        async function getDetail(id) {
-            let result = await fetch('https://api.opentripmap.com/0.1/en/places/xid/' + id + '?apikey=5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752');
-            let answer = null;
-            if (result.ok)
-                answer = await result.json();
-            return answer;
-        }
 
 
         // reset cursor to default when user is no longer hovering over a clickable feature
@@ -301,7 +305,7 @@ useEffect(() => {
 
             let popupNode  = document.createElement("div");
             ReactDOM.render(<Popup2 feature2={feature2} />, popupNode);
-            ReactDOM.render(<div><Button onClick={() => handleSearchByMarkerButton(array, radiusForPointerSearch)} >Search here?</Button></div>, popupNode);
+            ReactDOM.render(<div><Button variant="contained" onClick={() => handleSearchByMarkerButton(array, radiusForPointerSearch)} >Search here?</Button></div>, popupNode);
 
             // set popup on map
             popUpRef.current
@@ -356,7 +360,7 @@ useEffect(() => {
                         <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                         <div>
                             <div>
-                                <Button variant="contained" style={{color: "black", marginBottom:"20px"}} onClick={() => addToRoute(obj)}>{addButtonTag}</Button>
+                                {pointIsInRoute(obj) ? <Button variant="contained" endIcon={<SendIcon />} style={{color: "black", marginBottom:"20px"}} onClick={() => testRoute.push(obj)}>{addButtonTag}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{color: "black"}} onClick={() => removePointFromRoute(obj.properties.Id)}>Remove</Button>}
                                 <h2 id="nameField" style={{color:'white', marginBottom:"20px"}}>{obj.properties.name}</h2>
                             </div>
                             <div><img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img></div>

@@ -46,9 +46,11 @@ async function getBestRoute(request, res) {
     // Adjazenzmatrix aufbauen
     const p = JSON.parse(request.body.points);
     const l = p.length;
-    let out = [];
-    
-    //console.log(p);
+    let route = {
+        "coords": [],
+        "distance": 0,
+        "duration": 0,
+    };
 
     const matrix = [...Array(l)].map(e => Array(l).fill(0));
     for (let i = 0; i < l; i++) {
@@ -58,16 +60,16 @@ async function getBestRoute(request, res) {
             matrix[x][i] = distance;
         }
     }
-    const reihenfolge = tsp(matrix);
     const coords = tsp(matrix).map(e => p[e].geometry.coordinates);
     for(let count = 1; count < coords.length; count++)
     {
       let rout = await getDataFromURL(getRouteURL(request.body.vehicle, `${coords[count - 1].join(",")};${coords[count].join(",")}`, "en"));
-      out = out.concat(rout.routes[0].geometry.coordinates);
+      route.coords = route.coords.concat(rout.routes[0].geometry.coordinates);
+      route.duration += rout.routes[0].duration;
+      route.distance += rout.routes[0].distance;
     }
-    //console.log(JSON.stringify(tsp(matrix).map(e => p[e])));
 
-    res.status(200).send(JSON.stringify(out));
+    res.status(200).send(JSON.stringify(route));
     //res.status(200).send(tsp(matrix).map(e => p[e]));
 
     // Gefährlich wegen ban auf mapbox -> 

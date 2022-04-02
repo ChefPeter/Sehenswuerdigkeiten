@@ -107,7 +107,12 @@ function Register(props) {
               
               <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-password-input" label={passwordTextfieldTag} type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
              
-              <TextField sx={{ marginBottom: 0.5 }} fullWidth id="filled-password-input" label={retypePasswordTextfieldTag} type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} />
+              <TextField sx={{ marginBottom: 0.5 }} fullWidth id="filled-password-input" label={retypePasswordTextfieldTag} type="password" autoComplete="current-password" variant="filled" onChange={getRetypePasswordValue} 
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    post(setErrorText, setShowErrorAlert, setShowInfoAlert)
+                    e.preventDefault();
+                }}}/>
 
             </div>
               

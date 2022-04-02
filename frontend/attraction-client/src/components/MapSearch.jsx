@@ -281,24 +281,25 @@ function MapSearch (props) {
 
                   <div style={{paddingLeft:"10px", paddingBottom:"10px", paddingRight:"10px"}}>
                    
-                  <Stack direction="row" sx={{ mb: 0, mt:0.7 }} alignItems="center"><Typography
-                                    marginTop={1.2}
-                                    
-                                    marginLeft={"5px"}
-                                    minWidth={searchRadiusTag == "Raggio di ricerca: " ? "21ch" : "18.5ch"}
-                            
-                                    marginBottom={0.7}
-                                    >{searchRadiusTag} {radiusValue} km</Typography>
-                                    
-                                    <Slider 
-                                        style={{marginRight:"12px"}}
-                                        step={1}
-                                        min={0.5}
-                                        max={100}
-                                        valueLabelDisplay="auto"
-                                        onChangeCommitted={sliderChange}
-                                        size="small">
-                                    </Slider>
+                  <Stack direction="row" sx={{ mb: 0, mt:0.7 }} alignItems="center">
+                      <Typography
+                        marginTop={1.2}
+                        
+                        marginLeft={"5px"}
+                        minWidth={searchRadiusTag == "Raggio di ricerca: " ? "21ch" : "18.5ch"}
+                
+                        marginBottom={0.7}
+                        >{searchRadiusTag} {radiusValue} km</Typography>
+                        
+                        <Slider 
+                            style={{marginRight:"12px"}}
+                            step={1}
+                            min={0.5}
+                            max={100}
+                            valueLabelDisplay="auto"
+                            onChangeCommitted={sliderChange}
+                            size="small">
+                        </Slider>
 
                     </Stack>
                     

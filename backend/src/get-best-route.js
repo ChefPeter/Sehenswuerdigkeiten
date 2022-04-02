@@ -147,15 +147,17 @@ function getDistance(p1, p2) {
 function getRouteURL(type, coords, language)
 {
     const API_KEY="pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
-    return `https://api.mapbox.com/directions/v5/mapbox/${type}/${(new URLSearchParams(coords).toString()).slice(0,-1)}?alternatives=true&geometries=geojson&language=${language}&overview=simplified&steps=true&access_token=${API_KEY}`;
+    return `https://api.mapbox.com/directions/v5/mapbox/${type}/${(new URLSearchParams(coords).toString()).slice(0,-1)}?alternatives=false&overview=full&geometries=geojson&language=${language}&steps=true&access_token=${API_KEY}`;
 }
 
 async function getDataFromURL(url)
 {
+    console.log(url)  
     let result = await fetch(url);
     let answer = null;
     if(result.ok)
-    answer = await result.json();
+        answer = await result.json();
+      
     return answer;
 }
 

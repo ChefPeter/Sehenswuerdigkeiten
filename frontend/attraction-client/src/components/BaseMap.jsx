@@ -8,13 +8,15 @@ import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import RouteIcon from '@mui/icons-material/Route';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
-import { Box, Button, Card, Chip, CircularProgress, Drawer, OutlinedInput, Typography } from "@mui/material";
+import { Box, Button, Card, Chip, CircularProgress, Drawer, OutlinedInput, Typography, Switch, Tooltip, FormControlLabel, Checkbox, Divider } from "@mui/material";
 import mapboxgl from "mapbox-gl";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import MapSearch from "./MapSearch";
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
+import SuccessSnackbar from './SuccessSnackbar';
+import Zoom from '@mui/material/Zoom';
 
 const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
@@ -51,12 +53,13 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
     }
 
 
-    export async function postRoute(data, directionMode, setDidCalculateRoute, setCurrentRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput)
+    export async function postRoute(data, directionMode, setDidCalculateRoute, setCurrentRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute)
     {
         //makes no sense
         if(data.length < 2)
             return;
         
+        setShowLoadingCircleRoute(true)
         let formData = new FormData();
         let route, sortedIDs;
     
@@ -75,8 +78,9 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
         setDidCalculateRoute(true);
         setCurrentNotSortedPointsRouteOutput(data);
         setCurrentRouteOutput(sortedIDs)
-        setCurrentDurationInMinutes(Math.round(route.duration / 60 * 100) / 100);
-        setCurrentKilometers(Math.round(route.distance / 1000 * 100) / 100)
+        setCurrentDurationInMinutes(Math.round(route.duration / 60));
+        setCurrentKilometers(Math.round(route.distance / 1000 * 10) / 10)
+    
         
         map.addSource('route1', {
             'type': 'geojson',
@@ -102,6 +106,7 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
                 'line-width': 5
             }
         });
+        setShowLoadingCircleRoute(false)
     }
 
 
@@ -117,9 +122,16 @@ function BaseMap (props) {
     const [currentDurationInMinutes, setCurrentDurationInMinutes] = useState("-1")
     const [currentKilometers, setCurrentKilometers] = useState("-1")
 
-    const [currentAddedPoints, setCurrentAddedPoints] = useState(testRoute);
+    const[disableHandleRandomLocationButton,setDisableHandleRandomLocationButton] = useState(false);
+    const[showLoadingCircleRoute, setShowLoadingCircleRoute] = useState(false)
+    const[showSuccessSnack, setShowSuccessSnack] = useState(false)
+
+    
     const [currentSortedPointsRouteOutput, setCurrentSortedPointsRouteOutput] = useState([]);
     const [currentNotSortedPointsRouteOutput, setCurrentNotSortedPointsRouteOutput] = useState([]);
+    const [currentAddedPoints, setCurrentAddedPoints] = useState([]);
+
+    const [currentRandomLocation, setCurrentRandomLocation] = useState(false);
 
     const[drivingTag, setDrivingTag] = useState("Driving");
     const[walkingTag, setWalkingTag] = useState("Walking");
@@ -134,8 +146,14 @@ function BaseMap (props) {
     const[routeNameTag, setRouteNameTag] = useState("Route name");
     const[calculateBestRouteButtonTag, setCalculateBestRouteButtonTag] = useState("CALCULATE BEST ROUTE");
 
+    console.log("...............")
+    console.log(currentAddedPoints)
+    console.log(testRoute)
+    console.log("...............")
+
 
     useEffect(() =>{
+        
 
         if(props.l1 === "de"){
             setAddButtonTag("ZUR ROUTE HINZUFÜGEN");
@@ -321,9 +339,12 @@ useEffect(() => {
 
                     // create popup node
                     setImage("");
-                    imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
-                    if(imageSrc != undefined)
+                    try{
+                        imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
+                        if(imageSrc != undefined)
                         setImage(imageSrc);
+                    }catch(e){}
+                    
                     setShowLoadingInsteadPicture(false);    
                     const popupNode = document.createElement("div");
 
@@ -407,8 +428,12 @@ useEffect(() => {
 
 },[]);
 
+
     function pointIsInRoute(id){
-        if (currentAddedPoints.some(item => item["properties"]["id"]===id)) 
+        console.log("----------")
+        console.log(testRoute)
+        console.log("----------")
+        if (testRoute.some(item => item["properties"]["id"]===id)) 
             return true;
         return false;
     }
@@ -425,9 +450,6 @@ useEffect(() => {
     }
     function removePointFromRoute(id)
     {
-        console.log("hello")
-
-  
        let index = null;
         for(let i = 0; i<testRoute.length; i++){
             if(id===testRoute[i]["properties"]["id"]){
@@ -468,11 +490,38 @@ useEffect(() => {
             map.removeLayer("layer1");
             map.removeSource('route1');
         }
+        console.log(testRoute)
+        console.log(currentAddedPoints)
     }
+
     function saveCurrentRouteToDatabase(){
 
         console.log("lol")
 
+    }
+
+    async function handleRandomLocationButton(){
+
+        setDisableHandleRandomLocationButton(true);
+        setOpenRouteDrawer(false);
+        const resultRandomLocation = await fetch("http://localhost:5000/get-random-location", {
+            method: "get",
+            credentials:"include"
+        })
+            
+        let randomLocation = (await resultRandomLocation.json());
+        console.log(randomLocation)
+        setCurrentRandomLocation(randomLocation[2]);
+        setShowSuccessSnack(true)
+        flyToLocation ([randomLocation[0], randomLocation[1]], 100, true);
+        setDisableHandleRandomLocationButton(false);
+
+    }
+
+    function handlePointListClick(obj){
+        console.log(obj)
+        setObj(obj);
+        setOpen(true);
     }
      
     const PointList = () => (
@@ -480,8 +529,8 @@ useEffect(() => {
             {currentAddedPoints.map((item,i) => {
                 return (
 
-                    <Card  sx={{mt:1.5, ml:1, mr:1, pt:0.65, pb:0.65}} elevation={3} style={{display:"flex", justifyContent:"space-between", borderRadius:"15px"}}>
-                        <Typography sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{i+1}. {item["properties"]["name"]}</Typography>  
+                    <Card key={i} sx={{mt:1.5, ml:1, mr:1, pt:0.65, pb:0.65}} elevation={3} style={{display:"flex", justifyContent:"space-between", borderRadius:"15px"}}>
+                       <Box key={i} onClick={() => handlePointListClick(item)} style={{maxWidth:"80%"}}  sx={{mt:1, mb:1}}> <Typography fullWidth style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box>
                         <Button style={{minHeight: "42px", minWidth:"50px", maxHeight:"42px", margin:"auto", marginLeft:"15px", marginRight:"10px",  borderRadius:"15px"}} 
                             key={item["properties"]["id"]} color="error" variant="contained"
                             onClick={ () => handleRemoveItem(item["properties"]["id"])}>
@@ -510,20 +559,64 @@ useEffect(() => {
                     </Card>
                     
                     <Box  sx={{mt:2, ml:1, mr:1}}>
-                        <Button variant="contained" sx={{minHeight: 50}} fullWidth onClick={() => postRoute(currentAddedPoints, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput)}><RouteIcon />Calculate best route</Button>
+                        <Button variant="contained" sx={{minHeight: 50}} fullWidth disabled={showLoadingCircleRoute} onClick={() => postRoute(currentAddedPoints, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute)}>
+                            <RouteIcon />{calculateBestRouteButtonTag} 
+                        </Button>
                     </Box>
+                   
+                    <Card sx={{mt:2, ml:1, mr:1, pl:1,pt:1,pb:1,pr:1, mb:1.2}} elevation={5} style={{ borderRadius:"8px"}}>        
+                    
+                        <Box style={{display:"flex", justifyContent:"space-evenly", flexWrap: "wrap"}}>
+                            <Tooltip placement="top" title="If you activate this setting your starting point will also be your end point!" TransitionComponent={Zoom} arrow>
+                                <FormControlLabel
+                                    sx={{display: 'block',}}
+                                    onMouseOver={() => console.log("mouse!!")}
+                                    onMouseLeave={() => console.log("leave")}
+                                    control={
+                                        <Switch
+                                        checked={false}
+                                        
+                                        onChange={() => console.log("hal")}
+                                        name="loading"
+                                        color="primary"
+                                        />
+                                    }
+                                    label="Return to start point"
+                                    />
+                            </Tooltip>
+                            <Tooltip placement="top" title="If you activate this setting you will start at your current gps location!" TransitionComponent={Zoom} arrow>
+                                <FormControlLabel
+                                    sx={{display: 'block',}}
+                                    control={
+                                        <Switch
+                                        checked={false}
+                                        onChange={() => console.log("hal")}
+                                        name="loading"
+                                        color="primary"
+                                        />
+                                    }
+                                    label="Start at my current position"
+                                    />
+                                </Tooltip>
+                        </Box>
 
-                    <Card sx={{mt:2, ml:1, mr:1, pl:1,pt:1,pb:1,pr:1, mb:1.5}} elevation={5} style={{ borderRadius:"8px", display:"flex", justifyContent:"space-evenly"}}>        
-                    <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%", minHeight:"35px"}} icon={<DirectionsCarFilledIcon  />} label={drivingTag} variant={directionMode === "driving" ? "filled" : "outlined"} onClick={() => setDirectionMode("driving")} ></Chip>
-                    <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%", minHeight:"35px"}} icon={<DirectionsWalkIcon  />} label={walkingTag} variant={directionMode === "walking" ? "filled" : "outlined"} onClick={() => setDirectionMode("walking")}></Chip>
-                    <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%", minHeight:"35px"}} icon={<DirectionsBikeIcon  />} label={cyclingTag} variant={directionMode === "cycling" ? "filled" : "outlined"} onClick={() => setDirectionMode("cycling")}></Chip>
+                        <Box style={{display:"flex", justifyContent:"space-evenly", flexWrap: "wrap"}}>
+                            <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%", minHeight:"35px"}} icon={<DirectionsCarFilledIcon fontSize="small" />} label={drivingTag} variant={directionMode === "driving" ? "filled" : "outlined"} onClick={() => setDirectionMode("driving")} ></Chip>
+                            <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%",  minHeight:"35px"}} icon={<DirectionsWalkIcon fontSize="small" />} label={walkingTag} variant={directionMode === "walking" ? "filled" : "outlined"} onClick={() => setDirectionMode("walking")}></Chip>
+                            <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%",  minHeight:"35px"}} icon={<DirectionsBikeIcon fontSize="small" />} label={cyclingTag} variant={directionMode === "cycling" ? "filled" : "outlined"} onClick={() => setDirectionMode("cycling")}></Chip>
+                        </Box>
+
                     </Card>   
-
+                    {showLoadingCircleRoute ?
+                        <Card sx={{mt:2, ml:1, mr:1, pl:1,pt:1,pb:1,pr:1, mb:1.5}} elevation={0} style={{ borderRadius:"8px", display:"flex", justifyContent:"space-evenly"}}>   
+                            <CircularProgress size={40} color='grey' /> 
+                        </Card>
+                    : null }
 
                     { didCalculateRoute ?
                     <div>
                         <Card sx={{ mb:3, ml:1, mr:1, pt:1, pb:0.5}} style={{borderRadius:"8px"}} elevation={4}>
-                            <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{currentRouteTag}:</strong> {currentDurationInMinutes} {minutesTag}, {currentKilometers}km, {currentSortedPointsRouteOutput.length} POIs</Typography>
+                            <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{currentRouteTag}:</strong> {currentDurationInMinutes} {minutesTag}, {currentKilometers}km, {currentSortedPointsRouteOutput.length-1} POIs</Typography>
                             <SortedRouteNames></SortedRouteNames>
                         </Card>
                       
@@ -547,8 +640,8 @@ useEffect(() => {
             
             return (
                 <div>
-                    <Typography sx={{ml:1, mr:1}}>{i+1}. {item.name}</Typography>
-                    {i < currentSortedPointsRouteOutput.length-1 ? <Typography sx={{ml:1, mr:1}} ><ArrowCircleDownIcon fontSize='small'/></Typography> : <Typography sx={{ml:1, mr:1, mb:1}} ></Typography>}
+                    <Typography sx={{ml:1, mr:1}}><strong> {i+1}.</strong> {item.name}</Typography>
+                    {i < currentSortedPointsRouteOutput.length-1 ? <Typography style={{height:"22.5px"}} sx={{ml:0.9}} ><ArrowCircleDownIcon fontSize='small'/></Typography> : <Typography sx={{mb:1}} ></Typography>}
                     
                 </div>
             );
@@ -557,25 +650,25 @@ useEffect(() => {
     );
 
       const ShowIfNotEnoughPoints = () => {
-
         return(
             <div>
-                
                 <Card sx={{mt:3, mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={7}><Typography variant='h6' fontWeight={500} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{errorNoRouteTag}</Typography>
                     <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{errorNoRouteTagDescription}</Typography>
                 </Card>
                 <Box  sx={{mt:2, ml:1, mr:1}}>
                     <Button variant="contained" sx={{minHeight: 50}} fullWidth onClick={() => setOpenRouteDrawer(false)}>{closeThisWindowTag}</Button>  
                 </Box>
-
             </div>
         );
-
-
       }
 
+      const handleCloseSuccessSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+        setShowSuccessSnack(false);
+      };
 
-  
     return (
     
         <div>
@@ -609,7 +702,7 @@ useEffect(() => {
                     </div>
 
             </Drawer>
-
+         
             <Drawer 
                 anchor='right'
                 transitionDuration	= {280}
@@ -618,135 +711,124 @@ useEffect(() => {
                     
                     <div id="routeSwipeableDrawerDiv" >
             
-                    {currentAddedPoints.length > 0 ? <ShowIfEnoughPoints didCalculateRoute={didCalculateRoute} /> : <ShowIfNotEnoughPoints />}
-                        
-
+                        {currentAddedPoints.length > 0 || currentSortedPointsRouteOutput.length > 1 ? <ShowIfEnoughPoints didCalculateRoute={didCalculateRoute} /> : <ShowIfNotEnoughPoints />}
+                    
+                        <Box  sx={{mt:2, ml:1, mr:1}}>
+                            <Button variant="contained" disabled={disableHandleRandomLocationButton} sx={{minHeight: 50}} fullWidth onClick={() => handleRandomLocationButton()}>Explore a random location!</Button>
+                        </Box>
+                    
                     </div>
 
+                    
+                 
             </Drawer>
+            <SuccessSnackbar openSuccessSnack={showSuccessSnack} successMessage={"You fly to: " + currentRandomLocation} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
         </div>
     );
 };
 
-    async function getLocationData(lon, lat, radius, filters)
-    {
-        let locationData = new FormData();
-        let data;
-        locationData.append('radius', radius);
-        locationData.append('lat', lat);
-        locationData.append('lon', lon);
-        locationData.append('filters', JSON.stringify(filters));
+async function getLocationData(lon, lat, radius, filters)
+{
+    // console.log(lon + "  " + lat + "  " + radius)
+    let locationData = new FormData();
+    let data;
+    locationData.append('radius', radius);
+    locationData.append('lat', lat);
+    locationData.append('lon', lon);
+    locationData.append('filters', JSON.stringify(filters));
 
-        await fetch('http://localhost:5000/sights', {
-          method: 'post',
-          body: locationData,
-          credentials: 'include',
-      }).then(res => res.json())
-        .then(res => data = res);
+    await fetch('http://localhost:5000/sights', {
+        method: 'post',
+        body: locationData,
+        credentials: 'include',
+    }).then(res => res.json())
+    .then(res => data = res);
 
-        return {type: "FeatureCollection",features: data,};
+    return {type: "FeatureCollection",features: data,};
 
+}
+
+export async function flyToLocation (coords, radius, newCoordinates = false){
+    
+    let locationData = new FormData();
+
+    if(newCoordinates){
+        lastCoords = coords;
+        if(globalPopup !== ""){
+            globalPopup.remove()
+            globalPopup = "";
+        }
+        if(globalPopup2 !== ""){
+            globalPopup2.remove()
+        }
+        let marker2 = new mapboxgl.Marker();
+        // setMarkerCoords(coords)
+        marker2.setLngLat(coords).addTo(map);
+        globalPopup2 = marker2;
+
+    }else{
+        coords = lastCoords;
     }
 
-    export async function flyToLocation (coords, radius, newCoordinates = false){
-        
-        let locationData = new FormData();
-
-        if(newCoordinates){
-            lastCoords = coords;
-            if(globalPopup !== ""){
-                globalPopup.remove()
-                globalPopup = "";
-            }
-            if(globalPopup2 !== ""){
-                globalPopup2.remove()
-            }
-            let marker2 = new mapboxgl.Marker();
-           // setMarkerCoords(coords)
-            marker2.setLngLat(coords).addTo(map);
-            globalPopup2 = marker2;
-
-        }else{
-            coords = lastCoords;
-        }
-
-        let z = 12;
-        
-        if(radius < 5){z = 14}
-        else if(radius < 10){z = 10.3}
-        else if(radius < 15){z = 9.9}
-        else if(radius < 20){z = 9.1}
-        else if(radius < 25){z = 8.8}
-        else if(radius < 30){z = 8.5}
-        else if(radius < 35){z = 8.4}
-        else if(radius < 40){z = 8.2}
-        else if(radius < 45){z = 8}
-        else if(radius < 50){z = 7.9}
-        else if(radius < 55){z = 7.75}
-        else if(radius < 60){z = 7.55}
-        else if(radius < 65){z = 7.4}
-        else if(radius < 70){z = 7.3}
-        else if(radius < 75){z = 7.2}
-        else if(radius < 80){z = 7.1}
-        else if(radius < 85){z = 7}
-        else if(radius < 90){z = 6.9}
-        else if(radius < 95){z = 6.85}
-        else if(radius <= 100){z = 6.8}
-        
-        map.flyTo({
-            center: [
-            coords[0],
-            coords[1]
-            ],
-            zoom: z,
-            speed: 1.5,
-            essential: true // this animation is considered essential with respect to prefers-reduced-motion
-        });
+    let z = 12;
     
+    //zoom basesd on radius -> could need some work
+    if(radius < 5){z = 14}else if(radius < 10){z = 10.3}else if(radius < 15){z = 9.9}else if(radius < 20){z = 9.1}else if(radius < 25){z = 8.8}else if(radius < 30){z = 8.5}else if(radius < 35){z = 8.4}else if(radius < 40){z = 8.2}else if(radius < 45){z = 8}else if(radius < 50){z = 7.9}else if(radius < 55){z = 7.75}else if(radius < 60){z = 7.55}else if(radius < 65){z = 7.4}else if(radius < 70){z = 7.3}else if(radius < 75){z = 7.2}else if(radius < 80){z = 7.1}else if(radius < 85){z = 7}else if(radius < 90){z = 6.9}else if(radius < 95){z = 6.85}else if(radius <= 100){z = 6.8}
+    
+    map.flyTo({
+        center: [
+        coords[0],
+        coords[1]
+        ],
+        zoom: z,
+        speed: 1.5,
+        essential: true // this animation is considered essential with respect to prefers-reduced-motion
+    });
 
-        lastRadius = radius;
 
-        //const results1 = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius, filterToUse: filter });
-        const results = await getLocationData(coords[0], coords[1], radius, filter);
+    lastRadius = radius;
+
+    //const results1 = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius, filterToUse: filter });
+    const results = await getLocationData(coords[0], coords[1], radius, filter);
+    
+    currentGlobalResults = results;
+    // update "random-points-data" source with new data
+    // all layers that consume the "random-points-data" data source will be updated automatically
+    map.getSource("random-points-data").setData(results);
+}
+
+//new Request has to be made
+export async function changedFilter(coords = false){
+    
+    clearTimeout(timerID)
+
+    //on filterchange call api only every 1 second 
+    //(otherwise there would betoo many requests to the api if someone spams filter buttons)
+    timerID = setTimeout(async () => {
+
+        if(!coords){
+            if(lastCoords.length === 0)
+                return;
+            else
+                coords = lastCoords;
+        }
         
+        const results = await getLocationData(coords[0], coords[1], lastRadius, filter);
         currentGlobalResults = results;
+    
         // update "random-points-data" source with new data
         // all layers that consume the "random-points-data" data source will be updated automatically
         map.getSource("random-points-data").setData(results);
-    }
-
-    //new Request has to be made
-    export async function changedFilter(coords = false){
-        
-        clearTimeout(timerID)
-
-        //on filterchange call api only every 1 second 
-        //(otherwise there would betoo many requests to the api if someone spams filter buttons)
-        timerID = setTimeout(async () => {
-
-            if(!coords){
-                if(lastCoords.length === 0)
-                    return;
-                else
-                    coords = lastCoords;
-            }
-            
-            const results = await getLocationData(coords[0], coords[1], lastRadius, filter);
-            currentGlobalResults = results;
-     
-            // update "random-points-data" source with new data
-            // all layers that consume the "random-points-data" data source will be updated automatically
-            map.getSource("random-points-data").setData(results);
-        }, 900)
+    }, 900)
 
 
-    }
+}
 
 
-    export function setRadiusForPointerSearch (newRadius){
-        radiusForPointerSearch = newRadius;
-        if(searchByMarker)
-        flyToLocation(lastCoords, radiusForPointerSearch, false)
-    }
+export function setRadiusForPointerSearch (newRadius){
+    radiusForPointerSearch = newRadius;
+    if(searchByMarker)
+    flyToLocation(lastCoords, radiusForPointerSearch, false)
+}
 
 export default BaseMap;

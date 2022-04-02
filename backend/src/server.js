@@ -30,6 +30,7 @@ const getGroups = require("./get-groups");
 const getGroupConversation = require("./get-group-conversation");
 const getPosition = require("./get-position");
 const getRating = require("./get-rating");
+const getRandomLocation = require("./get-random-location");
 
 const express = require("express");
 const session = require("express-session");
@@ -68,7 +69,7 @@ app.use(cors(corsConfig));
 
 // Funktionen, um Antworten zu schicken
 const sendResponse = (error, res) => error ? res.status(400).send(error) : res.status(200).send();
-const sendGetResponse = (content, res) => content !== null ? res.status(200).send(content) : res.status(400).send("Error!");
+const sendGetResponse = (content, res) =>{ content !== null ? res.status(200).send(content) : res.status(400).send("Error!") };
 
 
 // POST REQUESTS
@@ -107,6 +108,7 @@ app.get("/groups", isAuthenticated, async(req, res) => sendGetResponse(await get
 app.get("/group-conversation", isAuthenticated, async(req, res) => sendGetResponse(await getGroupConversation(req), res));
 app.get("/position", isAuthenticated, async(req, res) => sendGetResponse(await getPosition(req), res));
 app.get("/rating", isAuthenticated, async(req, res) => sendGetResponse(await getRating(req), res));
+app.get("/get-random-location", isAuthenticated, async (req, res) => sendGetResponse(await getRandomLocation(req), res));
 //app.get("/logged-in", (req, res) => res.send(req.session));
 
 

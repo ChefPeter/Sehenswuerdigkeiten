@@ -60,7 +60,11 @@ async function getBestRoute(request, res) {
             matrix[x][i] = distance;
         }
     }
-    const coords = tsp(matrix).map(e => p[e].geometry.coordinates);
+    
+    let coords = tsp(matrix).map(e => p[e].geometry.coordinates);
+
+    if(request.body.returnToStart == "false")
+        coords.pop(); //last element is starting point
     let sortedIDs = [];
     for(let i = 0; i<l; i++){
         for(let x = 0; x<l; x++){
@@ -68,7 +72,9 @@ async function getBestRoute(request, res) {
                 sortedIDs.push({id: p[x].properties.id, name: p[x].properties.name});
         }
     }
-    sortedIDs.push(sortedIDs[0]);
+
+    if(request.body.returnToStart)
+        sortedIDs.push(sortedIDs[0]);
 
     for(let count = 1; count < coords.length; count++)
     {
@@ -152,7 +158,6 @@ function getRouteURL(type, coords, language)
 
 async function getDataFromURL(url)
 {
-    console.log(url)  
     let result = await fetch(url);
     let answer = null;
     if(result.ok)

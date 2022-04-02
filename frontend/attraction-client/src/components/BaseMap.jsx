@@ -5,6 +5,7 @@ import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
 import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
+import GpsOffIcon from '@mui/icons-material/GpsOff';
 import RouteIcon from '@mui/icons-material/Route';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
@@ -17,6 +18,7 @@ import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
 import Zoom from '@mui/material/Zoom';
+import ErrorSnackbar from './ErrorSnackbar';
 
 const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
@@ -32,7 +34,11 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
     let timerID;
     let globalPopup = "", globalPopup2 = "";
     let geolocate;
-    let lastPosition;
+    let lastPositionByMapboxGeolocate = [];
+    let returnToStart = false;
+    let startAtGps = false;
+    let userEnabledMapboxLocation = false;
+    let coordsForGpsSearch = [];
 
     export function setFilter(newFilter){
         filter = newFilter;
@@ -56,15 +62,29 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
     export async function postRoute(data, directionMode, setDidCalculateRoute, setCurrentRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute)
     {
         //makes no sense
-        if(data.length < 2)
+        if(data.length < 1 && startAtGps || data.length < 2 && !startAtGps ){
+            if (map.getSource('route1')) {
+                map.removeLayer("layer1");
+                map.removeSource('route1');
+            }
             return;
+        }
+            
         
         setShowLoadingCircleRoute(true)
+        if(data[0]["properties"]["id"] === "gpsLocatorId")
+                data.shift();
+
+        if(startAtGps){//addpoint of gps to data
+            data.unshift(JSON.parse('{"geometry":{"type":"Point","coordinates":['+lastPositionByMapboxGeolocate+']},"type":"Feature","properties":{"id":"gpsLocatorId","name":"Your location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"random-points-layer","type":"symbol","source":"random-points-data","layout":{"icon-image":"marker--v1","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.08},"paint":{}},"source":"random-points-data","state":{}}'));
+        }
+             
         let formData = new FormData();
         let route, sortedIDs;
-    
+
         formData.append('points', JSON.stringify(data));
         formData.append('vehicle', directionMode);
+        formData.append('returnToStart', returnToStart);
         await fetch('http://localhost:5000/route', {
             method: 'post',
             body: formData,
@@ -109,24 +129,22 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
         setShowLoadingCircleRoute(false)
     }
 
-
 function BaseMap (props) {
-   
+
     const [addButtonTag, setAddButtonTag] = useState("ADD TO ROUTE");
     const [showAddButton, setShowAddButton] = useState(true);
     const [removeButtonTag, setRemoveButtonTag] = useState("REMOVE FROM ROUTE");
     const [searchHereTag, setSearchHereTag] = useState("SEARCH HERE?");
     const [openRouteDrawer, setOpenRouteDrawer] = useState(false);
     const [directionMode, setDirectionMode] = useState("driving");
-    const [didCalculateRoute, setDidCalculateRoute] = useState(false)
-    const [currentDurationInMinutes, setCurrentDurationInMinutes] = useState("-1")
-    const [currentKilometers, setCurrentKilometers] = useState("-1")
+    const [didCalculateRoute, setDidCalculateRoute] = useState(false);
+    const [currentDurationInMinutes, setCurrentDurationInMinutes] = useState("-1");
+    const [currentKilometers, setCurrentKilometers] = useState("-1");
 
     const[disableHandleRandomLocationButton,setDisableHandleRandomLocationButton] = useState(false);
-    const[showLoadingCircleRoute, setShowLoadingCircleRoute] = useState(false)
-    const[showSuccessSnack, setShowSuccessSnack] = useState(false)
+    const[showLoadingCircleRoute, setShowLoadingCircleRoute] = useState(false);
+    const[showSuccessSnack, setShowSuccessSnack] = useState(false);
 
-    
     const [currentSortedPointsRouteOutput, setCurrentSortedPointsRouteOutput] = useState([]);
     const [currentNotSortedPointsRouteOutput, setCurrentNotSortedPointsRouteOutput] = useState([]);
     const [currentAddedPoints, setCurrentAddedPoints] = useState([]);
@@ -145,12 +163,10 @@ function BaseMap (props) {
     const[minutesTag, setMinutesTag] = useState("Minutes");
     const[routeNameTag, setRouteNameTag] = useState("Route name");
     const[calculateBestRouteButtonTag, setCalculateBestRouteButtonTag] = useState("CALCULATE BEST ROUTE");
-
-    console.log("...............")
-    console.log(currentAddedPoints)
-    console.log(testRoute)
-    console.log("...............")
-
+    
+    const [gpsActive, setGpsActive] = useState(false);
+    const [geolocationSupported, setGeolocationSupported] = useState(true);
+    const [unableToRetrieveLocation, setUnableToRetrieveLocation] = useState(false);
 
     useEffect(() =>{
         
@@ -223,7 +239,6 @@ function BaseMap (props) {
         
     const [obj, setObj] = useState({properties: {name: 'test'}});
     const [markerCoords, setMarkerCoords] = useState([]);
-    const [userEnabledLocation, setUserEnabledLocation] = useState(false);
 
     const Popup2 = ({ feature2 }) => {
         const { } = feature2;
@@ -235,22 +250,17 @@ function BaseMap (props) {
 
 
 useEffect(() => {
-        
+
         //Brixen
         let coordinates = [11.65598, 46.71503];
         lastCoords = coordinates;
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                coordinates = [position.coords.longitude, position.coords.latitude];
-            });
-        }
-
-
+       
         map = new mapboxgl.Map({
             container: "mapContainer",
             center: coordinates,
             style: theme,
             zoom: 12,
+            minZoom: 1
         });
 
         map.addControl(new mapboxgl.ScaleControl({ position: 'bottom-left' }));    
@@ -261,14 +271,13 @@ useEffect(() => {
             },
             trackUserLocation: true,
             // Draw an arrow next to the location dot to indicate which direction the device is heading.
-            showUserHeading: true
+            showUserHeading: true,
         });
 
+        
         geolocate.on('geolocate', function(e) {
-            var lon = e.coords.longitude;
-            var lat = e.coords.latitude;
-            lastCoords = [lon, lat];
-            console.log("position: " +  e.coords.longitude);
+            lastPositionByMapboxGeolocate = [e.coords.longitude, e.coords.latitude];
+            console.log("position: " +  lastPositionByMapboxGeolocate);
         });
 
         map.addControl(geolocate);
@@ -430,19 +439,50 @@ useEffect(() => {
 
 
     function pointIsInRoute(id){
-        console.log("----------")
-        console.log(testRoute)
-        console.log("----------")
         if (testRoute.some(item => item["properties"]["id"]===id)) 
             return true;
         return false;
     }
 
     function locationButtonClick(){
-        
+
+        lastPositionByMapboxGeolocate = [];        
+        userEnabledMapboxLocation = !userEnabledMapboxLocation;
         geolocate._geolocateButton.click();
 
+
+        if(userEnabledMapboxLocation){
+            function success(position) {
+                lastPositionByMapboxGeolocate = [position.coords.longitude,position.coords.latitude];
+                setUnableToRetrieveLocation(false)
+                setGpsActive(true)
+            }
+            function error() {
+                setGpsActive(false);
+                setUnableToRetrieveLocation(true);
+                startAtGps = false;
+            }
+            if(!navigator.geolocation) {
+                setGpsActive(false);
+                setGeolocationSupported(false);
+                startAtGps = false;
+            } else {
+                setGeolocationSupported(true);
+                navigator.geolocation.getCurrentPosition(success, error);
+            }
+        }
+        console.log(lastPositionByMapboxGeolocate);
+        delay(1000).then(() => {
+            if(lastPositionByMapboxGeolocate.length !== 0)
+                setGpsActive(true);
+            else
+                setGpsActive(false);
+        });
+        
     }
+
+    function delay(time) {return new Promise(resolve => setTimeout(resolve, time));}
+
 
     function removePointFromRouteButtonClicked(obj){
         removePointFromRoute(obj["properties"]["id"]);
@@ -490,13 +530,25 @@ useEffect(() => {
             map.removeLayer("layer1");
             map.removeSource('route1');
         }
-        console.log(testRoute)
-        console.log(currentAddedPoints)
     }
 
     function saveCurrentRouteToDatabase(){
 
         console.log("lol")
+
+    }
+
+    function startAtGpsSwitchChanged(value){
+        startAtGps = value;
+
+        if(startAtGps){
+
+            //if there are no mapbox coordinates there will be a browser prompt
+            if(userEnabledMapboxLocation){
+                
+            }
+
+        }
 
     }
 
@@ -510,7 +562,6 @@ useEffect(() => {
         })
             
         let randomLocation = (await resultRandomLocation.json());
-        console.log(randomLocation)
         setCurrentRandomLocation(randomLocation[2]);
         setShowSuccessSnack(true)
         flyToLocation ([randomLocation[0], randomLocation[1]], 100, true);
@@ -519,18 +570,20 @@ useEffect(() => {
     }
 
     function handlePointListClick(obj){
-        console.log(obj)
         setObj(obj);
         setOpen(true);
     }
-     
+
+
     const PointList = () => (
         <div>
             {currentAddedPoints.map((item,i) => {
                 return (
 
-                    <Card key={i} sx={{mt:1.5, ml:1, mr:1, pt:0.65, pb:0.65}} elevation={3} style={{display:"flex", justifyContent:"space-between", borderRadius:"15px"}}>
-                       <Box key={i} onClick={() => handlePointListClick(item)} style={{maxWidth:"80%"}}  sx={{mt:1, mb:1}}> <Typography fullWidth style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box>
+                    <Card  key={item["properties"]["id"]} sx={{mt:1.5, ml:1, mr:1, pt:0.65, pb:0.65}} elevation={3} style={{display:"flex", justifyContent:"space-between", borderRadius:"15px"}}>
+                       
+                       {item["properties"]["id"] === "gpsLocatorId" ? <Box key={i} style={{maxWidth:"80%"}}  sx={{mt:1, mb:1}}>  <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography> </Box> : <Box key={i} onClick={() => handlePointListClick(item)} style={{maxWidth:"80%"}}  sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box> }
+                       
                         <Button style={{minHeight: "42px", minWidth:"50px", maxHeight:"42px", margin:"auto", marginLeft:"15px", marginRight:"10px",  borderRadius:"15px"}} 
                             key={item["properties"]["id"]} color="error" variant="contained"
                             onClick={ () => handleRemoveItem(item["properties"]["id"])}>
@@ -552,10 +605,7 @@ useEffect(() => {
                                 placeholder={routeNameTag}
                                 onChange={(e) => console.log(e.value)}
                                 endAdornment={<Button onClick={() => saveCurrentRouteToDatabase()}><SaveIcon/></Button>}
-                            
-                                
-                                inputProps={{
-                                'aria-label': 'weight',}}/>
+                                inputProps={{'aria-label': 'weight',}}/>
                     </Card>
                     
                     <Box  sx={{mt:2, ml:1, mr:1}}>
@@ -567,30 +617,28 @@ useEffect(() => {
                     <Card sx={{mt:2, ml:1, mr:1, pl:1,pt:1,pb:1,pr:1, mb:1.2}} elevation={5} style={{ borderRadius:"8px"}}>        
                     
                         <Box style={{display:"flex", justifyContent:"space-evenly", flexWrap: "wrap"}}>
-                            <Tooltip placement="top" title="If you activate this setting your starting point will also be your end point!" TransitionComponent={Zoom} arrow>
+                            <Tooltip placement="top" disableFocusListener enterTouchDelay={520}  title="If you activate this setting your starting point will also be your end point!" TransitionComponent={Zoom} arrow>
                                 <FormControlLabel
                                     sx={{display: 'block',}}
-                                    onMouseOver={() => console.log("mouse!!")}
-                                    onMouseLeave={() => console.log("leave")}
                                     control={
                                         <Switch
-                                        checked={false}
-                                        
-                                        onChange={() => console.log("hal")}
-                                        name="loading"
+                                        defaultChecked={returnToStart}
+                                        onChange={(event) => returnToStart = event.target.checked}
+                                        name="switchEnableReturnToStartpoint"
                                         color="primary"
                                         />
                                     }
                                     label="Return to start point"
                                     />
                             </Tooltip>
-                            <Tooltip placement="top" title="If you activate this setting you will start at your current gps location!" TransitionComponent={Zoom} arrow>
+                            <Tooltip placement="top" disableFocusListener enterTouchDelay={520} title={gpsActive ? "If you activate this setting your route will start at your current gps location!" : "Set your location on the map to use this feature."} TransitionComponent={Zoom} arrow>
                                 <FormControlLabel
                                     sx={{display: 'block',}}
                                     control={
                                         <Switch
-                                        checked={false}
-                                        onChange={() => console.log("hal")}
+                                        defaultChecked={startAtGps}
+                                        disabled={!gpsActive}
+                                        onChange={(event) => startAtGpsSwitchChanged(event.target.checked)}
                                         name="loading"
                                         color="primary"
                                         />
@@ -616,7 +664,7 @@ useEffect(() => {
                     { didCalculateRoute ?
                     <div>
                         <Card sx={{ mb:3, ml:1, mr:1, pt:1, pb:0.5}} style={{borderRadius:"8px"}} elevation={4}>
-                            <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{currentRouteTag}:</strong> {currentDurationInMinutes} {minutesTag}, {currentKilometers}km, {currentSortedPointsRouteOutput.length-1} POIs</Typography>
+                            <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{currentRouteTag}:</strong> {currentDurationInMinutes} {minutesTag}, {currentKilometers} km, {currentSortedPointsRouteOutput.length-1} POIs</Typography>
                             <SortedRouteNames></SortedRouteNames>
                         </Card>
                       
@@ -639,7 +687,7 @@ useEffect(() => {
         {currentSortedPointsRouteOutput.map((item,i) => {
             
             return (
-                <div>
+                <div key={item["id"]+i}>
                     <Typography sx={{ml:1, mr:1}}><strong> {i+1}.</strong> {item.name}</Typography>
                     {i < currentSortedPointsRouteOutput.length-1 ? <Typography style={{height:"22.5px"}} sx={{ml:0.9}} ><ArrowCircleDownIcon fontSize='small'/></Typography> : <Typography sx={{mb:1}} ></Typography>}
                     
@@ -663,11 +711,22 @@ useEffect(() => {
       }
 
       const handleCloseSuccessSnackbar = (event, reason) => {
-        if (reason === 'clickaway') {
+        if (reason === 'clickaway')
           return;
-        }
         setShowSuccessSnack(false);
       };
+
+      const handleGpsErrorsnack = (event, reason) => {
+        if (reason === 'clickaway')
+          return;
+        setUnableToRetrieveLocation(false);
+      };
+
+      const handleGeolocationErrorsnack = (event, reason) => {
+        if(reason === "clickaway")
+            return;
+        setGeolocationSupported(true)   
+      }
 
     return (
     
@@ -679,7 +738,7 @@ useEffect(() => {
             <div  id="test" style={{position: "fixed",top: "calc(100% - 150px)", left:"calc(100vw - 75px)"}}>
                
                 <Button style={{width:"60px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => setOpenRouteDrawer(!openRouteDrawer)}><DirectionsIcon fontSize="large" style={{color:"#2979ff"}} /></Button>
-                <Button style={{width:"60px",marginTop:"15px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled"  onClick={() => locationButtonClick()}><GpsFixedIcon  style={{color:"#2979ff"}} fontSize="large" /></Button>
+                <Button style={{width:"60px",marginTop:"15px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} disabled={!geolocationSupported} variant="filled"  onClick={() => locationButtonClick()}> {gpsActive ? <GpsFixedIcon style={{color:"#2979ff"}} fontSize="large" /> : <GpsOffIcon style={{color:"grey"}}  fontSize='large'/>}  </Button>
             </div>
 
           </div>
@@ -718,18 +777,19 @@ useEffect(() => {
                         </Box>
                     
                     </div>
-
-                    
-                 
+               
             </Drawer>
+
             <SuccessSnackbar openSuccessSnack={showSuccessSnack} successMessage={"You fly to: " + currentRandomLocation} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
+            <ErrorSnackbar openErrorSnack={unableToRetrieveLocation} errorMessage={"Unable to retrieve your location!"} handleClose={handleGpsErrorsnack}></ErrorSnackbar>
+            <ErrorSnackbar openErrorSnack={!geolocationSupported} errorMessage={"GPS is not supported on your device."} handleClose={handleGeolocationErrorsnack}></ErrorSnackbar>
+
         </div>
     );
 };
 
 async function getLocationData(lon, lat, radius, filters)
 {
-    // console.log(lon + "  " + lat + "  " + radius)
     let locationData = new FormData();
     let data;
     locationData.append('radius', radius);

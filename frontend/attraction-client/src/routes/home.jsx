@@ -1,7 +1,7 @@
-import { Button, Card } from "@mui/material";
+import { Card } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React from 'react';
-import BaseMap, { postRoute } from '../components/BaseMap';
+import BaseMap from '../components/BaseMap';
 import Sidebar from "../components/Sidebar";
 import "./styles/home.css";
 import "./styles/start.css";
@@ -30,9 +30,6 @@ function Home(props) {
           <BaseMap l1={props.l1} />
           
           <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2} />
-                                                                                              
-          <Button style={{marginTop: "100px"}} id="test" onClick={() => postRoute()}>Enter</Button>
-
         </Card>
 
       </ThemeProvider>

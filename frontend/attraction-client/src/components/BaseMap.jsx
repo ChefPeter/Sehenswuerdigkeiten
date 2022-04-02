@@ -1,16 +1,20 @@
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DirectionsIcon from '@mui/icons-material/Directions';
+import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
+import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
+import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
+import RouteIcon from '@mui/icons-material/Route';
+import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
-import { Button, Card, Box, Container, Drawer, SwipeableDrawer, OutlinedInput, InputAdornment, Typography, Divider } from "@mui/material";
+import { Box, Button, Card, Chip, CircularProgress, Drawer, OutlinedInput, Typography } from "@mui/material";
 import mapboxgl from "mapbox-gl";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import MapSearch from "./MapSearch";
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
-import SaveIcon from '@mui/icons-material/Save';
-import RouteIcon from '@mui/icons-material/Route';
 
 const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
@@ -22,7 +26,6 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
     let lastCoords = [];
     let lastRadius = 1;
     let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, tourist_facilities: true, museums: true, palaces: true, malls: true, churches: true};
-    let directionsMode = "driving";
     let currentGlobalResults = [];
     let timerID;
     let globalPopup = "", globalPopup2 = "";
@@ -31,10 +34,6 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
 
     export function setFilter(newFilter){
         filter = newFilter;
-    }
-
-    export function setDirectionGlobally(mode) {
-        directionsMode = mode;
     }
 
     function getRouteURL(type, coords, language)
@@ -51,49 +50,34 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
         return answer;
     }
 
-    function pointIsInRoute(id)
-    {
-        for(let i = 0; i<testRoute.length; i++){
-            if(id===testRoute[i]["properties"]["id"])
-                return true;
-        }
-        return false;
-    }
 
-    function removePointFromRoute(id)
+    export async function postRoute(data, directionMode, setDidCalculateRoute, setCurrentRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput)
     {
-        let index = null;
-        for(let i = 0; i<testRoute.length; i++){
-            if(id===testRoute[i]["properties"]["id"]){
-                index=i;
-                break;
-            }
-        }
-        if(index !== null)
-            testRoute.splice(index,1)
-            
-        console.log(testRoute);
-    }
-
-    export async function postRoute()
-    {
+        //makes no sense
+        if(data.length < 2)
+            return;
+        
         let formData = new FormData();
-        let route;
+        let route, sortedIDs;
     
-        formData.append('points', JSON.stringify(testRoute));
-        formData.append('vehicle', directionsMode);
+        formData.append('points', JSON.stringify(data));
+        formData.append('vehicle', directionMode);
         await fetch('http://localhost:5000/route', {
             method: 'post',
             body: formData,
             credentials: 'include',
         }).then(res => res.json())
-            .then(res => route = res);
+            .then(res => {route = res.route; sortedIDs = res.sortedIDs});
         if (map.getSource('route1')) {
             map.removeLayer("layer1");
             map.removeSource('route1');
         }
+        setDidCalculateRoute(true);
+        setCurrentNotSortedPointsRouteOutput(data);
+        setCurrentRouteOutput(sortedIDs)
+        setCurrentDurationInMinutes(Math.round(route.duration / 60 * 100) / 100);
+        setCurrentKilometers(Math.round(route.distance / 1000 * 100) / 100)
         
-        console.log(" duration: " + Math.round(route.duration / 60 * 100) / 100 + " min distance: " + Math.round(route.distance / 1000 * 100) / 100 + " km");
         map.addSource('route1', {
             'type': 'geojson',
             'data': {
@@ -122,34 +106,85 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
 
 
 function BaseMap (props) {
-
-
+   
     const [addButtonTag, setAddButtonTag] = useState("ADD TO ROUTE");
     const [showAddButton, setShowAddButton] = useState(true);
     const [removeButtonTag, setRemoveButtonTag] = useState("REMOVE FROM ROUTE");
     const [searchHereTag, setSearchHereTag] = useState("SEARCH HERE?");
     const [openRouteDrawer, setOpenRouteDrawer] = useState(false);
+    const [directionMode, setDirectionMode] = useState("driving");
+    const [didCalculateRoute, setDidCalculateRoute] = useState(false)
+    const [currentDurationInMinutes, setCurrentDurationInMinutes] = useState("-1")
+    const [currentKilometers, setCurrentKilometers] = useState("-1")
 
-    useEffect(() => {
-        console.log("rerender")
-    })
+    const [currentAddedPoints, setCurrentAddedPoints] = useState(testRoute);
+    const [currentSortedPointsRouteOutput, setCurrentSortedPointsRouteOutput] = useState([]);
+    const [currentNotSortedPointsRouteOutput, setCurrentNotSortedPointsRouteOutput] = useState([]);
+
+    const[drivingTag, setDrivingTag] = useState("Driving");
+    const[walkingTag, setWalkingTag] = useState("Walking");
+    const[cyclingTag, setCyclingTag] = useState("Cycling");
+    const[closeThisWindowTag, setCloseThisWindowTag] = useState("Close this window");
+    const[errorNoRouteTag, setErrorNoRouteTag] = useState("Add at least 2 Points to calculate a Route!");
+    const[errorNoRouteTagDescription, setErrorNoRouteTagDescription] = useState("If you can't see any points on your map try a new search and adjust your radius and filters. If you still can't see anything it might be that there are no POIs in that area!");
+    const[deleteHoleRouteButtonTag, setDeleteHoleRouteButtonTag] = useState("Delete the hole route!")
+    const[yourPointsTag, setYourPointsTag] = useState("Current Points");
+    const[currentRouteTag, setCurrentRouteTag] = useState("Current Route");
+    const[minutesTag, setMinutesTag] = useState("Minutes");
+    const[routeNameTag, setRouteNameTag] = useState("Route name");
+    const[calculateBestRouteButtonTag, setCalculateBestRouteButtonTag] = useState("CALCULATE BEST ROUTE");
+
 
     useEffect(() =>{
-        
-        console.log("hallo")
-        console.log(props.l1)
+
         if(props.l1 === "de"){
             setAddButtonTag("ZUR ROUTE HINZUFÜGEN");
             setRemoveButtonTag("VON ROUTE LÖSCHEN");
             setSearchHereTag("HIER SUCHEN?");
+            setDrivingTag("Auto");
+            setWalkingTag("Zu Fuß");
+            setCyclingTag("Rad");
+            setCloseThisWindowTag("Dieses Fenster schließen");
+            setErrorNoRouteTag("Füge mindestens 2 Sehenswürdigkeiten hinzu, um eine Route zu berechnen!")
+            setErrorNoRouteTagDescription("Wenn du keine Punkte sehen kann, probiere es mit einer neuen Suche mit angepasstem Radius und Filtern auf der Karte. Solltest du dann immer noch nichts sehen sind in diesem Bereich keine Sehenswürdigkeiten verfügbar!");
+            setDeleteHoleRouteButtonTag("KOMPLETTE ROUTE LÖSCHEN!");
+            setYourPointsTag("Aktuelle Punkte");
+            setCurrentRouteTag("Aktuelle Route");
+            setMinutesTag("Minuten");
+            setRouteNameTag("Routenname");
+            setCalculateBestRouteButtonTag("OPTIMALE ROUTE BERECHNEN");
         }else if(props.l1 === "it"){
             setAddButtonTag("AGGIUNGI AL itinerario");
             setRemoveButtonTag("RIMUOVERE DAl itinerario");
             setSearchHereTag("CERCARE QUI?");
+            setDrivingTag("In macchina");
+            setWalkingTag("A Piedi");
+            setCyclingTag("Bici");
+            setCloseThisWindowTag("Chiudere questa finestra");
+            setErrorNoRouteTag("Aggiungi almeno 2 punti per calcolare un percorso!")
+            setErrorNoRouteTagDescription("Se non riesci a vedere nessun punto sulla tua mappa, prova una nuova ricerca e regola il raggio e i filtri. Se ancora non vedi nulla, potrebbe essere che non ci sono POI in quella zona!");
+            setDeleteHoleRouteButtonTag("Elimina tutto il percorso!");
+            setYourPointsTag("Punti correnti");
+            setCurrentRouteTag("Percorso attuale");
+            setMinutesTag("Minuti");
+            setRouteNameTag("Nome del percorso");
+            setCalculateBestRouteButtonTag("CALCOLA IL PERCORSO OTTIMALE");
         }else{
             setAddButtonTag("ADD TO ROUTE");
             setRemoveButtonTag("REMOVE FROM ROUTE");
             setSearchHereTag("SEARCH HERE?")
+            setDrivingTag("Driving")
+            setWalkingTag("Walking")
+            setCyclingTag("Cycling")
+            setCloseThisWindowTag("Close this window");
+            setErrorNoRouteTag("Add at least 2 Points to calculate a Route!")
+            setErrorNoRouteTagDescription("If you can't see any points on your map try a new search and adjust your radius and filters. If you still can't see anything it might be that there are no POIs in that area!");
+            setDeleteHoleRouteButtonTag("Delete the hole route!");
+            setYourPointsTag("Current Points");
+            setCurrentRouteTag("Current Route");
+            setMinutesTag("Minutes");
+            setRouteNameTag("Route name");
+            setCalculateBestRouteButtonTag("CALCULATE OPTIMAL ROUTE");
         }
 
     },[props.l1]);
@@ -161,6 +196,7 @@ function BaseMap (props) {
 
     const [open, setOpen] = useState(false);
     const [image, setImage] = useState("");
+    const[showLoadingInsteadPicture, setShowLoadingInsteadPicture] = useState(true);
 
     mapboxgl.accessToken = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
 
@@ -179,6 +215,7 @@ function BaseMap (props) {
         );
     };
 
+
 useEffect(() => {
         
         //Brixen
@@ -187,7 +224,6 @@ useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 coordinates = [position.coords.longitude, position.coords.latitude];
-                console.log(coordinates)
             });
         }
 
@@ -273,9 +309,9 @@ useEffect(() => {
         // change cursor to pointer when user hovers over a clickable feature
         map.on("mouseenter", "random-points-layer", async e => {
 
-
+            
             if (e.features.length) {
-
+                setShowLoadingInsteadPicture(true);
                 var UserAgent = navigator.userAgent.toLowerCase();
 
                 // Nur beim Computer
@@ -288,11 +324,10 @@ useEffect(() => {
                     imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
                     if(imageSrc != undefined)
                         setImage(imageSrc);
+                    setShowLoadingInsteadPicture(false);    
                     const popupNode = document.createElement("div");
 
                     ReactDOM.render(<Popup feature={feature} />, popupNode);
-                    // <img src="./kolosseum.jpg"></img>
-                    //ReactDOM.render(<Button variant="contained" style={{borderRadius: '20px'}} onClick={() => addToRoute(feature)}>Add</Button>, popupNode);
                     ReactDOM.render(<div><img src={imageSrc} alt="" style={{ width: "100%", height: "50%" }}></img>
                         <div style={{ display: "flex", justifyContent: "space-between" }}><p style={{ color: 'black' }}>{feature.properties.name}</p>
                         </div></div>, popupNode);
@@ -327,8 +362,6 @@ useEffect(() => {
         });
 
         map.on("dblclick", async e => {
-
-            console.log(e);
 
             const feature2 = e;
             let coords = [e.lngLat.lng, e.lngLat.lat]
@@ -374,6 +407,12 @@ useEffect(() => {
 
 },[]);
 
+    function pointIsInRoute(id){
+        if (currentAddedPoints.some(item => item["properties"]["id"]===id)) 
+            return true;
+        return false;
+    }
+
     function locationButtonClick(){
         
         geolocate._geolocateButton.click();
@@ -384,26 +423,165 @@ useEffect(() => {
         removePointFromRoute(obj["properties"]["id"]);
         setShowAddButton(true);
     }
+    function removePointFromRoute(id)
+    {
+        console.log("hello")
+
+  
+       let index = null;
+        for(let i = 0; i<testRoute.length; i++){
+            if(id===testRoute[i]["properties"]["id"]){
+                index=i;
+                break;
+            }
+        }
+        if(index !== null)
+            testRoute.splice(index,1)
+            
+        setCurrentAddedPoints(testRoute);
+    }
 
     function addPointToRouteButtonClicked(obj){
         //first check if object isnt already in the route!
-        for(let i = 0; i<testRoute.length; i++){
+        for(let i = 0; i<testRoute.length; i++)
             if(obj["properties"]["id"]===testRoute[i]["properties"]["id"])
                 return;
-        }
+
         testRoute.push(obj);
         setShowAddButton(false);
-        console.log(testRoute)
+        setCurrentAddedPoints(testRoute);
     }
+
+    const handleRemoveItem = (key) => {
+        removePointFromRoute(key)
+       /* testRoute = currentAddedPoints.filter(item => item["properties"]["id"] !== key);*/
+        setCurrentAddedPoints(currentAddedPoints.filter(item => item["properties"]["id"] !== key));
+    };
+
+    function deleteHoleRoute(){
+        setCurrentAddedPoints([])
+        testRoute = [];
+        setDidCalculateRoute(false)
+        setCurrentSortedPointsRouteOutput([]);
+        setCurrentNotSortedPointsRouteOutput([]);
+        if (map.getSource('route1')) {
+            map.removeLayer("layer1");
+            map.removeSource('route1');
+        }
+    }
+    function saveCurrentRouteToDatabase(){
+
+        console.log("lol")
+
+    }
+     
+    const PointList = () => (
+        <div>
+            {currentAddedPoints.map((item,i) => {
+                return (
+
+                    <Card  sx={{mt:1.5, ml:1, mr:1, pt:0.65, pb:0.65}} elevation={3} style={{display:"flex", justifyContent:"space-between", borderRadius:"15px"}}>
+                        <Typography sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{i+1}. {item["properties"]["name"]}</Typography>  
+                        <Button style={{minHeight: "42px", minWidth:"50px", maxHeight:"42px", margin:"auto", marginLeft:"15px", marginRight:"10px",  borderRadius:"15px"}} 
+                            key={item["properties"]["id"]} color="error" variant="contained"
+                            onClick={ () => handleRemoveItem(item["properties"]["id"])}>
+                            <DeleteIcon />
+                        </Button>
+                    </Card>
+                );
+            })}
+        </div>
+    );
+
+      const ShowIfEnoughPoints = (props) => {
+            return(
+                <div>
+                    <Card  sx={{mt:1.5, ml:1, mr:1}} >
+                            <OutlinedInput
+                                id="outlined-adornment-weight"
+                                fullWidth
+                                placeholder={routeNameTag}
+                                onChange={(e) => console.log(e.value)}
+                                endAdornment={<Button onClick={() => saveCurrentRouteToDatabase()}><SaveIcon/></Button>}
+                            
+                                
+                                inputProps={{
+                                'aria-label': 'weight',}}/>
+                    </Card>
+                    
+                    <Box  sx={{mt:2, ml:1, mr:1}}>
+                        <Button variant="contained" sx={{minHeight: 50}} fullWidth onClick={() => postRoute(currentAddedPoints, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput)}><RouteIcon />Calculate best route</Button>
+                    </Box>
+
+                    <Card sx={{mt:2, ml:1, mr:1, pl:1,pt:1,pb:1,pr:1, mb:1.5}} elevation={5} style={{ borderRadius:"8px", display:"flex", justifyContent:"space-evenly"}}>        
+                    <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%", minHeight:"35px"}} icon={<DirectionsCarFilledIcon  />} label={drivingTag} variant={directionMode === "driving" ? "filled" : "outlined"} onClick={() => setDirectionMode("driving")} ></Chip>
+                    <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%", minHeight:"35px"}} icon={<DirectionsWalkIcon  />} label={walkingTag} variant={directionMode === "walking" ? "filled" : "outlined"} onClick={() => setDirectionMode("walking")}></Chip>
+                    <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%", minHeight:"35px"}} icon={<DirectionsBikeIcon  />} label={cyclingTag} variant={directionMode === "cycling" ? "filled" : "outlined"} onClick={() => setDirectionMode("cycling")}></Chip>
+                    </Card>   
+
+
+                    { didCalculateRoute ?
+                    <div>
+                        <Card sx={{ mb:3, ml:1, mr:1, pt:1, pb:0.5}} style={{borderRadius:"8px"}} elevation={4}>
+                            <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{currentRouteTag}:</strong> {currentDurationInMinutes} {minutesTag}, {currentKilometers}km, {currentSortedPointsRouteOutput.length} POIs</Typography>
+                            <SortedRouteNames></SortedRouteNames>
+                        </Card>
+                      
+                        </div>
+                     : null}
+
+                    <Card sx={{ mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5, mt:4}} style={{ borderRadius:"8px"}} elevation={5}><Typography variant='h6' fontWeight={500} sx={{mt:0.8, mb:0.8}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{yourPointsTag}</Typography></Card>
+
+                    <PointList></PointList>
+                        
+                        <Box  sx={{mt:5, ml:1, mr:1, mb: 1}}>
+                            <Button color="error" fullWidth variant="contained" onClick={() => deleteHoleRoute()}><DeleteIcon />{deleteHoleRouteButtonTag}</Button>
+                        </Box>  
+                </div>
+            );
+      }
+
+      const SortedRouteNames = () => (
+          <div>  
+        {currentSortedPointsRouteOutput.map((item,i) => {
+            
+            return (
+                <div>
+                    <Typography sx={{ml:1, mr:1}}>{i+1}. {item.name}</Typography>
+                    {i < currentSortedPointsRouteOutput.length-1 ? <Typography sx={{ml:1, mr:1}} ><ArrowCircleDownIcon fontSize='small'/></Typography> : <Typography sx={{ml:1, mr:1, mb:1}} ></Typography>}
+                    
+                </div>
+            );
+        })}
+        </div>
+    );
+
+      const ShowIfNotEnoughPoints = () => {
+
+        return(
+            <div>
+                
+                <Card sx={{mt:3, mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={7}><Typography variant='h6' fontWeight={500} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{errorNoRouteTag}</Typography>
+                    <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{errorNoRouteTagDescription}</Typography>
+                </Card>
+                <Box  sx={{mt:2, ml:1, mr:1}}>
+                    <Button variant="contained" sx={{minHeight: 50}} fullWidth onClick={() => setOpenRouteDrawer(false)}>{closeThisWindowTag}</Button>  
+                </Box>
+
+            </div>
+        );
+
+
+      }
+
 
   
     return (
     
         <div>
-            <div id="test" style={{marginBottom:"100px"}}>opkkp</div>
             <div id="mapContainer" className="map"></div>
             <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
-            <MapSearch l1={props.l1}></MapSearch>
+            <MapSearch l1={props.l1} directionMode={directionMode} setDirectionMode={setDirectionMode}></MapSearch>
             
             <div  id="test" style={{position: "fixed",top: "calc(100% - 150px)", left:"calc(100vw - 75px)"}}>
                
@@ -418,58 +596,34 @@ useEffect(() => {
                 
                 open={open}
                 onClose={() => setOpen(!open)}>
-                    <div style={{maxHeight:"60vh", minHeight:"100px"}}>
+                    <div style={{maxHeight:"60vh", minHeight:"200px"}}>
                         <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                         <div>
                             <div> 
                                 {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{addButtonTag}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{removeButtonTag}</Button>}
                                 <h2 id="nameField" style={{marginBottom:"10px"}}>{obj.properties.name}</h2>
                             </div>
-                            <div><img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img></div>
+                            <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>
                         </div>
                         </div>
                     </div>
+
             </Drawer>
 
-            <SwipeableDrawer 
+            <Drawer 
                 anchor='right'
                 transitionDuration	= {280}
-               
                 open={openRouteDrawer}
                 onClose={() => setOpenRouteDrawer(!openRouteDrawer)}>
                     
                     <div id="routeSwipeableDrawerDiv" >
-                        <Card  sx={{mt:1.5, ml:1, mr:1}} >
-                        <OutlinedInput
-                            id="outlined-adornment-weight"
-                            fullWidth
-                            placeholder={"Route name"}
-                            onChange={(e) => console.log(e.value)}
-                            endAdornment={<Button><SaveIcon/></Button>}
-                           
-                            
-                            inputProps={{
-                            'aria-label': 'weight',}}/>
-                        </Card>
+            
+                    {currentAddedPoints.length > 0 ? <ShowIfEnoughPoints didCalculateRoute={didCalculateRoute} /> : <ShowIfNotEnoughPoints />}
                         
-
-                        <Box  sx={{mt:2, ml:1, mr:1}}>
-                            <Button variant="contained" sx={{minHeight: 50}} fullWidth><RouteIcon />Calculate best route</Button>
-                        </Box>
-
-                        <Card sx={{mt:3, mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={"6"}><Typography variant='h5' fontWeight={500} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>Your Route - Step by Step</Typography></Card>
-                        <Card sx={{ mb:3, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={"4"}><Typography variant='h6' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>25 Minutes, 20km by Car, 20 POIs</Typography></Card>
-                        <div style={{maxWidth:"100%", wordBreak:"break-all"}}>
-                            {testRoute.map((item, i) => <Card sx={{mt:1.5, ml:1, mr:1, pt:0.65, pb:0.65}} elevation={"3"} style={{display:"flex", justifyContent:"space-between", borderRadius:"15px"}}><Typography sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}> {i+1}. {(item["properties"]["name"])}</Typography>  <Button style={{minHeight: "42px", minWidth:"50px", maxHeight:"42px", margin:"auto", marginLeft:"15px", marginRight:"10px",  borderRadius:"15px"}} color="error" variant="contained"><DeleteIcon /></Button></Card>)}                            
-                        </div>
-
-                        <Box  sx={{mt:2, ml:1, mr:1}}>
-                            <Button color="error" variant="contained"><DeleteIcon />Delete the hole Route</Button>
-                        </Box>
 
                     </div>
 
-            </SwipeableDrawer>
+            </Drawer>
         </div>
     );
 };
@@ -577,9 +731,6 @@ useEffect(() => {
                     coords = lastCoords;
             }
             
-            //const results = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: lastRadius, filterToUse: filter });
-            console.log(filter);
-            
             const results = await getLocationData(coords[0], coords[1], lastRadius, filter);
             currentGlobalResults = results;
      
@@ -594,7 +745,6 @@ useEffect(() => {
 
     export function setRadiusForPointerSearch (newRadius){
         radiusForPointerSearch = newRadius;
-        console.log(searchByMarker)
         if(searchByMarker)
         flyToLocation(lastCoords, radiusForPointerSearch, false)
     }

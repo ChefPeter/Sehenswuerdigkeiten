@@ -51,7 +51,7 @@ async function getBestRoute(request, res) {
         "distance": 0,
         "duration": 0,
     };
-
+   
     const matrix = [...Array(l)].map(e => Array(l).fill(0));
     for (let i = 0; i < l; i++) {
         for (let x = i+1; x < l; x++) {
@@ -61,6 +61,15 @@ async function getBestRoute(request, res) {
         }
     }
     const coords = tsp(matrix).map(e => p[e].geometry.coordinates);
+    let sortedIDs = [];
+    for(let i = 0; i<l; i++){
+        for(let x = 0; x<l; x++){
+            if(coords[i][0] === p[x].geometry.coordinates[0] && coords[i][1] === p[x].geometry.coordinates[1])
+                sortedIDs.push({id: p[x].properties.id, name: p[x].properties.name});
+        }
+    }
+    sortedIDs.push(sortedIDs[0]);
+
     for(let count = 1; count < coords.length; count++)
     {
       let rout = await getDataFromURL(getRouteURL(request.body.vehicle, `${coords[count - 1].join(",")};${coords[count].join(",")}`, "en"));
@@ -68,8 +77,8 @@ async function getBestRoute(request, res) {
       route.duration += rout.routes[0].duration;
       route.distance += rout.routes[0].distance;
     }
-
-    res.status(200).send(JSON.stringify(route));
+    
+    res.status(200).send(JSON.stringify({route: route, sortedIDs: sortedIDs}));
     //res.status(200).send(tsp(matrix).map(e => p[e]));
 
     // Gefährlich wegen ban auf mapbox -> 
@@ -143,11 +152,11 @@ function getRouteURL(type, coords, language)
 
 async function getDataFromURL(url)
 {
-let result = await fetch(url);
-let answer = null;
-if(result.ok)
-answer = await result.json();
-return answer;
+    let result = await fetch(url);
+    let answer = null;
+    if(result.ok)
+    answer = await result.json();
+    return answer;
 }
 
 module.exports = getBestRoute;

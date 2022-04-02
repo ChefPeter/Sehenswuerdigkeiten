@@ -98,7 +98,7 @@ function MapSearch (props) {
             setMallsTag("Centri commerciali");
             setFilterLanguage("Filtro");
 
-            setDrivingTag("Auto")
+            setDrivingTag("In macchina")
             setWalkingTag("A Piedi")
             setCyclingTag("Bici")
 
@@ -305,9 +305,9 @@ function MapSearch (props) {
 
                     <Divider  sx={{ mb: 1, mt:1}} />
                    
-                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsCarFilledIcon fontSize="small" />} label={drivingTag} variant={directionsMode === "driving" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("driving")}></Chip>
-                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsWalkIcon fontSize="small" />} label={walkingTag} variant={directionsMode === "walking" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("walking")}></Chip>
-                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsBikeIcon fontSize="small" />} label={cyclingTag} variant={directionsMode === "cycling" ? "filled" : "outlined"} onClick={() => handleDirectionModeClick("cycling")}></Chip>
+                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsCarFilledIcon fontSize="small" />} label={drivingTag} variant={props.directionMode === "driving" ? "filled" : "outlined"} onClick={() => props.setDirectionMode("driving")}></Chip>
+                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsWalkIcon fontSize="small" />} label={walkingTag} variant={props.directionMode === "walking" ? "filled" : "outlined"} onClick={() => props.setDirectionMode("walking")}></Chip>
+                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsBikeIcon fontSize="small" />} label={cyclingTag} variant={props.directionMode === "cycling" ? "filled" : "outlined"} onClick={() => props.setDirectionMode("cycling")}></Chip>
                     
 
                     <Divider  sx={{ mb: 1, mt:1}} />
@@ -332,11 +332,6 @@ function MapSearch (props) {
         </Paper>
 
     );
-
-    function handleDirectionModeClick(mode){
-        setDirectionsMode(mode);
-        setDirectionGlobally(mode);
-    }
 
     //Function for Chips!!!
     function handleClickArchitecture(){

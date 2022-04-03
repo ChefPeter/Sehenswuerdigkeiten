@@ -109,7 +109,7 @@ function ChatSendbar (props) {
                 style={{width:"60%"}}
                 id="chatMessageInput"
                 type="text"
-                label="Type a message!"
+                label={props.labelField}
                 value={message}
                 onChange={checkMessageInput}
                 InputProps={{endAdornment: <Button onClick={sendMessage}><SendIcon/></Button> }}

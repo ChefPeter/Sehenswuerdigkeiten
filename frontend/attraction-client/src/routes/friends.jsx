@@ -122,13 +122,10 @@ function Friends(props) {
       let friendRequests = (await resultFriendRequests.json());
 
 
-      setFriendRequests(friendRequests)
+      setFriendRequests(friendRequests);
       setFriendsName(users);
       setProfilePicture(profilePictures);
-      setShowLoadingBar(false)
-
-
-    
+      setShowLoadingBar(false);
 
   }, []);
 
@@ -188,7 +185,7 @@ function Friends(props) {
           
             <List>
 
-              {friendsName.map((e,i) =>  <FriendItem name={e.name} description={e.description} key={e.name} profilePicture={profilePicture ? profilePicture[i] : null} l1={props.l1}></FriendItem>)}
+              {friendsName.map((e,i) =>  <FriendItem name={e.name} description={e.description} key={e.name} profilePicture={profilePicture ? profilePicture[i] : null} l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>)}
             
             </List>
             

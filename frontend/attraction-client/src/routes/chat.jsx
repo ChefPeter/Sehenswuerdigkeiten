@@ -162,10 +162,26 @@ const Chat = (props) => {
 
     useEffect(func, []);
 
+    const[writingTag, setWritingTag] = useState(" You are writing with: ");
+    const[textfieldTag, setTextfieldTag] = useState("Type a message");
+    useEffect(() => {
+      if(props.l1 === "de"){
+        setWritingTag(" Du schreibst mit: ");
+        setTextfieldTag("Schreibe eine Nachricht");
+      } else if (props.l1 === "it"){
+        setWritingTag(" Stai scrivendo con: ");
+        setTextfieldTag("Scrivi un messaggio");
+      } else {
+        setWritingTag(" You are writing with: ");
+        setTextfieldTag("Type a message");
+      }
+    }, [props.l1])
+
     
     return (
-        <ThemeProvider theme={createTheme(light)}>
-          <Sidebar/>
+        <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
+          <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
+          <Card style={{width:"100vw", borderRadius:"0px"}}>
             <Card elevation={4} sx={{
                     marginTop: 8.5, 
                     marginLeft: 1, 
@@ -173,7 +189,7 @@ const Chat = (props) => {
                     paddingTop: 1,
                     paddingBottom: 1,
                     paddingRight: 1,
-                    paddingLeft: 1}}> You are writing with: <strong>{name}</strong></Card>
+                    paddingLeft: 1}}>{writingTag}<strong>{name}</strong></Card>
           
                 <Card elevation={4} sx={{
                     marginTop: 1.5, 
@@ -214,7 +230,8 @@ const Chat = (props) => {
                     paddingBottom: 2,
                     paddingRight: 1,
                     paddingLeft: 1}}>
-                <ChatSendbar name={friend}></ChatSendbar>
+                <ChatSendbar name={friend} labelField={textfieldTag}></ChatSendbar>
+                </Card>
                 </Card>
         </ThemeProvider>
     );

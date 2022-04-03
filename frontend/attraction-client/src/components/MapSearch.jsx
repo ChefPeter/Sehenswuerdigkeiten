@@ -15,6 +15,7 @@ import MuseumIcon from '@mui/icons-material/Museum';
 import PeopleIcon from '@mui/icons-material/People';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import { Autocomplete, Button, Chip, CircularProgress, Container, Divider, Fade, Paper, Slider, Stack, TextField, Typography } from "@mui/material";
+import { height } from '@mui/system';
 import React, { useEffect, useState } from "react";
 import { changedFilter, flyToLocation, setDirectionGlobally, setFilter, setRadiusForPointerSearch } from "./BaseMap";
 import "./styles/mapsearch.css";
@@ -267,6 +268,7 @@ function MapSearch (props) {
                     onChange={handleSearchFriendInput}
                     {...params}
                     label={searchText}
+                    
                     InputProps={{
                     ...params.InputProps,
                     endAdornment: <Container id="btnContainerSearchbar" style={{display:"flex", marginRight:"1.2vw", maxWidth:"130px"}}>  <Button onClick={() => explore(locationInput)} > {showLoading ? <CircularProgress size={25} /> :null} {!showLoading ? <TravelExploreIcon/> : null} </Button>  <Divider orientation="vertical" flexItem /> <Button onClick={() => setShowDropdown(!showDropdown)}> {showDropdown ? <ArrowDropUpIcon /> : <ArrowDropDownIcon /> }</Button></Container> 

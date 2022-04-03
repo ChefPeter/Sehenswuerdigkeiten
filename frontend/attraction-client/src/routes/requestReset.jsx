@@ -13,12 +13,22 @@ function RequestReset(props) {
     const [errorText, setErrorText] = useState("Error");
     const [showInfoAlert, setShowInfoAlert] = useState(false);
     const [showErrorAlert, setShowErrorAlert] = useState(false);
-
+    
+    let resetText = "Enter your email and click reset button!";
+    let successMessage = "You have been sent an email with the instructions!";
+    if(props.l1 == "de"){
+        resetText = "Email eingeben und Reset Button clicken!";
+        successMessage = "Ihnen wurde eine Email mit den Anweisungen zugeschickt!";
+    } else if(props.l1 == "it"){
+        resetText = "Inserisci l'email e clicca sul pulsante di reset!";
+        successMessage = "Ti è stata inviata un'e-mail con le istruzioni!";
+    }
+       
     return (
         <div id="hintergrund">
             <div id="inputs">
             <div id="befehl">
-                    <h1>Email eingeben und Reset Button clicken!</h1>
+                    <h1>{resetText}</h1>
                 </div>
                 <div style={{width: "30vw", minWidth: "300px"}}>
                     <TextField sx={{ marginBottom: 1, width: 1}} id="filled-basic" label="Email" variant="filled" onChange={setInput} />
@@ -29,16 +39,16 @@ function RequestReset(props) {
                 <div>
                     <div>
                         {showErrorAlert ?
-                            <Alert severity="error">
+                            <Alert sx={{mt: 3}} severity="error">
                                 <AlertTitle>Error</AlertTitle>
                                 {errorText}
                             </Alert>
                             : null}
                     </div>
                         <div>
-                            {showInfoAlert ? <Alert false severity="info">
+                            {showInfoAlert ? <Alert sx={{mt: 3}} false severity="info">
                             <AlertTitle>Info</AlertTitle>
-                                Ihnen wurde eine Email mit den Anweisungen zugeschickt!
+                                {successMessage}
                             </Alert> : null}
                         </div>
                 </div>
@@ -68,7 +78,6 @@ function resetPassword(setErrorText, setShowErrorAlert, setShowInfoAlert) {
         }
         console.log(res.status)
     });
-    console.log("haha")
 }
 
 

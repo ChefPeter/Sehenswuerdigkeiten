@@ -71,14 +71,24 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
         }
             
         
-        setShowLoadingCircleRoute(true)
+        
         if(data[0]["properties"]["id"] === "gpsLocatorId")
                 data.shift();
 
         if(startAtGps){//addpoint of gps to data
             data.unshift(JSON.parse('{"geometry":{"type":"Point","coordinates":['+lastPositionByMapboxGeolocate+']},"type":"Feature","properties":{"id":"gpsLocatorId","name":"Your location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"random-points-layer","type":"symbol","source":"random-points-data","layout":{"icon-image":"marker--v1","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.08},"paint":{}},"source":"random-points-data","state":{}}'));
         }
-             
+
+        if(data.length < 2){
+            if (map.getSource('route1')) {
+                map.removeLayer("layer1");
+                map.removeSource('route1');
+            }
+            return;
+        }
+            
+
+        setShowLoadingCircleRoute(true) 
         let formData = new FormData();
         let route, sortedIDs;
 
@@ -100,7 +110,6 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
         setCurrentRouteOutput(sortedIDs)
         setCurrentDurationInMinutes(Math.round(route.duration / 60));
         setCurrentKilometers(Math.round(route.distance / 1000 * 10) / 10)
-    
         
         map.addSource('route1', {
             'type': 'geojson',
@@ -127,14 +136,13 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
             }
         });
         setShowLoadingCircleRoute(false)
+       
     }
 
 function BaseMap (props) {
+    
 
-    const [addButtonTag, setAddButtonTag] = useState("ADD TO ROUTE");
     const [showAddButton, setShowAddButton] = useState(true);
-    const [removeButtonTag, setRemoveButtonTag] = useState("REMOVE FROM ROUTE");
-    const [searchHereTag, setSearchHereTag] = useState("SEARCH HERE?");
     const [openRouteDrawer, setOpenRouteDrawer] = useState(false);
     const [directionMode, setDirectionMode] = useState("driving");
     const [didCalculateRoute, setDidCalculateRoute] = useState(false);
@@ -151,74 +159,119 @@ function BaseMap (props) {
 
     const [currentRandomLocation, setCurrentRandomLocation] = useState(false);
 
-    const[drivingTag, setDrivingTag] = useState("Driving");
-    const[walkingTag, setWalkingTag] = useState("Walking");
-    const[cyclingTag, setCyclingTag] = useState("Cycling");
-    const[closeThisWindowTag, setCloseThisWindowTag] = useState("Close this window");
-    const[errorNoRouteTag, setErrorNoRouteTag] = useState("Add at least 2 Points to calculate a Route!");
-    const[errorNoRouteTagDescription, setErrorNoRouteTagDescription] = useState("If you can't see any points on your map try a new search and adjust your radius and filters. If you still can't see anything it might be that there are no POIs in that area!");
-    const[deleteHoleRouteButtonTag, setDeleteHoleRouteButtonTag] = useState("Delete the hole route!")
-    const[yourPointsTag, setYourPointsTag] = useState("Current Points");
-    const[currentRouteTag, setCurrentRouteTag] = useState("Current Route");
-    const[minutesTag, setMinutesTag] = useState("Minutes");
-    const[routeNameTag, setRouteNameTag] = useState("Route name");
-    const[calculateBestRouteButtonTag, setCalculateBestRouteButtonTag] = useState("CALCULATE BEST ROUTE");
-    
+    const [languageTags, setLanguageTags] = useState({  
+                                                        addButton: "ADD TO ROUTE",
+                                                        removeButton: "REMOVE FROM ROUTE",
+                                                        searchHere: "SEARCH HERE?",
+                                                        driving: "Driving", walking: "Walking", cycling: "Cycling",
+                                                        closeThisWindow: "Close this window",
+                                                        errorNoRoute: "Add at least 2 Points to calculate a Route!",
+                                                        errorNoRouteDescription: "If you can't see any points on your map try a new search and adjust your radius and filters. If you still can't see anything it might be that there are no POIs in that area!",
+                                                        deleteHoleRouteButton: "Delete the hole route!",
+                                                        yourPoints: "Current Points",
+                                                        currentRoute: "Current Route",
+                                                        minutes: "Minutes",
+                                                        routeName: "Route name",
+                                                        calculateBestRouteButton: "CALCULATE BEST ROUTE",
+                                                        exploreRandomLocation: "EXPLORE A RANDOM LOCATION",
+                                                        returnToStart: "Return to start point",
+                                                        startAtMyCurrentPosition: "Start at my current position",
+                                                        returnToStartTooltip: "If you activate this setting your starting point will also be your end point!",
+                                                        startAtMyCurrentPositionWorkingTooltip: "If you activate this setting your route will start at your current gps location!",
+                                                        startAtMyCurrentPositionDisabledTooltipTag: "Set your location on the map to use this feature.",
+                                                        flyTo: "You fly to: ",
+                                                        unableToRetrieveLocation: "Unable to retrieve your location!",
+                                                        gpsNotSupported: "GPS is not supported on your device."
+                                                    });
+
+
     const [gpsActive, setGpsActive] = useState(false);
     const [geolocationSupported, setGeolocationSupported] = useState(true);
     const [unableToRetrieveLocation, setUnableToRetrieveLocation] = useState(false);
 
     useEffect(() =>{
         
-
         if(props.l1 === "de"){
-            setAddButtonTag("ZUR ROUTE HINZUFÜGEN");
-            setRemoveButtonTag("VON ROUTE LÖSCHEN");
-            setSearchHereTag("HIER SUCHEN?");
-            setDrivingTag("Auto");
-            setWalkingTag("Zu Fuß");
-            setCyclingTag("Rad");
-            setCloseThisWindowTag("Dieses Fenster schließen");
-            setErrorNoRouteTag("Füge mindestens 2 Sehenswürdigkeiten hinzu, um eine Route zu berechnen!")
-            setErrorNoRouteTagDescription("Wenn du keine Punkte sehen kann, probiere es mit einer neuen Suche mit angepasstem Radius und Filtern auf der Karte. Solltest du dann immer noch nichts sehen sind in diesem Bereich keine Sehenswürdigkeiten verfügbar!");
-            setDeleteHoleRouteButtonTag("KOMPLETTE ROUTE LÖSCHEN!");
-            setYourPointsTag("Aktuelle Punkte");
-            setCurrentRouteTag("Aktuelle Route");
-            setMinutesTag("Minuten");
-            setRouteNameTag("Routenname");
-            setCalculateBestRouteButtonTag("OPTIMALE ROUTE BERECHNEN");
+            
+            setLanguageTags({  
+                addButton: "ZUR ROUTE HINZUFÜGEN",
+                removeButton: "VON ROUTE LÖSCHEN",
+                searchHere: "HIER SUCHEN?",
+                driving: "Auto", walking: "Zu Fuß", cycling: "Rad",
+                closeThisWindow: "Dieses Fenster schließen",
+                errorNoRoute: "Füge mindestens 2 Sehenswürdigkeiten hinzu, um eine Route zu berechnen!",
+                errorNoRouteDescription: "Wenn du keine Punkte sehen kann, probiere es mit einer neuen Suche mit angepasstem Radius und Filtern auf der Karte. Solltest du dann immer noch nichts sehen sind in diesem Bereich keine Sehenswürdigkeiten verfügbar!",
+                deleteHoleRouteButton: "KOMPLETTE ROUTE LÖSCHEN!",
+                yourPoints: "Aktuelle Punkte",
+                currentRoute: "Current Route",
+                minutes: "Minuten",
+                routeName: "Routenname",
+                calculateBestRouteButton: "OPTIMALE ROUTE BERECHNEN",
+                exploreRandomLocation: "ZUFÄLLIG ERKUNDEN",
+                returnToStart: "Zum Startpunkt zurückkehren",
+                startAtMyCurrentPosition: "Bei jetztigem Standort starten",
+                returnToStartTooltip: "Wenn du diese Einstellung aktivierst, ist dein Startpunkt auch dein Endpunkt.",
+                startAtMyCurrentPositionWorkingTooltip: "Wenn du diese Einstellung aktivierst, startet die Route bei deiner momentanen GPS Position.",
+                startAtMyCurrentPositionDisabledTooltipTag: "Setze deine Position auf der Karte um diese Einstellung zu verwenden.",
+                flyTo: "Du fliegst nach: ",
+                unableToRetrieveLocation: "Deine Position kann nicht festgestellt werden!",
+                gpsNotSupported: "Die GPS Funktion wird für dein Gerät nicht unterstützt."
+            });
+
         }else if(props.l1 === "it"){
-            setAddButtonTag("AGGIUNGI AL itinerario");
-            setRemoveButtonTag("RIMUOVERE DAl itinerario");
-            setSearchHereTag("CERCARE QUI?");
-            setDrivingTag("In macchina");
-            setWalkingTag("A Piedi");
-            setCyclingTag("Bici");
-            setCloseThisWindowTag("Chiudere questa finestra");
-            setErrorNoRouteTag("Aggiungi almeno 2 punti per calcolare un percorso!")
-            setErrorNoRouteTagDescription("Se non riesci a vedere nessun punto sulla tua mappa, prova una nuova ricerca e regola il raggio e i filtri. Se ancora non vedi nulla, potrebbe essere che non ci sono POI in quella zona!");
-            setDeleteHoleRouteButtonTag("Elimina tutto il percorso!");
-            setYourPointsTag("Punti correnti");
-            setCurrentRouteTag("Percorso attuale");
-            setMinutesTag("Minuti");
-            setRouteNameTag("Nome del percorso");
-            setCalculateBestRouteButtonTag("CALCOLA IL PERCORSO OTTIMALE");
-        }else{
-            setAddButtonTag("ADD TO ROUTE");
-            setRemoveButtonTag("REMOVE FROM ROUTE");
-            setSearchHereTag("SEARCH HERE?")
-            setDrivingTag("Driving")
-            setWalkingTag("Walking")
-            setCyclingTag("Cycling")
-            setCloseThisWindowTag("Close this window");
-            setErrorNoRouteTag("Add at least 2 Points to calculate a Route!")
-            setErrorNoRouteTagDescription("If you can't see any points on your map try a new search and adjust your radius and filters. If you still can't see anything it might be that there are no POIs in that area!");
-            setDeleteHoleRouteButtonTag("Delete the hole route!");
-            setYourPointsTag("Current Points");
-            setCurrentRouteTag("Current Route");
-            setMinutesTag("Minutes");
-            setRouteNameTag("Route name");
-            setCalculateBestRouteButtonTag("CALCULATE OPTIMAL ROUTE");
+
+            setLanguageTags({  
+                addButton: "AGGIUNGI AL itinerario",
+                removeButton: "RIMUOVERE DAL itinerario",
+                searchHere: "CERCARE QUI?",
+                driving: "In macchina", walking: "A Piedi", cycling: "Bici",
+                closeThisWindow: "Chiudere questa finestra",
+                errorNoRoute: "Aggiungi almeno 2 punti per calcolare un percorso!",
+                errorNoRouteDescription: "Se non riesci a vedere nessun punto sulla tua mappa, prova una nuova ricerca e regola il raggio e i filtri. Se ancora non vedi nulla, potrebbe essere che non ci sono POI in quella zona!",
+                deleteHoleRouteButton: "Elimina tutto il percorso!",
+                yourPoints: "Punti correnti",
+                currentRoute: "Percorso attuale",
+                minutes: "Minuti",
+                routeName: "Nome del percorso",
+                calculateBestRouteButton: "CALCOLA IL PERCORSO OTTIMALE",
+                exploreRandomLocation: "ESPLORARE UN LUOGO CASUALE",
+                returnToStart: "Tornare al punto di partenza",
+                startAtMyCurrentPosition: "Iniziare dalla mia posizione attuale",
+                returnToStartTooltip: "Se attivi questa impostazione il tuo punto di partenza sarà anche il tuo punto di arrivo!",
+                startAtMyCurrentPositionWorkingTooltip: "Se attivi questa impostazione il tuo percorso inizierà dalla tua attuale posizione gps!",
+                startAtMyCurrentPositionDisabledTooltipTag: "Imposta la tua posizione sulla mappa per utilizzare questa funzione.",
+                flyTo: "Si vola verso: ",
+                unableToRetrieveLocation: "Impossibile recuperare la tua posizione!",
+                gpsNotSupported: "Il GPS non è supportato sul tuo dispositivo."
+            });
+
+        } else {
+
+            setLanguageTags({  
+                addButton: "ADD TO ROUTE",
+                removeButton: "REMOVE FROM ROUTE",
+                searchHere: "SEARCH HERE?",
+                driving: "Driving", walking: "Walking", cycling: "Cycling",
+                closeThisWindow: "Close this window",
+                errorNoRoute: "Add at least 2 Points to calculate a Route!",
+                errorNoRouteDescription: "If you can't see any points on your map try a new search and adjust your radius and filters. If you still can't see anything it might be that there are no POIs in that area!",
+                deleteHoleRouteButton: "Delete the hole route!",
+                yourPoints: "Current Points",
+                currentRoute: "Current Route",
+                minutes: "Minutes",
+                routeName: "Route name",
+                calculateBestRouteButton: "CALCULATE BEST ROUTE",
+                exploreRandomLocation: "EXPLORE A RANDOM LOCATION",
+                returnToStart: "Return to start point",
+                startAtMyCurrentPosition: "Start at my current position",
+                returnToStartTooltip: "If you activate this setting your starting point will also be your end point!",
+                startAtMyCurrentPositionWorkingTooltip: "If you activate this setting your route will start at your current gps location!",
+                startAtMyCurrentPositionDisabledTooltipTag: "Set your location on the map to use this feature.",
+                flyTo: "You fly to: ",
+                unableToRetrieveLocation: "Unable to retrieve your location!",
+                gpsNotSupported: "GPS is not supported on your device."
+            });
+
         }
 
     },[props.l1]);
@@ -553,7 +606,7 @@ useEffect(() => {
     }
 
     async function handleRandomLocationButton(){
-
+       
         setDisableHandleRandomLocationButton(true);
         setOpenRouteDrawer(false);
         const resultRandomLocation = await fetch("http://localhost:5000/get-random-location", {
@@ -589,6 +642,7 @@ useEffect(() => {
                             onClick={ () => handleRemoveItem(item["properties"]["id"])}>
                             <DeleteIcon />
                         </Button>
+
                     </Card>
                 );
             })}
@@ -602,7 +656,7 @@ useEffect(() => {
                             <OutlinedInput
                                 id="outlined-adornment-weight"
                                 fullWidth
-                                placeholder={routeNameTag}
+                                placeholder={languageTags.routeName}
                                 onChange={(e) => console.log(e.value)}
                                 endAdornment={<Button onClick={() => saveCurrentRouteToDatabase()}><SaveIcon/></Button>}
                                 inputProps={{'aria-label': 'weight',}}/>
@@ -610,14 +664,14 @@ useEffect(() => {
                     
                     <Box  sx={{mt:2, ml:1, mr:1}}>
                         <Button variant="contained" sx={{minHeight: 50}} fullWidth disabled={showLoadingCircleRoute} onClick={() => postRoute(currentAddedPoints, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute)}>
-                            <RouteIcon />{calculateBestRouteButtonTag} 
+                            <RouteIcon />{languageTags.calculateBestRouteButton} 
                         </Button>
                     </Box>
                    
                     <Card sx={{mt:2, ml:1, mr:1, pl:1,pt:1,pb:1,pr:1, mb:1.2}} elevation={5} style={{ borderRadius:"8px"}}>        
                     
                         <Box style={{display:"flex", justifyContent:"space-evenly", flexWrap: "wrap"}}>
-                            <Tooltip placement="top" disableFocusListener enterTouchDelay={520}  title="If you activate this setting your starting point will also be your end point!" TransitionComponent={Zoom} arrow>
+                            <Tooltip placement="top" disableFocusListener enterTouchDelay={520}  title={languageTags.returnToStartTooltip} TransitionComponent={Zoom} arrow>
                                 <FormControlLabel
                                     sx={{display: 'block',}}
                                     control={
@@ -628,10 +682,10 @@ useEffect(() => {
                                         color="primary"
                                         />
                                     }
-                                    label="Return to start point"
+                                    label={languageTags.returnToStart}
                                     />
                             </Tooltip>
-                            <Tooltip placement="top" disableFocusListener enterTouchDelay={520} title={gpsActive ? "If you activate this setting your route will start at your current gps location!" : "Set your location on the map to use this feature."} TransitionComponent={Zoom} arrow>
+                            <Tooltip placement="top" disableFocusListener enterTouchDelay={520} title={gpsActive ? languageTags.startAtMyCurrentPositionWorkingTooltip : languageTags.startAtMyCurrentPositionDisabledTooltipTag } TransitionComponent={Zoom} arrow>
                                 <FormControlLabel
                                     sx={{display: 'block',}}
                                     control={
@@ -643,15 +697,15 @@ useEffect(() => {
                                         color="primary"
                                         />
                                     }
-                                    label="Start at my current position"
+                                    label={languageTags.startAtMyCurrentPosition}
                                     />
                                 </Tooltip>
                         </Box>
 
                         <Box style={{display:"flex", justifyContent:"space-evenly", flexWrap: "wrap"}}>
-                            <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%", minHeight:"35px"}} icon={<DirectionsCarFilledIcon fontSize="small" />} label={drivingTag} variant={directionMode === "driving" ? "filled" : "outlined"} onClick={() => setDirectionMode("driving")} ></Chip>
-                            <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%",  minHeight:"35px"}} icon={<DirectionsWalkIcon fontSize="small" />} label={walkingTag} variant={directionMode === "walking" ? "filled" : "outlined"} onClick={() => setDirectionMode("walking")}></Chip>
-                            <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%",  minHeight:"35px"}} icon={<DirectionsBikeIcon fontSize="small" />} label={cyclingTag} variant={directionMode === "cycling" ? "filled" : "outlined"} onClick={() => setDirectionMode("cycling")}></Chip>
+                            <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%", minHeight:"35px"}} icon={<DirectionsCarFilledIcon fontSize="small" />} label={languageTags.driving} variant={directionMode === "driving" ? "filled" : "outlined"} onClick={() => setDirectionMode("driving")} ></Chip>
+                            <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%",  minHeight:"35px"}} icon={<DirectionsWalkIcon fontSize="small" />} label={languageTags.walking} variant={directionMode === "walking" ? "filled" : "outlined"} onClick={() => setDirectionMode("walking")}></Chip>
+                            <Chip className="attributeChipsOfSearchbar" style={{minWidth:"25%",  minHeight:"35px"}} icon={<DirectionsBikeIcon fontSize="small" />} label={languageTags.cycling} variant={directionMode === "cycling" ? "filled" : "outlined"} onClick={() => setDirectionMode("cycling")}></Chip>
                         </Box>
 
                     </Card>   
@@ -664,25 +718,26 @@ useEffect(() => {
                     { didCalculateRoute ?
                     <div>
                         <Card sx={{ mb:3, ml:1, mr:1, pt:1, pb:0.5}} style={{borderRadius:"8px"}} elevation={4}>
-                            <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{currentRouteTag}:</strong> {currentDurationInMinutes} {minutesTag}, {currentKilometers} km, {currentSortedPointsRouteOutput.length-1} POIs</Typography>
+                            <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{languageTags.currentRoute}:</strong> {currentDurationInMinutes} {languageTags.minutes}, {currentKilometers} km, {returnToStart ?  currentSortedPointsRouteOutput.length-1 : currentSortedPointsRouteOutput.length} POIs</Typography>
                             <SortedRouteNames></SortedRouteNames>
                         </Card>
                       
                         </div>
                      : null}
 
-                    <Card sx={{ mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5, mt:4}} style={{ borderRadius:"8px"}} elevation={5}><Typography variant='h6' fontWeight={500} sx={{mt:0.8, mb:0.8}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{yourPointsTag}</Typography></Card>
+                    <Card sx={{ mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5, mt:4}} style={{ borderRadius:"8px"}} elevation={5}><Typography variant='h6' fontWeight={500} sx={{mt:0.8, mb:0.8}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.yourPoints}</Typography></Card>
 
                     <PointList></PointList>
                         
                         <Box  sx={{mt:5, ml:1, mr:1, mb: 1}}>
-                            <Button color="error" fullWidth variant="contained" onClick={() => deleteHoleRoute()}><DeleteIcon />{deleteHoleRouteButtonTag}</Button>
+                            <Button color="error" fullWidth variant="contained" onClick={() => deleteHoleRoute()}><DeleteIcon />{languageTags.deleteHoleRouteButton}</Button>
                         </Box>  
                 </div>
             );
       }
 
       const SortedRouteNames = () => (
+          
           <div>  
         {currentSortedPointsRouteOutput.map((item,i) => {
             
@@ -700,11 +755,11 @@ useEffect(() => {
       const ShowIfNotEnoughPoints = () => {
         return(
             <div>
-                <Card sx={{mt:3, mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={7}><Typography variant='h6' fontWeight={500} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{errorNoRouteTag}</Typography>
-                    <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{errorNoRouteTagDescription}</Typography>
+                <Card sx={{mt:3, mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={7}><Typography variant='h6' fontWeight={500} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.errorNoRoute}</Typography>
+                    <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.errorNoRouteDescription}</Typography>
                 </Card>
                 <Box  sx={{mt:2, ml:1, mr:1}}>
-                    <Button variant="contained" sx={{minHeight: 50}} fullWidth onClick={() => setOpenRouteDrawer(false)}>{closeThisWindowTag}</Button>  
+                    <Button variant="contained" sx={{minHeight: 50}} fullWidth onClick={() => setOpenRouteDrawer(false)}>{languageTags.closeThisWindow}</Button>  
                 </Box>
             </div>
         );
@@ -752,7 +807,7 @@ useEffect(() => {
                         <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                         <div>
                             <div> 
-                                {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{addButtonTag}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{removeButtonTag}</Button>}
+                                {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{languageTags.addButton}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{languageTags.removeButton}</Button>}
                                 <h2 id="nameField" style={{marginBottom:"10px"}}>{obj.properties.name}</h2>
                             </div>
                             <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>
@@ -773,16 +828,16 @@ useEffect(() => {
                         {currentAddedPoints.length > 0 || currentSortedPointsRouteOutput.length > 1 ? <ShowIfEnoughPoints didCalculateRoute={didCalculateRoute} /> : <ShowIfNotEnoughPoints />}
                     
                         <Box  sx={{mt:2, ml:1, mr:1}}>
-                            <Button variant="contained" disabled={disableHandleRandomLocationButton} sx={{minHeight: 50}} fullWidth onClick={() => handleRandomLocationButton()}>Explore a random location!</Button>
+                            <Button variant="contained" disabled={disableHandleRandomLocationButton} sx={{minHeight: 50}} fullWidth onClick={() => handleRandomLocationButton()}>{languageTags.exploreRandomLocation}</Button>
                         </Box>
                     
                     </div>
                
             </Drawer>
 
-            <SuccessSnackbar openSuccessSnack={showSuccessSnack} successMessage={"You fly to: " + currentRandomLocation} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
-            <ErrorSnackbar openErrorSnack={unableToRetrieveLocation} errorMessage={"Unable to retrieve your location!"} handleClose={handleGpsErrorsnack}></ErrorSnackbar>
-            <ErrorSnackbar openErrorSnack={!geolocationSupported} errorMessage={"GPS is not supported on your device."} handleClose={handleGeolocationErrorsnack}></ErrorSnackbar>
+            <SuccessSnackbar openSuccessSnack={showSuccessSnack} successMessage={languageTags.flyTo + currentRandomLocation} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
+            <ErrorSnackbar openErrorSnack={unableToRetrieveLocation} errorMessage={languageTags.unableToRetrieveLocation} handleClose={handleGpsErrorsnack}></ErrorSnackbar>
+            <ErrorSnackbar openErrorSnack={!geolocationSupported} errorMessage={languageTags.gpsNotSupported} handleClose={handleGeolocationErrorsnack}></ErrorSnackbar>
 
         </div>
     );

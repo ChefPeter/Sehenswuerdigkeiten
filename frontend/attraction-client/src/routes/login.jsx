@@ -35,31 +35,54 @@ function Login(props) {
   const[resetPasswordButtonTag, setResetPasswordButtonTag] = useState("RESET PASSWORD");
   const[errorFieldTitleTag, setErrorFieldTitleTag] = useState("Error");
 
+  const[languageTags, setLanguageTags] = useState({
+                                                    usernameTextfield: "Username",
+                                                    passwordTextfield: "Password",
+                                                    loginButton: "LOGIN",
+                                                    newUserButton: "NEW USER?",
+                                                    resetPasswordButton: "RESET PASSWORD",
+                                                    errorFieldTitle: "Error"
+  });
+
   useEffect(() => {
 
     if(props.l1 == "de") {
-      setUsernameTextfieldTag("Benutzername");
-      setPasswordTextfieldTag("Passwort");
-      setLoginButtonTag("Anmelden");
-      setNewUserButtonTag("Neuer Benutzer?");
-      setResetPasswordButtonTag("Passwort zurücksetzen");
-      setErrorFieldTitleTag("Fehler");
+
+      setLanguageTags({
+                        usernameTextfield: "Benutzername",
+                        passwordTextfield: "Passwort",
+                        loginButton: "Anmelden",
+                        newUserButton: "Neuer Benutzer?",
+                        resetPasswordButton: "Passwort zurücksetzen",
+                        errorFieldTitle: "Fehler"
+      });
+
     } else if(props.l1 == "it") {
-      setUsernameTextfieldTag("Nome utente");
-      setPasswordTextfieldTag("Password");
-      setLoginButtonTag("Accedi");
-      setNewUserButtonTag("NUOVO UTENTE?");
-      setResetPasswordButtonTag("Ripristina la password");
-      setErrorFieldTitleTag("Errore");
+
+      setLanguageTags({
+        usernameTextfield: "Nome utente",
+        passwordTextfield: "Password",
+        loginButton: "Accedi",
+        newUserButton: "NUOVO UTENTE?",
+        resetPasswordButton: "Ripristina la password",
+        errorFieldTitle: "Errore"
+      });
+
     } else {
-      setUsernameTextfieldTag("Username");
-      setPasswordTextfieldTag("Password");
-      setLoginButtonTag("LOGIN");
-      setNewUserButtonTag("NEW USER?");
-      setResetPasswordButtonTag("RESET PASSWORD");
-      setErrorFieldTitleTag("Error");
+
+      setLanguageTags({
+        usernameTextfield: "Username",
+        passwordTextfield: "Password",
+        loginButton: "LOGIN",
+        newUserButton: "NEW USER?",
+        resetPasswordButton: "RESET PASSWORD",
+        errorFieldTitle: "Error"
+      });
+
    }
+
    setFullyLoaded(true)
+
   },[props.l1]);
 
 
@@ -69,44 +92,41 @@ function Login(props) {
   return (
     
     <div id='hintergrund'>     
-      <div id='titel'>
-        <h1>City2Go</h1>
-      </div>
-      {!fullyLoaded ?
-        <Box sx={{ display: 'flex', justifyContent:"center"}}>
-          <CircularProgress color="inherit" size={80}/>
-        </Box>
-      : null}
+      <div id='titel'><h1>City2Go</h1></div>
       {fullyLoaded ?
-      <div id = "textfeld">
-        <div id="widthTextfields">
-          <div id="textFieldsLogin">
-            <TextField sx={{ marginBottom: 1 }}  fullWidth id="filled-basic" label={usernameTextfieldTag} variant="filled" onChange={getUsernameValue} />
-            <TextField sx={{ marginBottom: 0.5 }} fullWidth id="filled-password-input" label={passwordTextfieldTag} type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} 
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                post(setErrorText, setShowErrorAlert);
-                e.preventDefault();
-            }}}/>
-          </div>
-          <Button fullWidth id='btnLoginPage' variant="conained" onClick={ () => post(setErrorText, setShowErrorAlert)}>{loginButtonTag}</Button>    
-         
-          <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/register")}>{newUserButtonTag}</Button>
-          
-          <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/requestreset")}>{resetPasswordButtonTag}</Button>
-          
-          {showErrorAlert ?
-            <Fade in={showErrorAlert} timeout={250}>
-              <Alert id="loginErrorAlert" severity="error"> 
-                  <AlertTitle>{errorFieldTitleTag}</AlertTitle>
-                      {errorText}
-              </Alert>
-            </Fade>
-          : null}
+          <div id = "textfeld">
+            <div id="widthTextfields">
+              <div id="textFieldsLogin">
+                <TextField sx={{ marginBottom: 1 }}  fullWidth id="filled-basic" label={languageTags.usernameTextfield} variant="filled" onChange={getUsernameValue} />
+                <TextField sx={{ marginBottom: 0.5 }} fullWidth id="filled-password-input" label={languageTags.passwordTextfield} type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} 
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    post(setErrorText, setShowErrorAlert);
+                    e.preventDefault();
+                }}}/>
+              </div>
+              <Button fullWidth id='btnLoginPage' variant="conained" onClick={ () => post(setErrorText, setShowErrorAlert)}>{languageTags.loginButton}</Button>    
+            
+              <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/register")}>{languageTags.newUserButton}</Button>
+              
+              <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/requestreset", {state: {l1: props.l1}})}>{languageTags.resetPasswordButton}</Button>
+              
+              {showErrorAlert ?
+                <Fade in={showErrorAlert} timeout={250}>
+                  <Alert id="loginErrorAlert" severity="error"> 
+                      <AlertTitle>{languageTags.errorFieldTitle}</AlertTitle>
+                          {errorText}
+                  </Alert>
+                </Fade>
+              : null}
 
-        </div>
-      </div>
-       : null}
+            </div>
+          </div>
+        :  
+          <Box sx={{ display: 'flex', justifyContent:"center"}}>
+            <CircularProgress color="inherit" size={80}/>
+          </Box>
+        }
     
       </div>   
      
@@ -124,11 +144,10 @@ function post (setErrorText, setShowErrorAlert){
       body: formData,
       credentials: 'include'
   }).then(res => {
-      if (res.status == 400) {
+      if (res.status == 400) { // error at login
           res.text().then(e => setErrorText(e));
           setShowErrorAlert(true);
-      } else {
-          // Infofeld sichtbar machen
+      } else { // login worked
          console.log("JAWOLL")
          window.location.href="/home";
          

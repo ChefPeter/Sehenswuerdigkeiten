@@ -60,11 +60,15 @@ async function getBestRoute(request, res) {
             matrix[x][i] = distance;
         }
     }
-    
-    let coords = tsp(matrix).map(e => p[e].geometry.coordinates);
+
+    let coords=null;
+    try{
+        coords = tsp(matrix).map(e => p[e].geometry.coordinates);
+    }catch(e){return null;}
 
     if(request.body.returnToStart == "false")
         coords.pop(); //last element is starting point
+
     let sortedIDs = [];
     for(let i = 0; i<l; i++){
         for(let x = 0; x<l; x++){
@@ -73,7 +77,7 @@ async function getBestRoute(request, res) {
         }
     }
 
-    if(request.body.returnToStart)
+    if(request.body.returnToStart != "false")
         sortedIDs.push(sortedIDs[0]);
 
     for(let count = 1; count < coords.length; count++)

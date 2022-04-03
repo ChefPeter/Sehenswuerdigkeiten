@@ -5,7 +5,6 @@ import {
 } from "react-router-dom";
 import { checkCookie } from './functions/cookieManager';
 import './index.css';
-import App from './routes/App';
 import Approve from './routes/approve';
 import Chat from './routes/chat';
 import Contact from "./routes/contact";
@@ -33,8 +32,6 @@ const Routing = () => {
       <Route path="/" element={<Login t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
       <Route path="" element={<Login t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
       <Route path="login" element={<Login t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
-
-      <Route path="app" element={<App /> }/>
       
       <Route path="home" element={<Home t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} /> } />
       <Route path="register" element={<Register t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />

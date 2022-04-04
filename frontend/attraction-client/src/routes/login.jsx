@@ -97,8 +97,8 @@ function Login(props) {
           <div id = "textfeld">
             <div id="widthTextfields">
               <div id="textFieldsLogin">
-                <TextField sx={{ marginBottom: 1 }}  fullWidth id="filled-basic" label={languageTags.usernameTextfield} variant="filled" onChange={getUsernameValue} />
-                <TextField sx={{ marginBottom: 0.5 }} fullWidth id="filled-password-input" label={languageTags.passwordTextfield} type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} 
+                <TextField sx={{ marginBottom: 1 }} autoFocus  inputProps={{ maxLength: 90 }} fullWidth id="filled-basic" label={languageTags.usernameTextfield} variant="filled" onChange={getUsernameValue} />
+                <TextField sx={{ marginBottom: 0.5 }}  fullWidth id="filled-password-input" label={languageTags.passwordTextfield} type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} 
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     post(setErrorText, setShowErrorAlert);

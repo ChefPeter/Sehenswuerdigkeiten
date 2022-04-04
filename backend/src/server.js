@@ -31,6 +31,7 @@ const getGroupConversation = require("./get-group-conversation");
 const getPosition = require("./get-position");
 const getRating = require("./get-rating");
 const getRandomLocation = require("./get-random-location");
+const getVisitedSights = require("./get-visited-sights.js");
 
 const express = require("express");
 const session = require("express-session");
@@ -89,7 +90,7 @@ app.post("/route", async(req, res) => await getBestRoute(req, res));
 app.post("/create-group", isAuthenticated, async(req, res) => sendResponse(await createGroup(req), res));
 app.post("/leave-group", isAuthenticated, async(req, res) => sendResponse(await leaveGroup(req), res));
 app.post("/add-to-group", isAuthenticated, async(req, res) => sendResponse(await addToGroup(req), res));
-app.post("/sights", /*isAuthenticated,*/ async(req, res) => await sendSights(req, res));
+app.post("/sights", isAuthenticated, async(req, res) => await sendSights(req, res));
 app.post("/add-sight", isAuthenticated, async(req, res) => sendResponse(await addSight(req), res));
 app.post("/add-position", isAuthenticated, async(req, res) => sendResponse(await addPosition(req), res));
 app.post("/add-rating", isAuthenticated, async(req, res) => sendResponse(await addRating(req), res));
@@ -109,6 +110,7 @@ app.get("/group-conversation", isAuthenticated, async(req, res) => sendGetRespon
 app.get("/position", isAuthenticated, async(req, res) => sendGetResponse(await getPosition(req), res));
 app.get("/rating", isAuthenticated, async(req, res) => sendGetResponse(await getRating(req), res));
 app.get("/get-random-location", isAuthenticated, async (req, res) => sendGetResponse(await getRandomLocation(req), res));
+app.get("/visited-sights", isAuthenticated, async(req, res) => sendGetResponse(await getVisitedSights(req), res));
 //app.get("/logged-in", (req, res) => res.send(req.session));
 
 

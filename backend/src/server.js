@@ -17,6 +17,7 @@ const sendSights = require("./send-sights");
 const  { addSight } = require("./add-sight");
 const addPosition = require("./add-position");
 const addRating = require("./add-rating");
+const changeVisibility = require("./change-visibility");
 
 const getDescription = require("./get-description");
 const getFriends = require("./get-friends");
@@ -33,7 +34,7 @@ const getRating = require("./get-rating");
 const getRandomLocation = require("./get-random-location");
 const getVisitedSights = require("./get-visited-sights.js");
 const getAllPositions = require("./get-all-positions");
-const changeVisibility = require("./change-visibility");
+const getVisibility = require("./get-visibility.js");
 
 const express = require("express");
 const session = require("express-session");
@@ -115,6 +116,7 @@ app.get("/rating", isAuthenticated, async(req, res) => sendGetResponse(await get
 app.get("/get-random-location", isAuthenticated, async (req, res) => sendGetResponse(await getRandomLocation(req), res));
 app.get("/visited-sights", isAuthenticated, async(req, res) => sendGetResponse(await getVisitedSights(req), res));
 app.get("/all-positions", isAuthenticated, async(req, res) => sendGetResponse(await getAllPositions(req), res));
+app.get("/visibility", isAuthenticated, async(req, res) => sendGetResponse(await getVisibility(req), res));
 //app.get("/logged-in", (req, res) => res.send(req.session));
 
 

@@ -27,7 +27,7 @@ function Home(props) {
       <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
         
         <Card id="container" style={{borderRadius:"0px"}}>
-          <BaseMap l1={props.l1} />
+          <BaseMap l1={props.l1} t1={props.t1} />
           
           <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2} />
         </Card>

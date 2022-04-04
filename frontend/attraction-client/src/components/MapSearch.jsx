@@ -20,6 +20,7 @@ import React, { useEffect, useState } from "react";
 import { changedFilter, flyToLocation, setDirectionGlobally, setFilter, setRadiusForPointerSearch } from "./BaseMap";
 import "./styles/mapsearch.css";
 import Zoom from '@mui/material/Zoom';
+import LayersIcon from '@mui/icons-material/Layers';
 
 let locationInput = "";
 let timerID;
@@ -245,8 +246,6 @@ function MapSearch (props) {
         }
     }
 
-  
-
     return (
 
         <Paper id="searchPaper" elevation={10} >
@@ -256,7 +255,6 @@ function MapSearch (props) {
                 id="idAutocomplete"
                 fullWidth
                 disableClearable
-               
                 onChange={handleInputChange} 
                 options={locations.map((option) => option.name)}
                 renderInput={(params) => (
@@ -310,9 +308,9 @@ function MapSearch (props) {
                     <Divider  sx={{ mb: 1, mt:1}} />
                    
                    <div style={{display:"flex"}}>
-                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsCarFilledIcon fontSize="small" />} label={drivingTag} variant={props.directionMode === "driving" ? "filled" : "outlined"} onClick={() => props.setDirectionMode("driving")}></Chip>
-                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsWalkIcon fontSize="small" />} label={walkingTag} variant={props.directionMode === "walking" ? "filled" : "outlined"} onClick={() => props.setDirectionMode("walking")}></Chip>
-                    <Chip className="attributeChipsOfSearchbar" icon={<DirectionsBikeIcon fontSize="small" />} label={cyclingTag} variant={props.directionMode === "cycling" ? "filled" : "outlined"} onClick={() => props.setDirectionMode("cycling")}></Chip>
+                    <Chip className="attributeChipsOfSearchbar" icon={<LayersIcon fontSize="small" />} label={"Light"} variant={props.themeMap === "light" ? "filled" : "outlined"} onClick={() => props.setThemeMap("light")}></Chip>
+                    <Chip className="attributeChipsOfSearchbar" icon={<LayersIcon fontSize="small" />} label={"Dark"} variant={props.themeMap === "dark" ? "filled" : "outlined"} onClick={() => props.setThemeMap("dark")}></Chip>
+                    <Chip className="attributeChipsOfSearchbar" icon={<LayersIcon fontSize="small" />} label={"Satellite"} variant={props.themeMap === "satellite" ? "filled" : "outlined"} onClick={() => props.setThemeMap("satellite")}></Chip>
                     
                     <Tooltip placement="top" disableFocusListener enterTouchDelay={420}  title={"Enables 3D Mode on the map. Zoom in and use CTRL + LEFT MOUSE to see the results."} TransitionComponent={Zoom} arrow>
                         <FormControlLabel
@@ -320,7 +318,7 @@ function MapSearch (props) {
                             control={
                                 <Switch
                                 sx={{ml:2}}
-                                defaultChecked={false}
+                                checked={props.enabled3D}
                                 onChange={() => props.enable3D()}
                                 name="switchEnableReturnToStartpoint"
                                 color="primary"

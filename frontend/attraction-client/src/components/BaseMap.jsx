@@ -9,37 +9,37 @@ import GpsOffIcon from '@mui/icons-material/GpsOff';
 import RouteIcon from '@mui/icons-material/Route';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
-import { Box, Button, Card, Chip, CircularProgress, Drawer, OutlinedInput, Typography, Switch, Tooltip, FormControlLabel, Checkbox, Divider } from "@mui/material";
+import { Box, Button, Card, Chip, CircularProgress, Drawer, FormControlLabel, OutlinedInput, Switch, Tooltip, Typography } from "@mui/material";
+import Zoom from '@mui/material/Zoom';
 import mapboxgl from "mapbox-gl";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
+import ErrorSnackbar from './ErrorSnackbar';
 import MapSearch from "./MapSearch";
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
-import Zoom from '@mui/material/Zoom';
-import ErrorSnackbar from './ErrorSnackbar';
 
-    let map;
-    let marker;
-    let testRoute = [];
-    let radiusForPointerSearch = 1;
-    let searchByMarker = false;
-    let lastCoords = [];
-    let lastRadius = 1;
-    let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, tourist_facilities: true, museums: true, palaces: true, malls: true, churches: true};
-    let currentGlobalResults = [];
-    let timerID;
-    let locationTimerID;
-    let globalPopup = "", globalPopup2 = "";
-    let geolocate;
-    let lastPositionByMapboxGeolocate = [];
-    let returnToStart = false;
-    let startAtGps = false;
-    let userEnabledMapboxLocation = false;
-    let coordsForGpsSearch = [];
-    let lastSentCoordinates = [];
-
+let map = null;
+let marker;
+let testRoute = [];
+let radiusForPointerSearch = 1;
+let searchByMarker = false;
+let lastCoords = [];
+let lastRadius = 1;
+let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, tourist_facilities: true, museums: true, palaces: true, malls: true, churches: true};
+let currentGlobalResults = [];
+let timerID;
+let locationTimerID;
+let globalPopup = "", globalPopup2 = "";
+let geolocate;
+let lastPositionByMapboxGeolocate = [];
+let returnToStart = false;
+let startAtGps = false;
+let userEnabledMapboxLocation = false;
+let coordsForGpsSearch = [];
+let lastSentCoordinates = [];
+let currentLineCoords = [];
 
     export function setFilter(newFilter){
         filter = newFilter;
@@ -72,7 +72,6 @@ import ErrorSnackbar from './ErrorSnackbar';
             return;
         }
             
-
         setShowLoadingCircleRoute(true) 
         let formData = new FormData();
         let route, sortedIDs, weather;
@@ -97,7 +96,7 @@ import ErrorSnackbar from './ErrorSnackbar';
         setCurrentRouteOutput(sortedIDs)
         setCurrentDurationInMinutes(Math.round(route.duration / 60));
         setCurrentKilometers(Math.round(route.distance / 1000 * 10) / 10)
-        
+        currentLineCoords = route.coords;
         map.addSource('route1', {
             'type': 'geojson',
             'data': {
@@ -136,6 +135,8 @@ function BaseMap (props) {
     const [currentDurationInMinutes, setCurrentDurationInMinutes] = useState("-1");
     const [currentKilometers, setCurrentKilometers] = useState("-1");
     const [weatherData, setWeatherData] = useState({});
+    const [themeMap, setThemeMap] = useState(props.t1);
+    const [enabled3D, setEnabled3D] = useState(false);
 
     const[disableHandleRandomLocationButton,setDisableHandleRandomLocationButton] = useState(false);
     const[showLoadingCircleRoute, setShowLoadingCircleRoute] = useState(false);
@@ -264,9 +265,13 @@ function BaseMap (props) {
 
     },[props.l1]);
 
+    useEffect(()=> {
+        newMap(themeMap, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen);
+    },[themeMap]);
+
     //mapbox://styles/mapbox/satellite-v9
     //mapbox://styles/mapbox/light-v10
-    let theme = "mapbox://styles/mapbox/navigation-night-v1";
+    let theme = "mapbox://styles/mapbox/light-v10";
     let imageSrc = "";
 
     const [open, setOpen] = useState(false);
@@ -281,42 +286,12 @@ function BaseMap (props) {
     const [obj, setObj] = useState({properties: {name: 'test'}});
     const [markerCoords, setMarkerCoords] = useState([]);
 
-    const Popup2 = ({ feature2 }) => {
-        const { } = feature2;
-
-        return (
-            <div></div>
-        );
-    };
-
-
 useEffect(() => {
 
         //Brixen
-        let coordinates = [11.65598, 46.71503];
-        lastCoords = coordinates;
-       
-        map = new mapboxgl.Map({
-            container: "mapContainer",
-            center: coordinates,
-            style: theme,
-            zoom: 12,
-            maxPitch: 60,
-            minZoom: 1
-        });
+        lastCoords =  [11.65598, 46.71503];
+        newMap(props.t1, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen);
 
-        map.addControl(new mapboxgl.ScaleControl({ position: 'bottom-left' }));    
-    
-        geolocate = new mapboxgl.GeolocateControl({
-            positionOptions: {
-                enableHighAccuracy: true
-            },
-            trackUserLocation: true,
-            // Draw an arrow next to the location dot to indicate which direction the device is heading.
-            showUserHeading: true,
-        });
-
-        
         geolocate.on('geolocate', function(e) {
             setGpsActive(true);
             lastPositionByMapboxGeolocate = [e.coords.longitude, e.coords.latitude];
@@ -339,76 +314,6 @@ useEffect(() => {
                     lastSentCoordinates = lastPositionByMapboxGeolocate;
                 } 
             }, 20000)
-
-        });
-        map.addControl(geolocate);
-        
-       
-        lastCoords = coordinates;
-        map.on("load", () => {
-            map.flyTo({
-                center: coordinates,
-                essential: true // this animation is considered essential with respect to prefers-reduced-motion
-            });
-
-           
-            map.loadImage('https://img.icons8.com/color/344/marker--v1.png',
-                function (error, image) {
-                    if (error) throw error;
-                    map.addImage('marker--v1', image);
-                }
-            );
-            // add the data source for new a feature collection with no features
-            map.addSource("attraction-points-data", {
-                type: "geojson",
-                data: {
-                    type: "FeatureCollection",
-                    features: []
-                }
-            });
-            // now add the layer, and reference the data source above by name
-            map.addLayer({
-                id: "attraction-points-layer",
-                source: "attraction-points-data",
-                type: "symbol",
-                layout: {
-                    // full list of icons here: https://labs.mapbox.com/maki-icons
-                    "icon-image": "marker--v1", // this will put little croissants on our map
-                    "icon-padding": 0,
-                    "icon-allow-overlap": true,
-                    "icon-size": 0.08
-                }
-            });
-    
-            map.loadImage('https://img.icons8.com/dusk/344/circled-user-male-skin-type-6.png',
-                function (error, image) {
-                    if (error) throw error;
-                    map.addImage('friends-marker', image);
-                }
-            );
-            // add the data source for new a feature collection with no features
-            map.addSource("friends-points-data", {
-                type: "geojson",
-                data: {
-                    type: "FeatureCollection",
-                    features: []
-                }
-            });
-                
-            // now add the layer, and reference the data source above by name
-            map.addLayer({
-                    id: "friends-points-layer",
-                    source: "friends-points-data",
-                    type: "symbol",
-                    layout: {
-                        // full list of icons here: https://labs.mapbox.com/maki-icons
-                        "icon-image": "friends-marker", // this will put little croissants on our map
-                        "icon-padding": 0,
-                        "icon-allow-overlap": true,
-                        "icon-size": 0.1
-                    }
-            });
-            
 
         });
 
@@ -438,130 +343,183 @@ useEffect(() => {
             console.log("getting positions");
 
         }, 20000);
-        
-
-        map.on("moveend", async () => {
-            // get new center coordinates
-            let lon = coordinates[1];
-            let lat = coordinates[0];
-
-            /*lon = "12.4907795";
-            lat = "41.8897653"*/
-            // fetch new data
-
-        });
-
-
-
-        // change cursor to pointer when user hovers over a clickable feature
-        map.on("mouseenter", "attraction-points-layer", async e => {
-
-            
-            if (e.features.length) {
-                setShowLoadingInsteadPicture(true);
-                var UserAgent = navigator.userAgent.toLowerCase();
-
-                // Nur beim Computer
-                if (UserAgent.search(/(iphone|ipod|opera mini|fennec|palm|blackberry|android|symbian|series60)/) < 0) {
-
-                    const feature = e.features[0];
-
-                    // create popup node
-                    setImage("");
-                    try{
-                        imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
-                        if(imageSrc != undefined)
-                        setImage(imageSrc);
-                    }catch(e){}
-                    
-                    setShowLoadingInsteadPicture(false);    
-                    const popupNode = document.createElement("div");
-
-                    ReactDOM.render(<Popup feature={feature} />, popupNode);
-                    ReactDOM.render(<div><img src={imageSrc} alt="" style={{ width: "100%", height: "50%" }}></img>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}><p style={{ color: 'black' }}>{feature.properties.name}</p>
-                        </div></div>, popupNode);
-
-                    //popupNode  = document.createElement("div");
-                    // set popup on map
-
-                    popUpRef.current
-                        .setLngLat(feature.geometry.coordinates)
-                        .setDOMContent(popupNode)
-                        .addTo(map);
-
-                }
-            }
-        });
-
-
-        // reset cursor to default when user is no longer hovering over a clickable feature
-        map.on("mouseleave", "attraction-points-layer", () => {
-            //mapboxgl-popup-close-button
-            popUpRef.current.remove();
-        });
-
-        // add popup when user clicks a point
-        map.on("click", "attraction-points-layer", e => {
-            if (e.features.length) {
-                setObj(e.features[0]);
-                console.log(e.features[0]);
-                setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
-                setOpen(true);
-            }
-        });
-
-        map.on("dblclick", async e => {
-
-            const feature2 = e;
-            let coords = [e.lngLat.lng, e.lngLat.lat]
-
-            let popupNode  = document.createElement("div");
-            ReactDOM.render(<Popup2 feature2={feature2} />, popupNode);
-            ReactDOM.render(<div><Button variant="contained" onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch)} >Search here?</Button></div>, popupNode);
-
-            // set popup on map
-            popUpRef.current
-                .setLngLat(coords)
-                .setDOMContent(popupNode)
-                .addTo(map);
-
-        });
-
-        marker = new mapboxgl.Marker();
-
-        function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch) {
-            if(globalPopup2 !== ""){
-                globalPopup2.remove()
-                globalPopup2 = "";
-            }
-            
-            lastCoords = markerCoords;
-
-            searchByMarker = true;
-
-            popUpRef.current.remove();
-            add_marker(markerCoords);
-
-            flyToLocation(markerCoords, radiusForPointerSearch, false)
-        }
-
-        function add_marker(coords) {
-            setMarkerCoords(coords)
-            marker.setLngLat(coords).addTo(map);
-            globalPopup = marker;
-        }
-        map.doubleClickZoom.disable()
-        //map.on('dblclick', add_marker);
-    
 
 },[]);
 
+async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen){
+  
+    setEnabled3D(false);
+
+    if(theme === "light"){
+        theme = "mapbox://styles/mapbox/light-v10";
+    }else if(theme === "satellite"){
+        theme = "mapbox://styles/mapbox/satellite-v9";
+    }else {
+        theme = "mapbox://styles/mapbox/navigation-night-v1";
+    }
+
+    if(map !== null)
+        map.remove();
+
+    if(lastCoords.length === 0)
+        lastCoords =  [11.65598, 46.71503];
+
+    map = new mapboxgl.Map({
+        container: "mapContainer",
+        style: theme,
+        zoom: 12,
+        maxPitch: 85,
+        center: lastCoords,
+        minZoom: 1,
+    });
+    map.addControl(new mapboxgl.ScaleControl({ position: 'bottom-left' }));
+    geolocate = new mapboxgl.GeolocateControl({
+        positionOptions: {
+            enableHighAccuracy: true
+        },
+        trackUserLocation: true,
+        // Draw an arrow next to the location dot to indicate which direction the device is heading.
+        showUserHeading: true,
+    });
+    map.on("load", () => {
+        map.addControl(geolocate);
+        addAllLayersToMap(map);
+    });
+    map.doubleClickZoom.disable();    
+    // change cursor to pointer when user hovers over a clickable feature
+    map.on("mouseenter", "attraction-points-layer", async e => {
+
+        if (e.features.length) {
+            setShowLoadingInsteadPicture(true);
+            var UserAgent = navigator.userAgent.toLowerCase();
+
+            // Nur beim Computer
+            if (UserAgent.search(/(iphone|ipod|opera mini|fennec|palm|blackberry|android|symbian|series60)/) < 0) {
+
+                const feature = e.features[0];
+
+                // create popup node
+                setImage("");
+                try{
+                    imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
+                    if(imageSrc != undefined)
+                    setImage(imageSrc);
+                }catch(e){}
+                
+                setShowLoadingInsteadPicture(false);    
+                const popupNode = document.createElement("div");
+
+                ReactDOM.render(<Popup feature={feature} />, popupNode);
+                ReactDOM.render(<div><img src={imageSrc} alt="" style={{ width: "100%", height: "50%" }}></img>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}><p style={{ color: 'black' }}>{feature.properties.name}</p>
+                    </div></div>, popupNode);
+
+                //popupNode  = document.createElement("div");
+                // set popup on map
+
+                popUpRef.current
+                    .setLngLat(feature.geometry.coordinates)
+                    .setDOMContent(popupNode)
+                    .addTo(map);
+
+            }
+        }
+    });
+    marker = new mapboxgl.Marker();
+    // reset cursor to default when user is no longer hovering over a clickable feature
+    map.on("mouseleave", "attraction-points-layer", () => {
+        //mapboxgl-popup-close-button
+        popUpRef.current.remove();
+    });
+    // add popup when user clicks a point
+    map.on("click", "attraction-points-layer", e => {
+        if (e.features.length) {
+            setObj(e.features[0]);
+            console.log(e.features[0]);
+            setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
+            setOpen(true);
+        }
+    });
+    map.on("dblclick", (e) => {
+        let coords = [e.lngLat.lng, e.lngLat.lat];
+        let popupNode  = document.createElement("div");
+        ReactDOM.render(<div><Button variant="contained" onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch)} >Search here?</Button></div>, popupNode);
+        popUpRef.current
+            .setLngLat(coords)
+            .setDOMContent(popupNode)
+            .addTo(map);
+    });
+    
+    delay(100).then(async () => {
+        try{
+            if(currentGlobalResults["features"].length > 0){
+                //could take some time till layer exists
+                while(map.getSource("attraction-points-data") == undefined){
+                    await sleep(125);
+                }
+                map.getSource("attraction-points-data").setData(currentGlobalResults);
+            }
+
+            //route exists -> draw new
+            if(currentLineCoords.length !== 0){
+                map.addSource('route1', {
+                    'type': 'geojson',
+                    'data': {
+                        'type': 'Feature',
+                        'properties': {},
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': currentLineCoords
+                        }
+                    }
+                });
+                map.addLayer({
+                    'id': 'layer1',
+                    'type': 'line',
+                    'source': 'route1',
+                    'layout': {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    'paint': {
+                        'line-color': 'yellow',
+                        'line-width': 5
+                    }
+                });
+            }
+        } catch (e){};
+    });
+   
+    const sleep = (milliseconds) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds))
+      }
+
+}
 
     function pointIsInRoute(id){
         if (testRoute.some(item => item["properties"]["id"]===id)) 
             return true;
         return false;
+    }
+    function add_marker(coords) {
+        setMarkerCoords(coords);
+        marker.setLngLat(coords).addTo(map);
+        globalPopup = marker;
+    }
+    function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch) {
+        if(globalPopup2 !== ""){
+            globalPopup2.remove();
+            globalPopup2 = "";
+        }
+        
+        lastCoords = markerCoords;
+
+        searchByMarker = true;
+
+        popUpRef.current.remove();
+        add_marker(markerCoords);
+
+        flyToLocation(markerCoords, radiusForPointerSearch, false)
     }
 
     function locationButtonClick(){
@@ -641,6 +599,7 @@ useEffect(() => {
     };
 
     function deleteHoleRoute(){
+        currentLineCoords = [];
         setCurrentAddedPoints([])
         testRoute = [];
         setDidCalculateRoute(false)
@@ -659,59 +618,83 @@ useEffect(() => {
     }
 
     function enable3D(){
-
+        setEnabled3D(true);
         if (map.getLayer('add-3d-buildings')) {
             map.removeLayer("add-3d-buildings");
+            map.removeSource("mapbox-dem");
+            map.remove("sky");
             map.setPitch(0)
             return;
         }
 
-        const layers = map.getStyle().layers;
-        const labelLayerId = layers.find(
-        (layer) => layer.type === 'symbol' && layer.layout['text-field']
-        ).id;
-        
-        // The 'building' layer in the Mapbox Streets
-        // vector tileset contains building height data
-        // from OpenStreetMap.
-        map.addLayer({
-        'id': 'add-3d-buildings',
-        'source': 'composite',
-        'source-layer': 'building',
-        'filter': ['==', 'extrude', 'true'],
-        'type': 'fill-extrusion',
-        'minzoom': 10,
-        'paint': {
-        'fill-extrusion-color': '#aaa',
-        
-        // Use an 'interpolate' expression to
-        // add a smooth transition effect to
-        // the buildings as the user zooms in.
-        'fill-extrusion-height': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        15,
-        0,
-        15.05,
-        ['get', 'height']
-        ],
-        'fill-extrusion-base': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        15,
-        0,
-        15.05,
-        ['get', 'min_height']
-        ],
-        'fill-extrusion-opacity': 0.8
+        if(map.getStyle()["name"] !== "Mapbox Satellite"){
+            const layers = map.getStyle().layers;
+            const labelLayerId = layers.find(
+            (layer) => layer.type === 'symbol' && layer.layout['text-field']
+            ).id;
+            
+            // The 'building' layer in the Mapbox Streets
+            // vector tileset contains building height data
+            // from OpenStreetMap.
+            map.addLayer({
+            'id': 'add-3d-buildings',
+            'source': 'composite',
+            'source-layer': 'building',
+            'filter': ['==', 'extrude', 'true'],
+            'type': 'fill-extrusion',
+            'minzoom': 10,
+            'paint': {
+            'fill-extrusion-color': '#aaa',
+            
+            // Use an 'interpolate' expression to
+            // add a smooth transition effect to
+            // the buildings as the user zooms in.
+            'fill-extrusion-height': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            15,
+            0,
+            15.05,
+            ['get', 'height']
+            ],
+            'fill-extrusion-base': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            15,
+            0,
+            15.05,
+            ['get', 'min_height']
+            ],
+            'fill-extrusion-opacity': 0.8
+            }
+            },
+            labelLayerId
+            );
         }
-        },
-        labelLayerId
-        );
+
+        map.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+            'tileSize': 512,
+            'maxzoom': 14
+        });
+        // add the DEM source as a terrain layer with exaggerated height
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.2 });
+
+        // add a sky layer that will show when the map is highly pitched
+        map.addLayer({
+            'id': 'sky',
+            'type': 'sky',
+            'paint': {
+                'sky-type': 'atmosphere',
+                'sky-atmosphere-sun': [0.0, 0.0],
+                'sky-atmosphere-sun-intensity': 20
+            }
+        });
         
-        map.setPitch(60);
+        map.setPitch(80);
     }
 
     function startAtGpsSwitchChanged(value){
@@ -905,7 +888,7 @@ useEffect(() => {
         <div>
             <div id="mapContainer" className="map"></div>
             <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
-            <MapSearch l1={props.l1} directionMode={directionMode} setDirectionMode={setDirectionMode} enable3D={enable3D} ></MapSearch>
+            <MapSearch l1={props.l1} directionMode={directionMode} setThemeMap={setThemeMap} themeMap={themeMap} enable3D={enable3D} enabled3D={enabled3D}></MapSearch>
             
             <div  id="test" style={{position: "fixed",top: "calc(100% - 150px)", left:"calc(100vw - 75px)"}}>
                
@@ -981,7 +964,7 @@ async function getLocationData(lon, lat, radius, filters)
 }
 
 export async function flyToLocation (coords, radius, newCoordinates = false){
-    
+
     let locationData = new FormData();
 
     if(newCoordinates){
@@ -1017,7 +1000,6 @@ export async function flyToLocation (coords, radius, newCoordinates = false){
         essential: true // this animation is considered essential with respect to prefers-reduced-motion
     });
 
-
     lastRadius = radius;
 
     //const results1 = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius, filterToUse: filter });
@@ -1027,6 +1009,7 @@ export async function flyToLocation (coords, radius, newCoordinates = false){
     // update "attraction-points-data" source with new data
     // all layers that consume the "attraction-points-data" data source will be updated automatically
     map.getSource("attraction-points-data").setData(results);
+    
 }
 
 //new Request has to be made
@@ -1054,6 +1037,65 @@ export async function changedFilter(coords = false){
     }, 900)
 
 
+}
+
+function addAllLayersToMap(map){
+    map.loadImage('https://img.icons8.com/color/344/marker--v1.png',
+    function (error, image) {
+        if (error) throw error;
+        map.addImage('marker--v1', image);
+    }
+    );
+    // add the data source for new a feature collection with no features
+    map.addSource("attraction-points-data", {
+        type: "geojson",
+        data: {
+            type: "FeatureCollection",
+            features: []
+        }
+    });
+    // now add the layer, and reference the data source above by name
+    map.addLayer({
+        id: "attraction-points-layer",
+        source: "attraction-points-data",
+        type: "symbol",
+        layout: {
+            // full list of icons here: https://labs.mapbox.com/maki-icons
+            "icon-image": "marker--v1", // this will put little croissants on our map
+            "icon-padding": 0,
+            "icon-allow-overlap": true,
+            "icon-size": 0.08
+        }
+    });
+
+    map.loadImage('https://img.icons8.com/dusk/344/circled-user-male-skin-type-6.png',
+        function (error, image) {
+            if (error) throw error;
+            map.addImage('friends-marker', image);
+        }
+    );
+    // add the data source for new a feature collection with no features
+    map.addSource("friends-points-data", {
+        type: "geojson",
+        data: {
+            type: "FeatureCollection",
+            features: []
+        }
+    });
+        
+    // now add the layer, and reference the data source above by name
+    map.addLayer({
+            id: "friends-points-layer",
+            source: "friends-points-data",
+            type: "symbol",
+            layout: {
+                // full list of icons here: https://labs.mapbox.com/maki-icons
+                "icon-image": "friends-marker", // this will put little croissants on our map
+                "icon-padding": 0,
+                "icon-allow-overlap": true,
+                "icon-size": 0.1
+            }
+    });
 }
 
 

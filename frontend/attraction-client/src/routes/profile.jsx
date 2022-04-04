@@ -100,14 +100,14 @@ function Profile(props) {
         method: "get",
         credentials: 'include'
       });
-      const activatedLocation = await fetch("http://localhost:5000/",{
+      const activatedLocation = await fetch("http://localhost:5000/visibility",{
         method: "get",
         credentials: "include"
       });
 
       let description2 = (await resultDescription.text());
       let file = (await fileProfilePicture.blob());
-
+      let activatedLocationText = (await activatedLocation.text());
       setUsername(await resultUsername.text());
       setDescription(description2);
       if(description2.length === 0){
@@ -120,10 +120,15 @@ function Profile(props) {
         }
       }
       setProfilePicture(URL.createObjectURL(file));
-
-      setShowMyLocationToFriends(activatedLocation)
-      currentShowLocation = activatedLocation;
-      lastShowLocation = activatedLocation;
+      if(activatedLocationText == "true"){
+        setShowMyLocationToFriends(true)
+        currentShowLocation = true;
+        lastShowLocation = true;
+      }else{
+        setShowMyLocationToFriends(false)
+        currentShowLocation = false;
+        lastShowLocation = false;
+      }
 
   },[]);
   
@@ -148,6 +153,24 @@ function Profile(props) {
           method: "post",
           body: formData,
           credentials: 'include'
+      }).then(res => {
+        if (res.status == 400 || res.status == 401) { //error
+          if(props.l1 === "de")
+            setErrorDescription("Fehler!");
+          else if(props.l1 === "it")
+            setErrorDescription("Errore!");
+          else
+            setErrorDescription("Error!");
+          setShowError(true)
+        } else {          
+            if(props.l1 === "de")
+              setSuccessDescription("Geändert!");
+            else if(props.l1 === "it")
+              setSuccessDescription("Cambiato!");
+            else
+              setSuccessDescription("Updated!");
+            setShowInfo(true);
+        }
       });
       lastShowLocation = currentShowLocation;
     }
@@ -248,7 +271,7 @@ function handleFileUpload(setShowInfo, setShowError, setSuccessDescription, setE
         else if(language === "it")
           setSuccessDescription("La foto del profilo è cambiata!");
         else
-          setSuccessDescription("Description updated!");
+          setSuccessDescription("Profile picture updated!");
 
         setShowInfo(true);
     }

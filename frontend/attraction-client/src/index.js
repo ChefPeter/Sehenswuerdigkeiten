@@ -7,6 +7,7 @@ import { checkCookie } from './functions/cookieManager';
 import './index.css';
 import Approve from './routes/approve';
 import Chat from './routes/chat';
+import GroupSettings from './routes/groupSettings';
 import Contact from "./routes/contact";
 import Friends from "./routes/friends";
 import Groups from "./routes/groups";
@@ -44,6 +45,7 @@ const Routing = () => {
       <Route path="profile" element={<Profile t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />}></Route>
       <Route path='legalnotice' element={<LegalNotice t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
       <Route path='chat' element={<Chat t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
+      <Route path='groupSettings' element={<GroupSettings t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
 
     </Routes>
 

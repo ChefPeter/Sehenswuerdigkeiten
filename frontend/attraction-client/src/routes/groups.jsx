@@ -70,15 +70,15 @@ function Groups(props) {
 
       <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
     
-          <TextField
-              style={{width: "40vw", minWidth:"250px", marginLeft:"0.625em", marginTop:"4.5em"}}
-              id="createGroupField"
-              type="text"
-              label={textfieldTextTag}
-              variant="filled"
-              onChange={handleCreateGroupInput}
-              InputProps={{endAdornment:<Button onClick={createGroup}><AddIcon></AddIcon></Button>}}
-            />
+      <TextField
+        style={{width: "40vw", minWidth:"250px", marginLeft:"0.625em", marginTop:"4.5em"}}
+        id="createGroupField"
+        type="text"
+        label={textfieldTextTag}
+        variant="filled"
+        onChange={handleCreateGroupInput}
+        InputProps={{endAdornment:<Button onClick={createGroup}><AddIcon></AddIcon></Button>}}
+      />
  
 
       <div id="freunde">

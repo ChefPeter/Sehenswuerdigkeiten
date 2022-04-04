@@ -320,8 +320,8 @@ function MapSearch (props) {
                             control={
                                 <Switch
                                 sx={{ml:2}}
-                                defaultChecked={true}
-                                onChange={() => console.log("hallo")}
+                                defaultChecked={false}
+                                onChange={() => props.enable3D()}
                                 name="switchEnableReturnToStartpoint"
                                 color="primary"
                                 />

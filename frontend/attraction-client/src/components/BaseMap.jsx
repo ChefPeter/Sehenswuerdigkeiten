@@ -301,6 +301,7 @@ useEffect(() => {
             center: coordinates,
             style: theme,
             zoom: 12,
+            maxPitch: 60,
             minZoom: 1
         });
 
@@ -350,6 +351,7 @@ useEffect(() => {
                 essential: true // this animation is considered essential with respect to prefers-reduced-motion
             });
 
+           
             map.loadImage('https://img.icons8.com/color/344/marker--v1.png',
                 function (error, image) {
                     if (error) throw error;
@@ -657,6 +659,13 @@ useEffect(() => {
     }
 
     function enable3D(){
+
+        if (map.getLayer('add-3d-buildings')) {
+            map.removeLayer("add-3d-buildings");
+            map.setPitch(0)
+            return;
+        }
+
         const layers = map.getStyle().layers;
         const labelLayerId = layers.find(
         (layer) => layer.type === 'symbol' && layer.layout['text-field']
@@ -665,8 +674,7 @@ useEffect(() => {
         // The 'building' layer in the Mapbox Streets
         // vector tileset contains building height data
         // from OpenStreetMap.
-        map.addLayer(
-        {
+        map.addLayer({
         'id': 'add-3d-buildings',
         'source': 'composite',
         'source-layer': 'building',
@@ -697,11 +705,13 @@ useEffect(() => {
         15.05,
         ['get', 'min_height']
         ],
-        'fill-extrusion-opacity': 0.6
+        'fill-extrusion-opacity': 0.8
         }
         },
         labelLayerId
         );
+        
+        map.setPitch(60);
     }
 
     function startAtGpsSwitchChanged(value){
@@ -895,7 +905,7 @@ useEffect(() => {
         <div>
             <div id="mapContainer" className="map"></div>
             <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
-            <MapSearch l1={props.l1} directionMode={directionMode} setDirectionMode={setDirectionMode}></MapSearch>
+            <MapSearch l1={props.l1} directionMode={directionMode} setDirectionMode={setDirectionMode} enable3D={enable3D} ></MapSearch>
             
             <div  id="test" style={{position: "fixed",top: "calc(100% - 150px)", left:"calc(100vw - 75px)"}}>
                

@@ -375,8 +375,12 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         theme = "mapbox://styles/mapbox/navigation-night-v1";
     }
 
-    if(map !== null)
-        map.remove();
+    if(map !== null){
+        try{
+            map.remove();
+        }catch(e){}
+    }
+        
 
     if(lastCoords.length === 0)
         lastCoords =  [11.65598, 46.71503];
@@ -633,14 +637,18 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     }
 
     function enable3D(){
-        setEnabled3D(true);
-        if (map.getLayer('add-3d-buildings')) {
-            map.removeLayer("add-3d-buildings");
-            map.removeSource("mapbox-dem");
-            map.remove("sky");
-            map.setPitch(0)
-            return;
-        }
+        setEnabled3D(!enabled3D);
+
+        try{
+            if (map.getLayer('add-3d-buildings') || map.getSource("mapbox-dem")) {
+                if(map.getLayer("add-3d-buildings"))
+                    map.removeLayer("add-3d-buildings");
+                map.setTerrain();
+                if(map.getSource("mapbox-dem"))
+                    map.removeSource("mapbox-dem");
+                map.setPitch(0)
+                return;
+        } } catch(e){return;}
 
         if(map.getStyle()["name"] !== "Mapbox Satellite"){
             const layers = map.getStyle().layers;
@@ -699,15 +707,18 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.2 });
 
         // add a sky layer that will show when the map is highly pitched
-        map.addLayer({
-            'id': 'sky',
-            'type': 'sky',
-            'paint': {
-                'sky-type': 'atmosphere',
-                'sky-atmosphere-sun': [0.0, 0.0],
-                'sky-atmosphere-sun-intensity': 20
-            }
-        });
+        if (!map.getLayer("sky")) {
+            map.addLayer({
+                'id': 'sky',
+                'type': 'sky',
+                'paint': {
+                    'sky-type': 'atmosphere',
+                    'sky-atmosphere-sun': [0.0, 0.0],
+                    'sky-atmosphere-sun-intensity': 20
+                }
+            });
+        }
+        
         
         map.setPitch(80);
     }

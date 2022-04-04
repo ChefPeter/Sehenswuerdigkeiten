@@ -9,6 +9,7 @@ import IncomingRequest from "../components/IncomingRequest";
 import SideBar from "../components/Sidebar";
 import SuccessSnackbar from "../components/SuccessSnackbar";
 import "./styles/friends.css";
+import { useSearchParams } from "react-router-dom";
 
 let searchFriendInput = "";
 // Define theme settings
@@ -30,14 +31,21 @@ const dark = {
 const GroupSettings = (props) => {
 
    //Language Tags
-   const [searchTextTag, setSearchTextTag] = useState("Search a friend")
+   const [title, setTitle] = useState("Title");
+   const [searchTextTag, setSearchTextTag] = useState("Search a friend");
+
+   const [searchParams, setSearchParams] = useSearchParams();
+   const name = searchParams.get("name");
 
   useEffect(() => {
     if(props.l1 == "de") {
+      setTitle("Gruppe: ");
       setSearchTextTag("Suche ein Mitglied");
     } else if(props.l1 == "it") {
+      setTitle("Gruppo: ");
       setSearchTextTag("Cerca un membro")
     } else {
+      setTitle("Group: ");
       setSearchTextTag("Search a member");
    }
   }, [props.l1]);
@@ -50,20 +58,17 @@ const GroupSettings = (props) => {
       <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
         <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
           <SideBar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
+          <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{title + name}</h2>
           
-          <div id="alignSearchBar">
-          
-            <TextField
-              style={{ marginLeft: "3.625em"}}
-              id="searchBarFriends"
-              type="text"
-              label={searchTextTag}
-              variant="filled"
-              onChange={handleSearchFriendInput}
-              InputProps={{endAdornment: <Button><PersonAddIcon/></Button>}}
-            />
-
-          </div>
+          <TextField
+            style={{width: "40vw", minWidth:"250px", marginLeft:"0.625em"}}
+            id=""
+            type="text"
+            label={searchTextTag}
+            variant="filled"
+            onChange={handleSearchFriendInput}
+            InputProps={{endAdornment: <Button onClick={() => console.log(props)}><PersonAddIcon/></Button>}}
+          />
 
           <div id="freunde" >
             <List>

@@ -23,20 +23,20 @@ const dark = {
 function Groups(props) {
 
   let createGroupInput = "";
-  const [titleText, setTitleText] = useState("Create Group");
+  const [titleText, setTitleText] = useState("Title");
   const [textfieldTextTag, setTextfieldTextTag] = useState("Create Group");
 
   useEffect(() => {
-      if(props.l1 == "de") {
-        setTitleText("Gruppen");
-        setTextfieldTextTag("Gruppe erstellen");
-      } else if(props.l1 == "it") {
-        setTitleText("Gruppi");
-        setTextfieldTextTag("Crea gruppo");
-      } else {
-        setTitleText("Groups");
-        setTextfieldTextTag("Create Group");
-      }
+    if(props.l1 == "de") {
+      setTitleText("Gruppen");
+      setTextfieldTextTag("Gruppe erstellen");
+    } else if(props.l1 == "it") {
+      setTitleText("Gruppi");
+      setTextfieldTextTag("Crea gruppo");
+    } else {
+      setTitleText("Groups");
+      setTextfieldTextTag("Create Group");
+    }
 
   }, [props.l1])
 

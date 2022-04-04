@@ -14,11 +14,12 @@ import LocalMallIcon from '@mui/icons-material/LocalMall';
 import MuseumIcon from '@mui/icons-material/Museum';
 import PeopleIcon from '@mui/icons-material/People';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
-import { Autocomplete, Button, Chip, CircularProgress, Container, Divider, Fade, Paper, Slider, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Switch, Button, Tooltip, Chip, FormControlLabel, CircularProgress, Container, Divider, Fade, Paper, Slider, Stack, TextField, Typography } from "@mui/material";
 import { height } from '@mui/system';
 import React, { useEffect, useState } from "react";
 import { changedFilter, flyToLocation, setDirectionGlobally, setFilter, setRadiusForPointerSearch } from "./BaseMap";
 import "./styles/mapsearch.css";
+import Zoom from '@mui/material/Zoom';
 
 let locationInput = "";
 let timerID;
@@ -308,10 +309,28 @@ function MapSearch (props) {
 
                     <Divider  sx={{ mb: 1, mt:1}} />
                    
+                   <div style={{display:"flex"}}>
                     <Chip className="attributeChipsOfSearchbar" icon={<DirectionsCarFilledIcon fontSize="small" />} label={drivingTag} variant={props.directionMode === "driving" ? "filled" : "outlined"} onClick={() => props.setDirectionMode("driving")}></Chip>
                     <Chip className="attributeChipsOfSearchbar" icon={<DirectionsWalkIcon fontSize="small" />} label={walkingTag} variant={props.directionMode === "walking" ? "filled" : "outlined"} onClick={() => props.setDirectionMode("walking")}></Chip>
                     <Chip className="attributeChipsOfSearchbar" icon={<DirectionsBikeIcon fontSize="small" />} label={cyclingTag} variant={props.directionMode === "cycling" ? "filled" : "outlined"} onClick={() => props.setDirectionMode("cycling")}></Chip>
                     
+                    <Tooltip placement="top" disableFocusListener enterTouchDelay={420}  title={"Enables 3D Mode on the map. Zoom in and use CTRL + LEFT MOUSE to see the results."} TransitionComponent={Zoom} arrow>
+                        <FormControlLabel
+                            sx={{display: 'block',}}
+                            control={
+                                <Switch
+                                sx={{ml:2}}
+                                defaultChecked={true}
+                                onChange={() => console.log("hallo")}
+                                name="switchEnableReturnToStartpoint"
+                                color="primary"
+                                />
+                            }
+                            label="Enable 3D"
+                            />
+                    </Tooltip>
+                    </div>
+
 
                     <Divider  sx={{ mb: 1, mt:1}} />
 

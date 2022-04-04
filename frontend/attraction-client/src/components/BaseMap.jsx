@@ -427,9 +427,9 @@ useEffect(() => {
               });
             let locationOfFriends = await positions.json();
               console.log(locationOfFriends)
-            for(let i = 0; i<locationOfFriends.length(); i++){
+           /* for(let i = 0; i<locationOfFriends.length(); i++){
                 console.log("d "+ locationOfFriends[i]);
-            }
+            }*/
 
             map.getSource("friends-points-data").setData(JSON.parse('{"geometry":{"type":"Point","coordinates":['+lastPositionByMapboxGeolocate+']},"type":"Feature","properties":{"id":"friendLocator","name":"Friend Location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"friends-points-layer","type":"symbol","source":"friends-marker","layout":{"icon-image":"friends-marker","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.12},"paint":{}},"source":"friends-points-data","state":{}}'));
             
@@ -656,18 +656,56 @@ useEffect(() => {
 
     }
 
+    function enable3D(){
+        const layers = map.getStyle().layers;
+        const labelLayerId = layers.find(
+        (layer) => layer.type === 'symbol' && layer.layout['text-field']
+        ).id;
+        
+        // The 'building' layer in the Mapbox Streets
+        // vector tileset contains building height data
+        // from OpenStreetMap.
+        map.addLayer(
+        {
+        'id': 'add-3d-buildings',
+        'source': 'composite',
+        'source-layer': 'building',
+        'filter': ['==', 'extrude', 'true'],
+        'type': 'fill-extrusion',
+        'minzoom': 10,
+        'paint': {
+        'fill-extrusion-color': '#aaa',
+        
+        // Use an 'interpolate' expression to
+        // add a smooth transition effect to
+        // the buildings as the user zooms in.
+        'fill-extrusion-height': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        15,
+        0,
+        15.05,
+        ['get', 'height']
+        ],
+        'fill-extrusion-base': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        15,
+        0,
+        15.05,
+        ['get', 'min_height']
+        ],
+        'fill-extrusion-opacity': 0.6
+        }
+        },
+        labelLayerId
+        );
+    }
+
     function startAtGpsSwitchChanged(value){
         startAtGps = value;
-
-        if(startAtGps){
-
-            //if there are no mapbox coordinates there will be a browser prompt
-            if(userEnabledMapboxLocation){
-                
-            }
-
-        }
-
     }
 
     async function handleRandomLocationButton(){

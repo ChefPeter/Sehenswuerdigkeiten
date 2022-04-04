@@ -135,7 +135,14 @@ function Profile(props) {
       setShowInfo(false);
 
       //send data to server...
-
+      let formData = new FormData();
+      formData.append('value', currentShowLocation);
+ 
+      fetch("http://localhost:5000/change-visibility", {
+          method: "post",
+          body: formData,
+          credentials: 'include'
+      });
 
       lastShowLocation = currentShowLocation;
     }

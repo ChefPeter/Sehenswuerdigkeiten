@@ -42,9 +42,9 @@ function LeftMessage (props) {
         { props.path ? 
             <object data={file}></object>
             :
-            <p>{props.message}</p>
+            <p style={{color:"black",}}>{props.message}</p>
         }
-        <Card sx={{backgroundColor: "primary.light", width: "19ch" }}>{formattedTime}</Card>
+        <Card sx={{backgroundColor: "primary.light", color:"black", width: "19ch" }}>{formattedTime}</Card>
         </Container>
     );
 

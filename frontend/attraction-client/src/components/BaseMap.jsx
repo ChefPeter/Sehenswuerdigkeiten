@@ -32,6 +32,7 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
     let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, tourist_facilities: true, museums: true, palaces: true, malls: true, churches: true};
     let currentGlobalResults = [];
     let timerID;
+    let locationTimerID;
     let globalPopup = "", globalPopup2 = "";
     let geolocate;
     let lastPositionByMapboxGeolocate = [];
@@ -39,6 +40,8 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
     let startAtGps = false;
     let userEnabledMapboxLocation = false;
     let coordsForGpsSearch = [];
+    let lastSentCoordinates = [];
+
 
     export function setFilter(newFilter){
         filter = newFilter;
@@ -329,11 +332,39 @@ useEffect(() => {
 
         
         geolocate.on('geolocate', function(e) {
+            setGpsActive(true);
             lastPositionByMapboxGeolocate = [e.coords.longitude, e.coords.latitude];
             console.log("position: " +  lastPositionByMapboxGeolocate);
-        });
+           
+            //posts location every 10 secs
+            setInterval(async () => {
+                
+                if((lastPositionByMapboxGeolocate.length === 2) && (lastPositionByMapboxGeolocate[0] !== lastSentCoordinates[0] && lastPositionByMapboxGeolocate[1] !== lastSentCoordinates[1])){
+                    console.log("posting data")
+                    let formData = new FormData();
+                    formData.append('latitude', lastPositionByMapboxGeolocate[1]);
+                    formData.append('longtitude', lastPositionByMapboxGeolocate[0]);
 
+                    fetch("http://localhost:5000/add-position", {
+                        method: "post",
+                        body: formData,
+                        credentials: 'include'
+                    });
+                    lastSentCoordinates = lastPositionByMapboxGeolocate;
+                } 
+            }, 10000)
+
+        });
         map.addControl(geolocate);
+
+
+        console.log("getting positions 1")
+        //gets location of friends every 10 secs
+        setInterval(async () => {
+                
+            console.log("getting positions")
+
+        }, 10000)
         
        
         lastCoords = coordinates;
@@ -378,6 +409,7 @@ useEffect(() => {
             // get new center coordinates
             let lon = coordinates[1];
             let lat = coordinates[0];
+
             /*lon = "12.4907795";
             lat = "41.8897653"*/
             // fetch new data

@@ -100,6 +100,10 @@ function Profile(props) {
         method: "get",
         credentials: 'include'
       });
+      const activatedLocation = await fetch("http://localhost:5000/",{
+        method: "get",
+        credentials: "include"
+      });
 
       let description2 = (await resultDescription.text());
       let file = (await fileProfilePicture.blob());
@@ -116,9 +120,11 @@ function Profile(props) {
         }
       }
       setProfilePicture(URL.createObjectURL(file));
-      setShowMyLocationToFriends(true)
-      currentShowLocation = true;
-      lastShowLocation = true;
+
+      setShowMyLocationToFriends(activatedLocation)
+      currentShowLocation = activatedLocation;
+      lastShowLocation = activatedLocation;
+
   },[]);
   
 
@@ -143,7 +149,6 @@ function Profile(props) {
           body: formData,
           credentials: 'include'
       });
-
       lastShowLocation = currentShowLocation;
     }
 

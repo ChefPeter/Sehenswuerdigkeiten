@@ -116,7 +116,7 @@ function Register(props) {
         <div id="widthTextfields">
           <div id="textFieldsLogin">
 
-              <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-basic" label={languageTags.usernameTextfield} variant="filled" onChange={getUsernameValue} />
+              <TextField sx={{ marginBottom: 1 }} autoFocus fullWidth id="filled-basic" label={languageTags.usernameTextfield} variant="filled" onChange={getUsernameValue} />
              
               <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-basic" label="Email" variant="filled" onChange={getEmailValue} />
               

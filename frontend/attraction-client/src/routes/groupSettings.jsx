@@ -70,6 +70,11 @@ const GroupSettings = (props) => {
               <FriendItem name="Peter" description="Ich bin Peter" key="" profilePicture="" l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>
               <FriendItem name="Lukas" description="Ich bin Lukas" key="" profilePicture="" l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>
               <FriendItem name="Olli" description="Ich bin Olli" key="" profilePicture="" l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>
+            
+              {
+                              
+              }
+            
             </List>
           </div>
       </Card>

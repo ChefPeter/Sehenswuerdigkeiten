@@ -32,9 +32,10 @@ const getGroupConversation = require("./get-group-conversation");
 const getPosition = require("./get-position");
 const getRating = require("./get-rating");
 const getRandomLocation = require("./get-random-location");
-const getVisitedSights = require("./get-visited-sights.js");
+const getVisitedSights = require("./get-visited-sights");
 const getAllPositions = require("./get-all-positions");
-const getVisibility = require("./get-visibility.js");
+const getVisibility = require("./get-visibility");
+const getGroupMembers = require("./get-group-members");
 
 const express = require("express");
 const session = require("express-session");
@@ -117,6 +118,7 @@ app.get("/get-random-location", isAuthenticated, async (req, res) => sendGetResp
 app.get("/visited-sights", isAuthenticated, async(req, res) => sendGetResponse(await getVisitedSights(req), res));
 app.get("/all-positions", isAuthenticated, async(req, res) => sendGetResponse(await getAllPositions(req), res));
 app.get("/visibility", isAuthenticated, async(req, res) => sendGetResponse(await getVisibility(req), res));
+app.get("/group-members", isAuthenticated, async(req, res) => sendGetResponse(await getGroupMembers(req), res));
 //app.get("/logged-in", (req, res) => res.send(req.session));
 
 

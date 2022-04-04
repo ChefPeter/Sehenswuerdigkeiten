@@ -158,13 +158,13 @@ function getDistance(p1, p2) {
 
 function getRouteURL(type, coords, language)
 {
-    const API_KEY="pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
+    const API_KEY=process.env.MAP_BOX_API_KEY;
     return `https://api.mapbox.com/directions/v5/mapbox/${type}/${(new URLSearchParams(coords).toString()).slice(0,-1)}?alternatives=false&overview=full&geometries=geojson&language=${language}&steps=true&access_token=${API_KEY}`;
 }
 
 function getWeatherURL(lat, lon)
 {
-    const API_KEY = 'c405f2a76e969399925feecfd7cbb035';
+    const API_KEY=process.env.OPENWEATHER_API_KEY;
     return `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
 }
 

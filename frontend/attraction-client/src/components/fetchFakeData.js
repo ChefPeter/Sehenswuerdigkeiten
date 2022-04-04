@@ -28,7 +28,7 @@ const fetchFakeData = async centerCoordinates => {
       //return `https://api.opentripmap.com/0.1/en/places/${method}?apikey=${API_KEY}&radius=${radius}&limit=${limit}&offset=0&lon=${lon}&lat=${lat}&rate=2&format=json`;
   }
 
-  const API_KEY = "5ae2e3f221c38a28845f05b690c520033dc6de71c6665213ffad8752";
+  const API_KEY = process.env.TRIPMAP_API_KEY;
 
   let points = [];
 

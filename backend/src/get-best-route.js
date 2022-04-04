@@ -88,7 +88,9 @@ async function getBestRoute(request, res) {
       route.distance += rout.routes[0].distance;
     }
     
-    res.status(200).send(JSON.stringify({route: route, sortedIDs: sortedIDs}));
+    let weather = await getDataFromURL(getWeatherURL(p[0].geometry.coordinates[1], p[0].geometry.coordinates[0]));
+
+    res.status(200).send(JSON.stringify({route: route, sortedIDs: sortedIDs, weather: weather}));
     //res.status(200).send(tsp(matrix).map(e => p[e]));
 
     // Gefährlich wegen ban auf mapbox -> 
@@ -158,6 +160,12 @@ function getRouteURL(type, coords, language)
 {
     const API_KEY="pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
     return `https://api.mapbox.com/directions/v5/mapbox/${type}/${(new URLSearchParams(coords).toString()).slice(0,-1)}?alternatives=false&overview=full&geometries=geojson&language=${language}&steps=true&access_token=${API_KEY}`;
+}
+
+function getWeatherURL(lat, lon)
+{
+    const API_KEY = 'c405f2a76e969399925feecfd7cbb035';
+    return `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
 }
 
 async function getDataFromURL(url)

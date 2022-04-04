@@ -20,8 +20,6 @@ import SuccessSnackbar from './SuccessSnackbar';
 import Zoom from '@mui/material/Zoom';
 import ErrorSnackbar from './ErrorSnackbar';
 
-const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNpIn0.RY-K9qwZD1hseyM5TxLzww";
-
     let map;
     let marker;
     let testRoute = [];
@@ -47,11 +45,6 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
         filter = newFilter;
     }
 
-    function getRouteURL(type, coords, language)
-    {
-      return `https://api.mapbox.com/directions/v5/mapbox/${type}/${(new URLSearchParams(coords).toString()).slice(0,-1)}?alternatives=true&geometries=geojson&language=${language}&overview=simplified&steps=true&access_token=${API_KEY}`;
-    }
-
     async function getDataFromURL(url)
     {
         let result = await fetch(url);
@@ -62,19 +55,8 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
     }
 
 
-    export async function postRoute(data, directionMode, setDidCalculateRoute, setCurrentRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute)
-    {
-        //makes no sense
-        if(data.length < 1 && startAtGps || data.length < 2 && !startAtGps ){
-            if (map.getSource('route1')) {
-                map.removeLayer("layer1");
-                map.removeSource('route1');
-            }
-            return;
-        }
-            
-        
-        
+    export async function postRoute(data, directionMode, setDidCalculateRoute, setCurrentRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData)
+    {   
         if(data[0]["properties"]["id"] === "gpsLocatorId")
                 data.shift();
 
@@ -93,7 +75,7 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
 
         setShowLoadingCircleRoute(true) 
         let formData = new FormData();
-        let route, sortedIDs;
+        let route, sortedIDs, weather;
 
         formData.append('points', JSON.stringify(data));
         formData.append('vehicle', directionMode);
@@ -103,11 +85,13 @@ const API_KEY = "pk.eyJ1IjoiemJhYWtleiIsImEiOiJja3pvaXJ3eWM0bnV2MnVvMTc2d2U5aTNp
             body: formData,
             credentials: 'include',
         }).then(res => res.json())
-            .then(res => {route = res.route; sortedIDs = res.sortedIDs});
+            .then(res => {route = res.route; sortedIDs = res.sortedIDs; weather = res.weather});
         if (map.getSource('route1')) {
             map.removeLayer("layer1");
             map.removeSource('route1');
         }
+        console.log(weather);
+        setWeatherData({ icon: weather.weather[0].icon, temp: weather.main.temp });
         setDidCalculateRoute(true);
         setCurrentNotSortedPointsRouteOutput(data);
         setCurrentRouteOutput(sortedIDs)
@@ -151,6 +135,7 @@ function BaseMap (props) {
     const [didCalculateRoute, setDidCalculateRoute] = useState(false);
     const [currentDurationInMinutes, setCurrentDurationInMinutes] = useState("-1");
     const [currentKilometers, setCurrentKilometers] = useState("-1");
+    const [weatherData, setWeatherData] = useState({});
 
     const[disableHandleRandomLocationButton,setDisableHandleRandomLocationButton] = useState(false);
     const[showLoadingCircleRoute, setShowLoadingCircleRoute] = useState(false);
@@ -695,7 +680,7 @@ useEffect(() => {
                     </Card>
                     
                     <Box  sx={{mt:2, ml:1, mr:1}}>
-                        <Button variant="contained" sx={{minHeight: 50}} fullWidth disabled={showLoadingCircleRoute} onClick={() => postRoute(currentAddedPoints, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute)}>
+                        <Button variant="contained" sx={{minHeight: 50}} fullWidth disabled={showLoadingCircleRoute} onClick={() => postRoute(currentAddedPoints, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData)}>
                             <RouteIcon />{languageTags.calculateBestRouteButton} 
                         </Button>
                     </Box>
@@ -749,6 +734,10 @@ useEffect(() => {
 
                     { didCalculateRoute ?
                     <div>
+                        <div>
+                            <img src={`http://openweathermap.org/img/wn/${weatherData.icon}.png`} alt='weather' ></img>
+                            <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{Math.round(weatherData.temp - 273.15) + "°C"}</strong></Typography>
+                        </div>
                         <Card sx={{ mb:3, ml:1, mr:1, pt:1, pb:0.5}} style={{borderRadius:"8px"}} elevation={4}>
                             <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{languageTags.currentRoute}:</strong> {currentDurationInMinutes} {languageTags.minutes}, {currentKilometers} km, {returnToStart ?  currentSortedPointsRouteOutput.length-1 : currentSortedPointsRouteOutput.length} POIs</Typography>
                             <SortedRouteNames></SortedRouteNames>

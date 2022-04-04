@@ -20,6 +20,7 @@ import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
 
+let globvalal;
 let map = null;
 let marker;
 let testRoute = [];
@@ -269,9 +270,6 @@ function BaseMap (props) {
         newMap(themeMap, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen);
     },[themeMap]);
 
-    //mapbox://styles/mapbox/satellite-v9
-    //mapbox://styles/mapbox/light-v10
-    let theme = "mapbox://styles/mapbox/light-v10";
     let imageSrc = "";
 
     const [open, setOpen] = useState(false);
@@ -291,21 +289,19 @@ useEffect(() => {
         //Brixen
         lastCoords =  [11.65598, 46.71503];
         newMap(props.t1, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen);
-
+        let interval1;
         geolocate.on('geolocate', function(e) {
             setGpsActive(true);
             lastPositionByMapboxGeolocate = [e.coords.longitude, e.coords.latitude];
             console.log("position: " +  lastPositionByMapboxGeolocate);
            
             //posts location every 10 secs
-            setInterval(async () => {
-                
+            interval1 =  setInterval(async () => {
                 if((lastPositionByMapboxGeolocate.length === 2) && (lastPositionByMapboxGeolocate[0] !== lastSentCoordinates[0] && lastPositionByMapboxGeolocate[1] !== lastSentCoordinates[1])){
-                    console.log("posting data")
                     let formData = new FormData();
                     formData.append('latitude', lastPositionByMapboxGeolocate[1]);
                     formData.append('longtitude', lastPositionByMapboxGeolocate[0]);
-
+                    console.log("poooost")
                     fetch("http://localhost:5000/add-position", {
                         method: "post",
                         body: formData,
@@ -313,38 +309,59 @@ useEffect(() => {
                     });
                     lastSentCoordinates = lastPositionByMapboxGeolocate;
                 } 
-            }, 20000)
+            }, 15000)
 
         });
 
         setTimeout(async () => {
-
-            console.log("getting positions 1");
-            map.getSource("friends-points-data").setData(JSON.parse('{"geometry":{"type":"Point","coordinates":[30,45]},"type":"Feature","properties":{"id":"friendLocator","name":"Friend Location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"friends-points-layer","type":"symbol","source":"friends-marker","layout":{"icon-image":"friends-marker","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.12},"paint":{}},"source":"friends-points-data","state":{}}'));
-          
-
+            getFriendsLocation();
         }, 3000);
 
         //gets location of friends every 10 secs
-        setInterval(async () => {
+        let interval2 = setInterval(async () => {
+            getFriendsLocation()
+        }, 15000);
 
-            const positions = await fetch("http://localhost:5000/all-positions", {
-                method: "get",
+        return () => {
+            clearInterval(interval1);
+            clearInterval(interval2);
+            lastPositionByMapboxGeolocate = [];
+            lastSentCoordinates = [];
+            let formData = new FormData();
+            formData.append('latitude', null);
+            formData.append('longtitude', null);
+
+            fetch("http://localhost:5000/add-position", {
+                method: "post",
+                body: formData,
                 credentials: 'include'
-              });
-            let locationOfFriends = await positions.json();
-              console.log(locationOfFriends)
-           /* for(let i = 0; i<locationOfFriends.length(); i++){
-                console.log("d "+ locationOfFriends[i]);
-            }*/
-
-            map.getSource("friends-points-data").setData(JSON.parse('{"geometry":{"type":"Point","coordinates":['+lastPositionByMapboxGeolocate+']},"type":"Feature","properties":{"id":"friendLocator","name":"Friend Location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"friends-points-layer","type":"symbol","source":"friends-marker","layout":{"icon-image":"friends-marker","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.12},"paint":{}},"source":"friends-points-data","state":{}}'));
-            
-            console.log("getting positions");
-
-        }, 20000);
+            });
+        };
 
 },[]);
+
+async function getFriendsLocation(){
+
+    const positions = await fetch("http://localhost:5000/all-positions", {
+        method: "get",
+        credentials: 'include'
+    });
+    let locationOfFriends = await positions.json();
+    let positionsFriends = [];
+    console.log(locationOfFriends)
+  //  locationOfFriends = [{longtitude: 20, latitude: 40},{longtitude: 30, latitude: 40},{longtitude: 20, latitude: 30},{longtitude: 50, latitude: 40}];
+    for(let i = 0; i<locationOfFriends.length; i++){
+        if(locationOfFriends[i]["longtitude"] !== null || locationOfFriends[i]["latitude"] !== null){
+            positionsFriends.push({type:"Feature",geometry:{type:"Point",coordinates:[locationOfFriends[i]["longtitude"],locationOfFriends[i]["latitude"]]},properties:{id:"id"+i,name:"name"+i}});
+        }
+    }
+   
+    if(positionsFriends.length !== 0){
+        map.getSource("friends-points-data").setData({type: "FeatureCollection", features: positionsFriends});
+    }
+        return null;
+
+}
 
 async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen){
   
@@ -413,15 +430,12 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 ReactDOM.render(<div><img src={imageSrc} alt="" style={{ width: "100%", height: "50%" }}></img>
                     <div style={{ display: "flex", justifyContent: "space-between" }}><p style={{ color: 'black' }}>{feature.properties.name}</p>
                     </div></div>, popupNode);
-
                 //popupNode  = document.createElement("div");
                 // set popup on map
-
                 popUpRef.current
                     .setLngLat(feature.geometry.coordinates)
                     .setDOMContent(popupNode)
                     .addTo(map);
-
             }
         }
     });
@@ -440,6 +454,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             setOpen(true);
         }
     });
+
     map.on("dblclick", (e) => {
         let coords = [e.lngLat.lng, e.lngLat.lat];
         let popupNode  = document.createElement("div");
@@ -958,9 +973,8 @@ async function getLocationData(lon, lat, radius, filters)
         credentials: 'include',
     }).then(res => res.json())
     .then(res => data = res);
-
-    return {type: "FeatureCollection",features: data,};
-
+    console.log(data);
+    return {type: "FeatureCollection", features: data};
 }
 
 export async function flyToLocation (coords, radius, newCoordinates = false){
@@ -1008,6 +1022,8 @@ export async function flyToLocation (coords, radius, newCoordinates = false){
     currentGlobalResults = results;
     // update "attraction-points-data" source with new data
     // all layers that consume the "attraction-points-data" data source will be updated automatically
+    console.log("res")
+    console.log(results)
     map.getSource("attraction-points-data").setData(results);
     
 }

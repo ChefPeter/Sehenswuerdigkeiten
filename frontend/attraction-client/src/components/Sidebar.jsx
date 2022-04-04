@@ -113,13 +113,6 @@ export default function SwipeableTemporaryDrawer(props) {
             <ListItemText primary={friendsTag} />
           </ListItem>
 
-          <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/notifications">
-            <ListItemIcon>
-            <NotificationsIcon />
-            </ListItemIcon>
-            <ListItemText primary={notificationsTag} />
-          </ListItem>
-
           <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/contact">
             <ListItemIcon>
               <ContactPageIcon />

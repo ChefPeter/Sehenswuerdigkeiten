@@ -61,7 +61,7 @@ import ErrorSnackbar from './ErrorSnackbar';
                 data.shift();
 
         if(startAtGps){//addpoint of gps to data
-            data.unshift(JSON.parse('{"geometry":{"type":"Point","coordinates":['+lastPositionByMapboxGeolocate+']},"type":"Feature","properties":{"id":"gpsLocatorId","name":"Your location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"random-points-layer","type":"symbol","source":"random-points-data","layout":{"icon-image":"marker--v1","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.08},"paint":{}},"source":"random-points-data","state":{}}'));
+            data.unshift(JSON.parse('{"geometry":{"type":"Point","coordinates":['+lastPositionByMapboxGeolocate+']},"type":"Feature","properties":{"id":"gpsLocatorId","name":"Your location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"attraction-points-layer","type":"symbol","source":"attraction-points-data","layout":{"icon-image":"marker--v1","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.08},"paint":{}},"source":"attraction-points-data","state":{}}'));
         }
 
         if(data.length < 2){
@@ -337,19 +337,10 @@ useEffect(() => {
                     });
                     lastSentCoordinates = lastPositionByMapboxGeolocate;
                 } 
-            }, 10000)
+            }, 20000)
 
         });
         map.addControl(geolocate);
-
-
-        console.log("getting positions 1")
-        //gets location of friends every 10 secs
-        setInterval(async () => {
-                
-            console.log("getting positions")
-
-        }, 10000)
         
        
         lastCoords = coordinates;
@@ -365,20 +356,18 @@ useEffect(() => {
                     map.addImage('marker--v1', image);
                 }
             );
-
             // add the data source for new a feature collection with no features
-            map.addSource("random-points-data", {
+            map.addSource("attraction-points-data", {
                 type: "geojson",
                 data: {
                     type: "FeatureCollection",
                     features: []
                 }
             });
-            
             // now add the layer, and reference the data source above by name
             map.addLayer({
-                id: "random-points-layer",
-                source: "random-points-data",
+                id: "attraction-points-layer",
+                source: "attraction-points-data",
                 type: "symbol",
                 layout: {
                     // full list of icons here: https://labs.mapbox.com/maki-icons
@@ -388,7 +377,66 @@ useEffect(() => {
                     "icon-size": 0.08
                 }
             });
+    
+            map.loadImage('https://img.icons8.com/dusk/344/circled-user-male-skin-type-6.png',
+                function (error, image) {
+                    if (error) throw error;
+                    map.addImage('friends-marker', image);
+                }
+            );
+            // add the data source for new a feature collection with no features
+            map.addSource("friends-points-data", {
+                type: "geojson",
+                data: {
+                    type: "FeatureCollection",
+                    features: []
+                }
+            });
+                
+            // now add the layer, and reference the data source above by name
+            map.addLayer({
+                    id: "friends-points-layer",
+                    source: "friends-points-data",
+                    type: "symbol",
+                    layout: {
+                        // full list of icons here: https://labs.mapbox.com/maki-icons
+                        "icon-image": "friends-marker", // this will put little croissants on our map
+                        "icon-padding": 0,
+                        "icon-allow-overlap": true,
+                        "icon-size": 0.1
+                    }
+            });
+            
+
         });
+
+        setTimeout(async () => {
+
+            console.log("getting positions 1");
+            map.getSource("friends-points-data").setData(JSON.parse('{"geometry":{"type":"Point","coordinates":[30,45]},"type":"Feature","properties":{"id":"friendLocator","name":"Friend Location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"friends-points-layer","type":"symbol","source":"friends-marker","layout":{"icon-image":"friends-marker","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.12},"paint":{}},"source":"friends-points-data","state":{}}'));
+          
+
+        }, 3000);
+
+        //gets location of friends every 10 secs
+        setInterval(async () => {
+
+            const positions = await fetch("http://localhost:5000/all-positions", {
+                method: "get",
+                credentials: 'include'
+              });
+            let locationOfFriends = await positions.json();
+              console.log(locationOfFriends)
+            for(let i = 0; i<locationOfFriends.length(); i++){
+                console.log("d "+ locationOfFriends[i]);
+            }
+
+            map.getSource("friends-points-data").setData(JSON.parse('{"geometry":{"type":"Point","coordinates":['+lastPositionByMapboxGeolocate+']},"type":"Feature","properties":{"id":"friendLocator","name":"Friend Location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"friends-points-layer","type":"symbol","source":"friends-marker","layout":{"icon-image":"friends-marker","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.12},"paint":{}},"source":"friends-points-data","state":{}}'));
+            
+            console.log("getting positions");
+
+        }, 20000);
+        
 
         map.on("moveend", async () => {
             // get new center coordinates
@@ -404,7 +452,7 @@ useEffect(() => {
 
 
         // change cursor to pointer when user hovers over a clickable feature
-        map.on("mouseenter", "random-points-layer", async e => {
+        map.on("mouseenter", "attraction-points-layer", async e => {
 
             
             if (e.features.length) {
@@ -446,13 +494,13 @@ useEffect(() => {
 
 
         // reset cursor to default when user is no longer hovering over a clickable feature
-        map.on("mouseleave", "random-points-layer", () => {
+        map.on("mouseleave", "attraction-points-layer", () => {
             //mapboxgl-popup-close-button
             popUpRef.current.remove();
         });
 
         // add popup when user clicks a point
-        map.on("click", "random-points-layer", e => {
+        map.on("click", "attraction-points-layer", e => {
             if (e.features.length) {
                 setObj(e.features[0]);
                 console.log(e.features[0]);
@@ -928,9 +976,9 @@ export async function flyToLocation (coords, radius, newCoordinates = false){
     const results = await getLocationData(coords[0], coords[1], radius, filter);
     
     currentGlobalResults = results;
-    // update "random-points-data" source with new data
-    // all layers that consume the "random-points-data" data source will be updated automatically
-    map.getSource("random-points-data").setData(results);
+    // update "attraction-points-data" source with new data
+    // all layers that consume the "attraction-points-data" data source will be updated automatically
+    map.getSource("attraction-points-data").setData(results);
 }
 
 //new Request has to be made
@@ -954,7 +1002,7 @@ export async function changedFilter(coords = false){
     
         // update "random-points-data" source with new data
         // all layers that consume the "random-points-data" data source will be updated automatically
-        map.getSource("random-points-data").setData(results);
+        map.getSource("attraction-points-data").setData(results);
     }, 900)
 
 

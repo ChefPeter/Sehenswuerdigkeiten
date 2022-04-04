@@ -14,7 +14,7 @@ async function getVisibility(request) {
         const result = await query(
             `SELECT share_position AS s FROM users WHERE username='${request.session.username}'`
         );
-        return result[0].s;
+        return result[0].s === 0 ? false : true;
     } catch(e) {
         console.error(e);
         return "Fehler mit der Datenbank!";

@@ -23,14 +23,18 @@ const dark = {
 function Groups(props) {
 
   let createGroupInput = "";
+  const [titleText, setTitleText] = useState("Create Group");
   const [textfieldTextTag, setTextfieldTextTag] = useState("Create Group");
 
   useEffect(() => {
       if(props.l1 == "de") {
+        setTitleText("Gruppen");
         setTextfieldTextTag("Gruppe erstellen");
       } else if(props.l1 == "it") {
-          setTextfieldTextTag("Crea gruppo");
+        setTitleText("Gruppi");
+        setTextfieldTextTag("Crea gruppo");
       } else {
+        setTitleText("Groups");
         setTextfieldTextTag("Create Group");
       }
 
@@ -70,7 +74,7 @@ function Groups(props) {
 
       <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
 
-      <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>Gruppen</h2>
+      <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{titleText}</h2>
     
       <TextField
         style={{width: "40vw", minWidth:"250px", marginLeft:"0.625em"}}

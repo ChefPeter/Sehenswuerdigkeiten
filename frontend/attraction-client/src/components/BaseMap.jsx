@@ -312,6 +312,7 @@ useEffect(() => {
 
         });
 
+
         setTimeout(async () => {
             getFriendsLocation();
         }, 3000);
@@ -520,10 +521,11 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         } catch (e){};
     });
    
-    const sleep = (milliseconds) => {
-        return new Promise(resolve => setTimeout(resolve, milliseconds))
-      }
 
+}
+
+const sleep = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
     function pointIsInRoute(id){

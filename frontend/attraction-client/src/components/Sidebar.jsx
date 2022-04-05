@@ -24,43 +24,50 @@ export default function SwipeableTemporaryDrawer(props) {
 
   const [state, setState] = React.useState({left: false});
 
-  const [homeTag, setHomeTag] = useState("Map");
-  const [groupsTag, setGroupsTag] = useState("Groups");
-  const [friendsTag, setFriendsTag] = useState("Friends");
-  const [notificationsTag, setNotificationsTag] = useState("Notifications");
-  const [contactTag, setContactTag] = useState("Contact");
-  const [legalNoticeTag, setLegalNoticeTag] = useState("Legal Notice");
-  const [profileTag, setProfileTag] = useState("Profile");
+  const [languageTags, setLanguageTags] = useState({
+                                                      home: "Map",
+                                                      groups: "Groups",
+                                                      friends: "Friends",
+                                                      contact: "Contact",
+                                                      legalNotice: "Legal Notice",
+                                                      profile: "Profile"
+  });
 
   //reacts only to language changes
   useEffect(() => {
     
     if(props.l1 == "de") {
-      setHomeTag("Karte");
-      setGroupsTag("Gruppen");
-      setFriendsTag("Freunde");
-      setNotificationsTag("Benachrichtigungen");
-      setContactTag("Kontakt");
-      setLegalNoticeTag("Impressum");
-      setProfileTag("Profil");
+
+        setLanguageTags({
+                          home: "Karte",
+                          groups: "Gruppen",
+                          friends: "Freunde",
+                          contact: "Kontakt",
+                          legalNotice: "Impressum",
+                          profile: "Profil"
+        });
 
     } else if(props.l1 == "it") {
-      setHomeTag("Mappa")
-      setGroupsTag("Gruppi");
-      setFriendsTag("Amici");
-      setNotificationsTag("Notifiche");
-      setContactTag("Contatti");
-      setLegalNoticeTag("Avviso legale");
-      setProfileTag("Profilo");
+
+      setLanguageTags({
+                        home: "Mappa",
+                        groups: "Gruppi",
+                        friends: "Amici",
+                        contact: "Contatto",
+                        legalNotice: "Avviso legale",
+                        profile: "Profilo"
+      });
 
     } else {
-      setHomeTag("Map")
-      setGroupsTag("Groups");
-      setFriendsTag("Friends");
-      setNotificationsTag("Notifications");
-      setContactTag("Contact");
-      setLegalNoticeTag("Legal Notice");
-      setProfileTag("Profile");
+
+      setLanguageTags({
+                      home: "Map",
+                      groups: "Groups",
+                      friends: "Friends",
+                      contact: "Contact",
+                      legalNotice: "Legal Notice",
+                      profile: "Profile"
+      });
 
     }
 
@@ -95,35 +102,35 @@ export default function SwipeableTemporaryDrawer(props) {
             <ListItemIcon>
               <TravelExploreIcon />
             </ListItemIcon>
-            <ListItemText primary={homeTag} />
+            <ListItemText primary={languageTags.home} />
           </ListItem>
 
           <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/groups">
             <ListItemIcon>
               <GroupIcon />
             </ListItemIcon>
-            <ListItemText primary={groupsTag} />
+            <ListItemText primary={languageTags.groups} />
           </ListItem>
 
           <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/friends">
             <ListItemIcon>
             <PersonAddIcon />
             </ListItemIcon>
-            <ListItemText primary={friendsTag} />
+            <ListItemText primary={languageTags.friends} />
           </ListItem>
 
           <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/contact">
             <ListItemIcon>
               <ContactPageIcon />
             </ListItemIcon>
-            <ListItemText primary={contactTag} />
+            <ListItemText primary={languageTags.contact} />
           </ListItem>
 
           <ListItem button onClick={toggleDrawer(anchor, false)} component={Link} to="/legalnotice">
             <ListItemIcon>
               <PolicyIcon />
             </ListItemIcon>
-            <ListItemText primary={legalNoticeTag} />
+            <ListItemText primary={languageTags.legalNotice} />
           </ListItem>
         
       </List>
@@ -133,7 +140,7 @@ export default function SwipeableTemporaryDrawer(props) {
             <ListItemIcon>
             <AccountBoxIcon />
             </ListItemIcon>
-            <ListItemText primary={profileTag} />
+            <ListItemText primary={languageTags.profile} />
       </ListItem>
 
       <Dark_Mode t1={props.t1} t2={props.t2}></Dark_Mode>
@@ -158,8 +165,6 @@ export default function SwipeableTemporaryDrawer(props) {
             style={{padding: "10px 10px 10px 10px"}}
             color="inherit"
             aria-label="open drawer"
-            
-           
           >
             <MenuIcon ></MenuIcon>
           </IconButton>

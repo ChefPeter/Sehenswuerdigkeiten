@@ -4,23 +4,19 @@ import ApartmentIcon from '@mui/icons-material/Apartment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ChurchIcon from '@mui/icons-material/Church';
-import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
-import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
-import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import LandscapeIcon from '@mui/icons-material/Landscape';
+import LayersIcon from '@mui/icons-material/Layers';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import MuseumIcon from '@mui/icons-material/Museum';
 import PeopleIcon from '@mui/icons-material/People';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
-import { Autocomplete, Switch, Button, Tooltip, Chip, FormControlLabel, CircularProgress, Container, Divider, Fade, Paper, Slider, Stack, TextField, Typography } from "@mui/material";
-import { height } from '@mui/system';
-import React, { useEffect, useState } from "react";
-import { changedFilter, flyToLocation, setDirectionGlobally, setFilter, setRadiusForPointerSearch } from "./BaseMap";
-import "./styles/mapsearch.css";
+import { Autocomplete, Button, Chip, CircularProgress, Container, Divider, Fade, FormControlLabel, Paper, Slider, Stack, Switch, TextField, Tooltip, Typography } from "@mui/material";
 import Zoom from '@mui/material/Zoom';
-import LayersIcon from '@mui/icons-material/Layers';
+import React, { useEffect, useState } from "react";
+import { changedFilter, flyToLocation, setFilter, setRadiusForPointerSearch } from "./BaseMap";
+import "./styles/mapsearch.css";
 
 let locationInput = "";
 let timerID;
@@ -31,98 +27,92 @@ function MapSearch (props) {
     const [radiusValue, setRadiusValue] = useState(1);
     const [selectedCityCoords, setSelectedCityCoords] = useState([]);
     const [showLoading, setShowLoading] = useState(false);
-    const [showDropdown, setShowDropdown] = useState(false)
+    const [showDropdown, setShowDropdown] = useState(false);
 
-    const [architecture, setArchitecture] = useState(true)
-    const [culture, setCulture] = useState(true)
-    const [churches, setChurches] = useState(true)
-    const [historical, setHistorical] = useState(true)
-    const [natural, setNatural] = useState(true)
-    const [religion, setReligion] = useState(true)
-    const [touristFacilities, setTouristFacilities] = useState(true)
-    const [museums, setMuseums] = useState(true)
-    const [palaces, setPalaces] = useState(true)
-    const [malls, setMalls] = useState(true)
+    const [architecture, setArchitecture] = useState(true);
+    const [culture, setCulture] = useState(true);
+    const [churches, setChurches] = useState(true);
+    const [historical, setHistorical] = useState(true);
+    const [natural, setNatural] = useState(true);
+    const [religion, setReligion] = useState(true);
+    const [touristFacilities, setTouristFacilities] = useState(true);
+    const [museums, setMuseums] = useState(true);
+    const [palaces, setPalaces] = useState(true);
+    const [malls, setMalls] = useState(true);
 
-    const [searchText, setSearchText] = useState("Search a city");
-    const [searchRadiusTag, setSearchRadiusTag] = useState("Searchradius: ")
-    const [architectureTag, setArchitectureTag] = useState("Architecture");
-    const [culturalTag, setCulturalTag] = useState("Culture");
-    const [churchesTag, setChurchesTag] = useState("Churches");
-    const [historicalTag, setHistoricalTag] = useState("Historical");
-    const [naturalTag, setNaturalTag] = useState("Nature");
-    const [religionTag, setReligionTag] = useState("Religion");
-    const [touristTag, setTouristTag] = useState("Tourist facilities");
-    const [museumsTag, setMuseumsTag] = useState("Museums");
-    const [palacesTag, setPalacesTag] = useState("Palaces");
-    const [mallsTag, setMallsTag] = useState("Malls");
-
-    const[drivingTag, setDrivingTag] = useState("Driving");
-    const[walkingTag, setWalkingTag] = useState("Walking");
-    const[cyclingTag, setCyclingTag] = useState("Cycling");
-
-    const [filterLanguage, setFilterLanguage] = useState("Filter")
-    const [directionsMode, setDirectionsMode] = useState("driving");
-
+    const [languageTags, setLanguageTags] = useState({
+                                                        searchText: "Search a city",
+                                                        searchRadius: "Searchradius: ",
+                                                        architectureText: "Architecture",
+                                                        cultureText: "Culture",
+                                                        churchesText: "Churches",
+                                                        historicalText: "Historical",
+                                                        naturalText: "Nature",
+                                                        religionText: "Religion",
+                                                        touristText: "Tourist facilities",
+                                                        museumsText: "Museums",
+                                                        palacesText: "Palaces",
+                                                        mallsText: "Malls",
+                                                        filterText: "Filter"
+    });
+    
     //reacts only to language change
     useEffect(() => {
         
         if(props.l1 == "de"){
-            setSearchText("Suche eine Stadt");
-            setSearchRadiusTag("Suchradius: ");
-            setArchitectureTag("Architektur");
-            setCulturalTag("Kultur");
-            setChurchesTag("Kirchen");
-            setHistoricalTag("Geschichte");
-            setNaturalTag("Natur");
-            setReligionTag("Religion");
-            setTouristTag("Touristisch");
-            setMuseumsTag("Museen");
-            setPalacesTag("Paläste");
-            setMallsTag("Einkaufszentren");
-            setFilterLanguage("Filter");
 
-            setDrivingTag("Auto")
-            setWalkingTag("Zu Fuß")
-            setCyclingTag("Rad")
+            setLanguageTags({
+                            searchText: "Suche eine Stadt",
+                            searchRadius: "Suchradius: ",
+                            architectureText: "Architektur",
+                            cultureText: "Kultur",
+                            churchesText: "Kirchen",
+                            historicalText: "Geschichte",
+                            naturalText: "Natur",
+                            religionText: "Religion",
+                            touristText: "Touristisch",
+                            museumsText: "Museen",
+                            palacesText: "Paläste",
+                            mallsText: "Einkaufszentren",
+                            filterText: "Filter"
+            });
 
         }else if(props.l1 == "it"){
-            setSearchText("Cerca una città");
-            setSearchRadiusTag("Raggio di ricerca: ");
-            setArchitectureTag("Architettura");
-            setCulturalTag("Cultura");
-            setChurchesTag("Chiese");
-            setHistoricalTag("Storia");
-            setNaturalTag("Natura");
-            setReligionTag("Religione");
-            setTouristTag("Turismo");
-            setMuseumsTag("Musei");
-            setPalacesTag("Palazzi");
-            setMallsTag("Centri commerciali");
-            setFilterLanguage("Filtro");
 
-            setDrivingTag("In macchina")
-            setWalkingTag("A Piedi")
-            setCyclingTag("Bici")
+            setLanguageTags({
+                            searchText: "Cerca una città",
+                            searchRadius: "Raggio di ricerca: ",
+                            architectureText: "Architettura",
+                            cultureText: "Cultura",
+                            churchesText: "Chiese",
+                            historicalText: "Storia",
+                            naturalText: "Natura",
+                            religionText: "Religione",
+                            touristText: "Turismo",
+                            museumsText: "Musei",
+                            palacesText: "Palazzi",
+                            mallsText: "Centri commerciali",
+                            filterText: "Filtro"
+            });
 
         }else{
-            setSearchText("Search a city");
-            setSearchRadiusTag("Searchradius: ");
-            setArchitecture("Architektur af walsch");
-            setCulturalTag("Culture");
-            setChurchesTag("Churches");
-            setHistoricalTag("Historical");
-            setNaturalTag("Nature");
-            setReligionTag("Religion");
-            setTouristTag("Tourist facilities");
-            setMuseumsTag("Museums");
-            setPalacesTag("Palaces");
-            setMallsTag("Malls");
-            setFilterLanguage("Filter");
 
-            setDrivingTag("Driving")
-            setWalkingTag("Walking")
-            setCyclingTag("Cycling")
+            setLanguageTags({
+                            searchText: "Search a city",
+                            searchRadius: "Searchradius: ",
+                            architectureText: "Architecture",
+                            cultureText: "Culture",
+                            churchesText: "Churches",
+                            historicalText: "Historical",
+                            naturalText: "Nature",
+                            religionText: "Religion",
+                            touristText: "Tourist facilities",
+                            museumsText: "Museums",
+                            palacesText: "Palaces",
+                            mallsText: "Malls",
+                            filterText: "Filter"
+            });
+
         }
     }, [props.l1]);
 
@@ -138,7 +128,6 @@ function MapSearch (props) {
         if(language !== "de" && language !== "it" && language!== "en")
             language = "en";
         
-
         if(event.target.value.length > 1){
             setShowLoading(true)
             //to limit api requests -> if user stops typing for 500 ms the api gets called, otherwise not
@@ -266,7 +255,7 @@ function MapSearch (props) {
                     }}}
                     onChange={handleSearchFriendInput}
                     {...params}
-                    label={searchText}
+                    label={languageTags.searchText}
                     
                     InputProps={{
                     ...params.InputProps,
@@ -287,10 +276,10 @@ function MapSearch (props) {
                         marginTop={1.2}
                         
                         marginLeft={"5px"}
-                        minWidth={searchRadiusTag == "Raggio di ricerca: " ? "21ch" : "18.5ch"}
+                        minWidth={languageTags.searchRadius == "Raggio di ricerca: " ? "21ch" : "18.5ch"}
                 
                         marginBottom={0.7}
-                        >{searchRadiusTag} {radiusValue} km</Typography>
+                        >{languageTags.searchRadius} {radiusValue} km</Typography>
                         
                         <Slider 
                             style={{marginRight:"12px"}}
@@ -332,18 +321,18 @@ function MapSearch (props) {
 
                     <Divider  sx={{ mb: 1, mt:1}} />
 
-                    <Typography style={{marginLeft:"5px", marginTop:"0px"}}>{filterLanguage}</Typography>
+                    <Typography style={{marginLeft:"5px", marginTop:"0px"}}>{languageTags.filterText}</Typography>
 
-                    <Chip className="attributeChipsOfSearchbar" icon={<ApartmentIcon fontSize="small" />} variant={architecture ? "filled" : "outlined"} label={architectureTag} onClick={() => handleClickArchitecture()} />
-                    <Chip className="attributeChipsOfSearchbar" icon={<AlignVerticalBottomIcon fontSize="small" />} variant={culture ? "filled" : "outlined"} label={culturalTag} onClick={() => handleClickCulture()} />
-                    <Chip className="attributeChipsOfSearchbar" icon={<ChurchIcon fontSize="small" />} variant={churches ? "filled" : "outlined"} label={churchesTag} onClick={() => handleClickChurch()} />
-                    <Chip className="attributeChipsOfSearchbar" icon={<HistoryEduIcon fontSize="small" />} variant={historical ? "filled" : "outlined"} label={historicalTag} onClick={() => handleClickHistorical()} />
-                    <Chip className="attributeChipsOfSearchbar" icon={<LandscapeIcon fontSize="small" />} variant={natural ? "filled" : "outlined"} label={naturalTag} onClick={() => handleClickNatural()} />
-                    <Chip className="attributeChipsOfSearchbar" icon={<PeopleIcon fontSize="small" />} variant={religion ? "filled" : "outlined"} label={religionTag} onClick={() => handleClickReligion()} />
-                    <Chip className="attributeChipsOfSearchbar" icon={<EmojiPeopleIcon fontSize="small" />} variant={touristFacilities ? "filled" : "outlined"} label={touristTag} onClick={() => handleClickTouristFacilities()} />
-                    <Chip className="attributeChipsOfSearchbar" icon={<MuseumIcon fontSize="small" />} variant={museums ? "filled" : "outlined"} label={museumsTag} onClick={() => handleClickMuseums()} />
-                    <Chip className="attributeChipsOfSearchbar" icon={<AccountBalanceIcon fontSize="small" />} variant={palaces ? "filled" : "outlined"} label={palacesTag} onClick={() => handleClickPalaces()} />
-                    <Chip className="attributeChipsOfSearchbar" icon={<LocalMallIcon fontSize="small" />} variant={malls ? "filled" : "outlined"} label={mallsTag} onClick={() => handleClickMalls()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<ApartmentIcon fontSize="small" />} variant={architecture ? "filled" : "outlined"} label={languageTags.architectureText} onClick={() => handleClickArchitecture()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<AlignVerticalBottomIcon fontSize="small" />} variant={culture ? "filled" : "outlined"} label={languageTags.cultureText} onClick={() => handleClickCulture()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<ChurchIcon fontSize="small" />} variant={churches ? "filled" : "outlined"} label={languageTags.churchesText} onClick={() => handleClickChurch()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<HistoryEduIcon fontSize="small" />} variant={historical ? "filled" : "outlined"} label={languageTags.historicalText} onClick={() => handleClickHistorical()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<LandscapeIcon fontSize="small" />} variant={natural ? "filled" : "outlined"} label={languageTags.naturalText} onClick={() => handleClickNatural()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<PeopleIcon fontSize="small" />} variant={religion ? "filled" : "outlined"} label={languageTags.religionText} onClick={() => handleClickReligion()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<EmojiPeopleIcon fontSize="small" />} variant={touristFacilities ? "filled" : "outlined"} label={languageTags.touristText} onClick={() => handleClickTouristFacilities()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<MuseumIcon fontSize="small" />} variant={museums ? "filled" : "outlined"} label={languageTags.museumsText} onClick={() => handleClickMuseums()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<AccountBalanceIcon fontSize="small" />} variant={palaces ? "filled" : "outlined"} label={languageTags.palacesText} onClick={() => handleClickPalaces()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<LocalMallIcon fontSize="small" />} variant={malls ? "filled" : "outlined"} label={languageTags.mallsText} onClick={() => handleClickMalls()} />
 
                 </div>
                 </Fade>

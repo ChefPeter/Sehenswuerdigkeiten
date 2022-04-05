@@ -347,7 +347,6 @@ async function getFriendsLocation(){
     });
     let locationOfFriends = await positions.json();
     let positionsFriends = [];
-    console.log(locationOfFriends)
   //  locationOfFriends = [{longtitude: 20, latitude: 40},{longtitude: 30, latitude: 40},{longtitude: 20, latitude: 30},{longtitude: 50, latitude: 40}];
     for(let i = 0; i<locationOfFriends.length; i++){
         if(locationOfFriends[i]["longtitude"] !== null || locationOfFriends[i]["latitude"] !== null){
@@ -363,7 +362,7 @@ async function getFriendsLocation(){
 }
 
 async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen){
-  
+    
     setEnabled3D(false);
 
     if(theme === "light"){
@@ -373,23 +372,28 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     }else {
         theme = "mapbox://styles/mapbox/navigation-night-v1";
     }
+    let zoom = 12;
+    let center = [11.65598, 46.71503];
+    if(lastCoords.length !== 0){
+        center = lastCoords;
+    }else{
+        lastCoords = [11.65598, 46.71503];
+    }
 
     if(map !== null){
         try{
+            center = map.getCenter();
+            zoom = map.getZoom();
             map.remove();
         }catch(e){}
     }
-        
-
-    if(lastCoords.length === 0)
-        lastCoords =  [11.65598, 46.71503];
-
+    
     map = new mapboxgl.Map({
         container: "mapContainer",
         style: theme,
-        zoom: 12,
+        zoom: zoom,
         maxPitch: 85,
-        center: lastCoords,
+        center: center,
         minZoom: 1,
     });
     map.addControl(new mapboxgl.ScaleControl({ position: 'bottom-left' }));

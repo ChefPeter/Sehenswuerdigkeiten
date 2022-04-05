@@ -61,7 +61,7 @@ const GroupSettings = (props) => {
           <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{title + name}</h2>
           
           <TextField
-            style={{width: "40vw", minWidth:"250px", marginLeft:"0.625em"}}
+            style={{width: "calc(100vw - 30px)", marginLeft:"0.625em"}}
             id=""
             type="text"
             label={searchTextTag}

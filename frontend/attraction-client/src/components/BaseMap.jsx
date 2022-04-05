@@ -20,7 +20,6 @@ import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
 
-let globvalal;
 let map = null;
 let marker;
 let testRoute = [];
@@ -474,7 +473,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             if(currentGlobalResults["features"].length > 0){
                 //could take some time till layer exists
                 while(map.getSource("attraction-points-data") == undefined){
-                    await sleep(125);
+                    await sleep(100);
                 }
                 map.getSource("attraction-points-data").setData(currentGlobalResults);
             }
@@ -506,6 +505,14 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     }
                 });
             }
+
+            if(lastCoords.length !== 0){
+                let marker2 = new mapboxgl.Marker();
+                // setMarkerCoords(coords)
+                marker2.setLngLat(lastCoords).addTo(map);
+                globalPopup2 = marker2;
+            }
+
         } catch (e){};
     });
    
@@ -984,7 +991,6 @@ async function getLocationData(lon, lat, radius, filters)
         credentials: 'include',
     }).then(res => res.json())
     .then(res => data = res);
-    console.log(data);
     return {type: "FeatureCollection", features: data};
 }
 
@@ -1033,8 +1039,6 @@ export async function flyToLocation (coords, radius, newCoordinates = false){
     currentGlobalResults = results;
     // update "attraction-points-data" source with new data
     // all layers that consume the "attraction-points-data" data source will be updated automatically
-    console.log("res")
-    console.log(results)
     map.getSource("attraction-points-data").setData(results);
     
 }

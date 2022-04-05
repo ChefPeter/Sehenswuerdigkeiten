@@ -2,7 +2,6 @@ import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
 import GroupIcon from '@mui/icons-material/Group';
 import MenuIcon from '@mui/icons-material/Menu';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PolicyIcon from '@mui/icons-material/Policy';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';

@@ -18,6 +18,7 @@ import Profile from './routes/profile';
 import Register from "./routes/register";
 import RequestReset from "./routes/requestReset";
 import ResetPassword from './routes/reset-password';
+import ErrorPage from './routes/errorPage';
 
 const rootElement = document.getElementById("root");
 
@@ -46,6 +47,7 @@ const Routing = () => {
       <Route path='legalnotice' element={<LegalNotice t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
       <Route path='chat' element={<Chat t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
       <Route path='groupSettings' element={<GroupSettings t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
+      <Route path="*" element={<ErrorPage />} />
 
     </Routes>
 

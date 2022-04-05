@@ -40,17 +40,21 @@ function Friends(props) {
   const [errorMessage, setErrorMessage] = useState("Error");
 
    //Language Tags
+   const [title, setTitle] = useState("Title");
    const [incomingRequestTag, setIncomingRequestTag] = useState("Friend requests");
    const [searchTextTag, setSearchTextTag] = useState("Search a friend")
 
   useEffect(() => {
     if(props.l1 == "de") {
+      setTitle("Freunde");
       setIncomingRequestTag("Freundschaftsanfragen");
       setSearchTextTag("Suche einen Freund");
     } else if(props.l1 == "it") {
+      setTitle("Amici");
       setIncomingRequestTag("Richiesti di amicizia");
       setSearchTextTag("Cerca un amico")
     } else {
+      setTitle("Friends");
       setIncomingRequestTag("Friend requests");
       setSearchTextTag("Search a friend");
    }
@@ -151,7 +155,7 @@ function Friends(props) {
       <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
         <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
           <SideBar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
-
+          <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{title}</h2>
           { showLoadingBar ? 
                <LinearProgress color="inherit"/>
           : null}
@@ -160,7 +164,7 @@ function Friends(props) {
           <div id="alignSearchBar">
           
             <TextField
-              style={{ marginLeft: "3.625em"}}
+              style={{ marginLeft: "0.625em"}}
               id="searchBarFriends"
               type="text"
               label={searchTextTag}

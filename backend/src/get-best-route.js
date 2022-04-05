@@ -80,17 +80,32 @@ async function getBestRoute(request, res) {
     if(request.body.returnToStart != "false")
         sortedIDs.push(sortedIDs[0]);
 
-    for(let count = 1; count < coords.length; count++)
+    //zwischen lat lon , zwischen zwei ; 25
+    for(let count = 0; count < coords.length; count += 25)
+    {
+        let rout = await getDataFromURL(getRouteURL(request.body.vehicle, coords.slice(count, count + 25).join(";"), "en"));
+        console.log(count);
+        console.log(JSON.stringify(rout));
+        route.coords = route.coords.concat(rout.routes[0].geometry.coordinates);
+        route.duration += rout.routes[0].duration;
+        route.distance += rout.routes[0].distance;
+    }
+
+    let weather = await getDataFromURL(getWeatherURL(p[0].geometry.coordinates[1], p[0].geometry.coordinates[0]));
+    console.log("send");
+    res.status(200).send(JSON.stringify({route: route, sortedIDs: sortedIDs, weather: weather}));
+
+    /*for(let count = 1; count < coords.length; count++)
     {
       let rout = await getDataFromURL(getRouteURL(request.body.vehicle, `${coords[count - 1].join(",")};${coords[count].join(",")}`, "en"));
       route.coords = route.coords.concat(rout.routes[0].geometry.coordinates);
       route.duration += rout.routes[0].duration;
       route.distance += rout.routes[0].distance;
-    }
+    }*
     
-    let weather = await getDataFromURL(getWeatherURL(p[0].geometry.coordinates[1], p[0].geometry.coordinates[0]));
+    
 
-    res.status(200).send(JSON.stringify({route: route, sortedIDs: sortedIDs, weather: weather}));
+    
     //res.status(200).send(tsp(matrix).map(e => p[e]));
 
     // Gefährlich wegen ban auf mapbox -> 

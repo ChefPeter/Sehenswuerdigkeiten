@@ -139,7 +139,7 @@ function post (setErrorText, setShowErrorAlert){
   formData.append('username', usernameInput);
   formData.append('password', passwordInput)
 
-  fetch("http://10.10.30.18:5000/login", {
+  fetch("http://localhost:5000/login", {
       method: "post",
       body: formData,
       credentials: 'include'
@@ -157,7 +157,7 @@ function post (setErrorText, setShowErrorAlert){
 
 
 function handle(){
-  fetch("http://10.10.30.18:5000/logged-in", {
+  fetch("http://localhost:5000/logged-in", {
     method: "GET",
     credentials: "include"
   })

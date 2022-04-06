@@ -18,7 +18,7 @@ function Approve(props) {
         formData.append('email', email);
         formData.append('approved-token', token);
 
-        fetch("http://10.10.30.18:5000/approve", {
+        fetch("http://localhost:5000/approve", {
             method: "post",
             body: formData
         }).then(res => res.text())

@@ -21,6 +21,7 @@ import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
 
 let map = null;
+let countUserPoints = 0;
 let marker;
 let testRoute = [];
 let radiusForPointerSearch = 1;
@@ -66,6 +67,7 @@ let currentLineCoords = [];
 
         if(data.length < 2){
             if (map.getSource('route1')) {
+                map.removeLayer("arrow-layer");
                 map.removeLayer("layer1");
                 map.removeSource('route1');
             }
@@ -79,13 +81,14 @@ let currentLineCoords = [];
         formData.append('points', JSON.stringify(data));
         formData.append('vehicle', directionMode);
         formData.append('returnToStart', returnToStart);
-        await fetch('http://10.10.30.18:5000/route', {
+        await fetch('http://localhost:5000/route', {
             method: 'post',
             body: formData,
             credentials: 'include',
         }).then(res => res.json())
             .then(res => {route = res.route; sortedIDs = res.sortedIDs; weather = res.weather});
         if (map.getSource('route1')) {
+            map.removeLayer("arrow-layer");
             map.removeLayer("layer1");
             map.removeSource('route1');
         }
@@ -112,14 +115,51 @@ let currentLineCoords = [];
             'id': 'layer1',
             'type': 'line',
             'source': 'route1',
+            'filter': ['==', '$type', 'LineString'],
             'layout': {
                 'line-join': 'round',
                 'line-cap': 'round'
             },
             'paint': {
-                'line-color': 'yellow',
-                'line-width': 5
+                'line-color': '#3cb2d0',
+                'line-width': {
+                    'base': 1,
+                    'stops': [
+                      [1, 0.5],
+                      [3, 2],
+                      [4, 2.5],
+                      [8, 3],
+                      [15, 6],
+                      [22, 8]
+                    ]
+                  }
             }
+        });
+        var url = 'https://cdn.iconscout.com/icon/free/png-256/arrow-fat-right-3609681-3014880.png';
+        
+        map.loadImage(url, function(err, image2) {
+            if(!map.hasImage('arrow')){
+          if (err) {
+            console.error('err image', err);
+            return;
+          }
+          map.addImage('arrow', image2);
+        }
+
+          map.addLayer({
+            'id': 'arrow-layer',
+            'type': 'symbol',
+            'source': 'route1',
+            'layout': {
+              'symbol-placement': 'line',
+              'symbol-spacing': 1,
+              'icon-allow-overlap': true,
+              // 'icon-ignore-placement': true,
+              'icon-image': 'arrow',
+              'icon-size': 0.1,
+              'visibility': 'visible'
+            }
+          });
         });
         setShowLoadingCircleRoute(false)
        
@@ -301,7 +341,7 @@ useEffect(() => {
                     let formData = new FormData();
                     formData.append('latitude', lastPositionByMapboxGeolocate[1]);
                     formData.append('longtitude', lastPositionByMapboxGeolocate[0]);
-                    fetch("http://10.10.30.18:5000/add-position", {
+                    fetch("http://localhost:5000/add-position", {
                         method: "post",
                         body: formData,
                         credentials: 'include'
@@ -331,7 +371,7 @@ useEffect(() => {
             formData.append('latitude', null);
             formData.append('longtitude', null);
 
-            fetch("http://10.10.30.18:5000/add-position", {
+            fetch("http://localhost:5000/add-position", {
                 method: "post",
                 body: formData,
                 credentials: 'include'
@@ -342,7 +382,7 @@ useEffect(() => {
 
 async function getFriendsLocation(){
 
-    const positions = await fetch("http://10.10.30.18:5000/all-positions", {
+    const positions = await fetch("http://localhost:5000/all-positions", {
         method: "get",
         credentials: 'include'
     });
@@ -356,7 +396,7 @@ async function getFriendsLocation(){
 
     if(positionsFriends.length !== 0){
         try{map.getSource("friends-points-data").setData({type: "FeatureCollection", features: positionsFriends});}
-        catch (e){console.log()}
+        catch (e){}
     }
         return null;
 
@@ -474,7 +514,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     map.on("dblclick", (e) => {
         let coords = [e.lngLat.lng, e.lngLat.lat];
         let popupNode  = document.createElement("div");
-        ReactDOM.render(<div><Button variant="contained" onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch)} >Search here?</Button></div>, popupNode);
+        ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch)} >Search here?</Button><Button sx={{mt:2, mb:2}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);
         popUpRef.current
             .setLngLat(coords)
             .setDOMContent(popupNode)
@@ -508,14 +548,47 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     'id': 'layer1',
                     'type': 'line',
                     'source': 'route1',
+                    'filter': ['==', '$type', 'LineString'],
                     'layout': {
                         'line-join': 'round',
                         'line-cap': 'round'
                     },
                     'paint': {
-                        'line-color': 'yellow',
-                        'line-width': 5
+                        'line-color': '#3cb2d0',
+                        'line-width': {
+                            'base': 1,
+                            'stops': [
+                              [1, 0.5],
+                              [3, 2],
+                              [4, 2.5],
+                              [8, 3],
+                              [15, 6],
+                              [22, 8]
+                            ]
+                          }
                     }
+                });
+                var url = 'https://cdn.iconscout.com/icon/free/png-256/arrow-fat-right-3609681-3014880.png';
+                map.loadImage(url, function(err, image2) {
+                  if (err) {
+                    console.error('err image', err);
+                    return;
+                  }try{
+                  map.addImage('arrow', image2);}catch(e){}
+                  map.addLayer({
+                    'id': 'arrow-layer',
+                    'type': 'symbol',
+                    'source': 'route1',
+                    'layout': {
+                      'symbol-placement': 'line',
+                      'symbol-spacing': 1,
+                      'icon-allow-overlap': true,
+                      // 'icon-ignore-placement': true,
+                      'icon-image': 'arrow',
+                      'icon-size': 0.1,
+                      'visibility': 'visible'
+                    }
+                  });
                 });
             }
 
@@ -566,6 +639,12 @@ const sleep = (milliseconds) => {
         flyToLocation(markerCoords, radiusForPointerSearch, false)
     }
 
+    function handleAddClickedByUserPointToRoute(coords){
+        //maybe add a marker or something
+        popUpRef.current.remove();
+        addClickedByUserPointToRoute(coords);
+    }
+
     function locationButtonClick(){
 
         lastPositionByMapboxGeolocate = [];        
@@ -593,7 +672,6 @@ const sleep = (milliseconds) => {
                 navigator.geolocation.getCurrentPosition(success, error);
             }
         }
-        console.log(lastPositionByMapboxGeolocate);
         delay(1000).then(() => {
             if(lastPositionByMapboxGeolocate.length !== 0)
                 setGpsActive(true);
@@ -630,9 +708,16 @@ const sleep = (milliseconds) => {
         for(let i = 0; i<testRoute.length; i++)
             if(obj["properties"]["id"]===testRoute[i]["properties"]["id"])
                 return;
-
+        
         testRoute.push(obj);
         setShowAddButton(false);
+        setCurrentAddedPoints(testRoute);
+    }
+
+    function addClickedByUserPointToRoute(coords){
+        countUserPoints++;
+        let objLocal = '{"geometry":{"type":"Point","coordinates":['+coords[0]+','+coords[1]+']},"type":"Feature","properties":{"id":"randomPoint'+countUserPoints+'","name":"Random Point '+countUserPoints+'","wikidata":"nodata"}}';
+        testRoute.push(JSON.parse(objLocal));
         setCurrentAddedPoints(testRoute);
     }
 
@@ -651,6 +736,7 @@ const sleep = (milliseconds) => {
         setCurrentNotSortedPointsRouteOutput([]);
         if (map.getSource('route1')) {
             map.removeLayer("layer1");
+            map.removeLayer('arrow-layer');
             map.removeSource('route1');
         }
     }
@@ -756,7 +842,7 @@ const sleep = (milliseconds) => {
        
         setDisableHandleRandomLocationButton(true);
         setOpenRouteDrawer(false);
-        const resultRandomLocation = await fetch("http://10.10.30.18:5000/get-random-location", {
+        const resultRandomLocation = await fetch("http://localhost:5000/get-random-location", {
             method: "get",
             credentials:"include"
         })
@@ -1007,7 +1093,7 @@ async function getLocationData(lon, lat, radius, filters)
     locationData.append('lon', lon);
     locationData.append('filters', JSON.stringify(filters));
 
-    await fetch('http://10.10.30.18:5000/sights', {
+    await fetch('http://localhost:5000/sights', {
         method: 'post',
         body: locationData,
         credentials: 'include',

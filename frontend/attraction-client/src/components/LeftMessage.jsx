@@ -10,7 +10,7 @@ function LeftMessage (props) {
     useEffect(async() => {
         if (props.path) {
             console.log("BLALBALBLAB");
-            const result = await fetch("http://10.10.30.18:5000/file?"+new URLSearchParams({file: props.path}).toString(), {
+            const result = await fetch("http://localhost:5000/file?"+new URLSearchParams({file: props.path}).toString(), {
                 method: "GET",
                 credentials: "include"
             });

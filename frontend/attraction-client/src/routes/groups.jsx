@@ -50,7 +50,7 @@ function Groups(props) {
     let formData = new FormData();
     formData.append("groupname", createGroupInput);
 
-    fetch("http://10.10.30.18:5000/create-group", {
+    fetch("http://localhost:5000/create-group", {
       method: "POST",
       credentials: "include",
       body: formData
@@ -59,7 +59,7 @@ function Groups(props) {
 
   const [groups, setGroups] = useState([]);
   useEffect(() => {
-    fetch("http://10.10.30.18:5000/groups", {
+    fetch("http://localhost:5000/groups", {
       method: "GET",
       credentials: "include"
     }).then(res => res.json())

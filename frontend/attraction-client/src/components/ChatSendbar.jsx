@@ -23,7 +23,7 @@ function ChatSendbar (props) {
         formData.append('recipient', props.name);
         formData.append('content', message);
 
-        fetch("http://10.10.30.18:5000/send-message", {
+        fetch("http://localhost:5000/send-message", {
             method: "post",
             body: formData,
             credentials: 'include'
@@ -78,7 +78,7 @@ function ChatSendbar (props) {
         formData.append('file', document.getElementById("pictureUpload").files[0]);
         formData.append('recipient', props.name);
 
-        fetch("http://10.10.30.18:5000/send-message", {
+        fetch("http://localhost:5000/send-message", {
             method: "post",
             body: formData,
             credentials: 'include'
@@ -93,7 +93,7 @@ function ChatSendbar (props) {
         formData.append('file', audio);
         formData.append('recipient', props.name);
 
-        fetch("http://10.10.30.18:5000/send-message", {
+        fetch("http://localhost:5000/send-message", {
             method: "post",
             body: formData,
             credentials: 'include'

@@ -58,7 +58,7 @@ function handleLeaveGroup(groupID){
     let formData = new FormData();
     formData.append('group_id', groupID);
   
-    fetch("http://10.10.30.18:5000/leave-group", {
+    fetch("http://localhost:5000/leave-group", {
         method: "post",
         body: formData,
         credentials: 'include'

@@ -62,7 +62,7 @@ function Friends(props) {
 
   useEffect(async() => {
 
-      const resultFriends = await fetch("http://localhost:5000/friends", {
+      const resultFriends = await fetch("http://10.10.30.18:5000/friends", {
         method: "get",
         credentials: 'include'
       })
@@ -73,7 +73,7 @@ function Friends(props) {
       let profilePictures = [];
       for(let i = 0; i<friends.length; i++){
 
-        const fileProfilePicture = await fetch("http://localhost:5000/profile-picture?"+new URLSearchParams({friend: friends[i]}), {
+        const fileProfilePicture = await fetch("http://10.10.30.18:5000/profile-picture?"+new URLSearchParams({friend: friends[i]}), {
           method: "get",
           credentials: 'include'
         });
@@ -100,7 +100,7 @@ function Friends(props) {
       
       for(let i = 0; i<friends.length; i++){
 
-        const resultDescription = await fetch("http://localhost:5000/description?"+new URLSearchParams({username:friends[i]}).toString(), {
+        const resultDescription = await fetch("http://10.10.30.18:5000/description?"+new URLSearchParams({username:friends[i]}).toString(), {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
@@ -118,7 +118,7 @@ function Friends(props) {
       
     
       //fetch friend requests
-      const resultFriendRequests = await fetch("http://localhost:5000/pending-friends", {
+      const resultFriendRequests = await fetch("http://10.10.30.18:5000/pending-friends", {
         method: "get",
         credentials: 'include'
       });
@@ -215,7 +215,7 @@ function handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessa
   let formData = new FormData();
   formData.append('friend', searchFriendInput);
 
-  fetch("http://localhost:5000/add-friend", {
+  fetch("http://10.10.30.18:5000/add-friend", {
       method: "post",
       body: formData,
       credentials: 'include'

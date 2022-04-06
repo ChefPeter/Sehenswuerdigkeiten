@@ -41,7 +41,7 @@ const dark = {
 
     this.friend = "loberhauser3";
     this.messages = [];
-    fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
+    fetch("http://10.10.30.18:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
       method: "GET",
       credentials: "include"
     })
@@ -128,7 +128,7 @@ const Chat = (props) => {
 
     function func () {
 
-      fetch("http://localhost:5000/username", {
+      fetch("http://10.10.30.18:5000/username", {
         method: "GET",
         credentials: "include"
       }).then(res => res.text())
@@ -138,7 +138,7 @@ const Chat = (props) => {
 
       let intervalID;
       if (groupID) {
-        intervalID = setInterval( () => fetch("http://localhost:5000/group-conversation?"+new URLSearchParams({group_id: groupID}).toString(), {
+        intervalID = setInterval( () => fetch("http://10.10.30.18:5000/group-conversation?"+new URLSearchParams({group_id: groupID}).toString(), {
           method: "GET",
           credentials: "include"
         })
@@ -148,7 +148,7 @@ const Chat = (props) => {
         }), 500);
       }
       else {
-        intervalID = setInterval( () => fetch("http://localhost:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
+        intervalID = setInterval( () => fetch("http://10.10.30.18:5000/conversation?"+new URLSearchParams({friend: friend}).toString(), {
           method: "GET",
           credentials: "include"
         })

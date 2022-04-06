@@ -75,7 +75,7 @@ function handleRemoveFriend(name){
     let formData = new FormData();
     formData.append('friend', name);
   
-    fetch("http://localhost:5000/reject-friend", {
+    fetch("http://10.10.30.18:5000/reject-friend", {
         method: "post",
         body: formData,
         credentials: 'include'

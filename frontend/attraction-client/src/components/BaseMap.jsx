@@ -79,7 +79,7 @@ let currentLineCoords = [];
         formData.append('points', JSON.stringify(data));
         formData.append('vehicle', directionMode);
         formData.append('returnToStart', returnToStart);
-        await fetch('http://localhost:5000/route', {
+        await fetch('http://10.10.30.18:5000/route', {
             method: 'post',
             body: formData,
             credentials: 'include',
@@ -301,7 +301,7 @@ useEffect(() => {
                     formData.append('latitude', lastPositionByMapboxGeolocate[1]);
                     formData.append('longtitude', lastPositionByMapboxGeolocate[0]);
                     console.log("poooost")
-                    fetch("http://localhost:5000/add-position", {
+                    fetch("http://10.10.30.18:5000/add-position", {
                         method: "post",
                         body: formData,
                         credentials: 'include'
@@ -331,7 +331,7 @@ useEffect(() => {
             formData.append('latitude', null);
             formData.append('longtitude', null);
 
-            fetch("http://localhost:5000/add-position", {
+            fetch("http://10.10.30.18:5000/add-position", {
                 method: "post",
                 body: formData,
                 credentials: 'include'
@@ -342,7 +342,7 @@ useEffect(() => {
 
 async function getFriendsLocation(){
 
-    const positions = await fetch("http://localhost:5000/all-positions", {
+    const positions = await fetch("http://10.10.30.18:5000/all-positions", {
         method: "get",
         credentials: 'include'
     });
@@ -744,7 +744,7 @@ const sleep = (milliseconds) => {
        
         setDisableHandleRandomLocationButton(true);
         setOpenRouteDrawer(false);
-        const resultRandomLocation = await fetch("http://localhost:5000/get-random-location", {
+        const resultRandomLocation = await fetch("http://10.10.30.18:5000/get-random-location", {
             method: "get",
             credentials:"include"
         })
@@ -991,7 +991,7 @@ async function getLocationData(lon, lat, radius, filters)
     locationData.append('lon', lon);
     locationData.append('filters', JSON.stringify(filters));
 
-    await fetch('http://localhost:5000/sights', {
+    await fetch('http://10.10.30.18:5000/sights', {
         method: 'post',
         body: locationData,
         credentials: 'include',

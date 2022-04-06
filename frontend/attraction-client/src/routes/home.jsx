@@ -40,7 +40,7 @@ function Home(props) {
 //<Button id="testButton" onClick={() => {console.log("test");}}>Post Route</Button>
 //checks if logged in
 function handle(){
-  fetch("http://localhost:5000/logged-in", {
+  fetch("http://10.10.30.18:5000/logged-in", {
     method: "GET",
   }).then(res => {
     //not logged in

@@ -137,7 +137,7 @@ function sendContactMessage(setOpenErrorSnack, setOpenSuccessSnack) {
   let formData = new FormData();
   formData.append('content', contactInput);
 
-  fetch("http://localhost:5000/report", {
+  fetch("http://10.10.30.18:5000/report", {
       method: "post",
       body: formData,
       credentials: 'include'

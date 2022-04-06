@@ -89,7 +89,7 @@ let currentLineCoords = [];
             map.removeLayer("layer1");
             map.removeSource('route1');
         }
-        console.log(weather);
+        
         setWeatherData({ icon: weather.weather[0].icon, temp: weather.main.temp });
         setDidCalculateRoute(true);
         setCurrentNotSortedPointsRouteOutput(data);
@@ -282,6 +282,8 @@ function BaseMap (props) {
         
     const [obj, setObj] = useState({properties: {name: 'test'}});
     const [markerCoords, setMarkerCoords] = useState([]);
+    const [clickedFriends, setClickedFriends] = useState(false);
+
 
 useEffect(() => {
 
@@ -292,7 +294,6 @@ useEffect(() => {
         geolocate.on('geolocate', function(e) {
             setGpsActive(true);
             lastPositionByMapboxGeolocate = [e.coords.longitude, e.coords.latitude];
-            console.log("position: " +  lastPositionByMapboxGeolocate);
            
             //posts location every 10 secs
             interval1 =  setInterval(async () => {
@@ -300,7 +301,6 @@ useEffect(() => {
                     let formData = new FormData();
                     formData.append('latitude', lastPositionByMapboxGeolocate[1]);
                     formData.append('longtitude', lastPositionByMapboxGeolocate[0]);
-                    console.log("poooost")
                     fetch("http://10.10.30.18:5000/add-position", {
                         method: "post",
                         body: formData,
@@ -308,7 +308,7 @@ useEffect(() => {
                     });
                     lastSentCoordinates = lastPositionByMapboxGeolocate;
                 } 
-            }, 15000)
+            }, 12000)
 
         });
 
@@ -320,7 +320,7 @@ useEffect(() => {
         //gets location of friends every 10 secs
         let interval2 = setInterval(async () => {
             getFriendsLocation()
-        }, 15000);
+        }, 12000);
 
         return () => {
             clearInterval(interval1);
@@ -348,15 +348,15 @@ async function getFriendsLocation(){
     });
     let locationOfFriends = await positions.json();
     let positionsFriends = [];
-  //  locationOfFriends = [{longtitude: 20, latitude: 40},{longtitude: 30, latitude: 40},{longtitude: 20, latitude: 30},{longtitude: 50, latitude: 40}];
     for(let i = 0; i<locationOfFriends.length; i++){
         if(locationOfFriends[i]["longtitude"] !== null || locationOfFriends[i]["latitude"] !== null){
-            positionsFriends.push({type:"Feature",geometry:{type:"Point",coordinates:[locationOfFriends[i]["longtitude"],locationOfFriends[i]["latitude"]]},properties:{id:"id"+i,name:"name"+i}});
+            positionsFriends.push({type:"Feature",geometry:{type:"Point",coordinates:[locationOfFriends[i]["longtitude"],locationOfFriends[i]["latitude"]]},properties:{id:"name"+i,name:locationOfFriends[i]["username"],title:locationOfFriends[i]["username"]}});
         }
     }
-   
+
     if(positionsFriends.length !== 0){
-        map.getSource("friends-points-data").setData({type: "FeatureCollection", features: positionsFriends});
+        try{map.getSource("friends-points-data").setData({type: "FeatureCollection", features: positionsFriends});}
+        catch (e){console.log()}
     }
         return null;
 
@@ -367,19 +367,19 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     setEnabled3D(false);
 
     if(theme === "light"){
-        theme = "mapbox://styles/mapbox/light-v10";
+        theme = "mapbox://styles/mapbox/streets-v11";
     }else if(theme === "satellite"){
-        theme = "mapbox://styles/mapbox/satellite-v9";
+        theme = "mapbox://styles/mapbox/satellite-streets-v11";
     }else {
         theme = "mapbox://styles/mapbox/navigation-night-v1";
     }
+    
     let zoom = 12;
     let center = [11.65598, 46.71503];
-    if(lastCoords.length !== 0){
+    if(lastCoords.length !== 0)
         center = lastCoords;
-    }else{
+    else
         lastCoords = [11.65598, 46.71503];
-    }
 
     if(map !== null){
         try{
@@ -462,6 +462,14 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             setOpen(true);
         }
     });
+    map.on("click", "friends-points-layer", e => {
+        setClickedFriends(true);
+        if (e.features.length) {
+            setObj(e.features[0]);
+            setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
+            setOpen(true);
+        }
+    });
 
     map.on("dblclick", (e) => {
         let coords = [e.lngLat.lng, e.lngLat.lat];
@@ -517,10 +525,14 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 marker2.setLngLat(lastCoords).addTo(map);
                 globalPopup2 = marker2;
             }
-
+            
         } catch (e){};
+        
     });
-   
+
+    delay(1200).then(() => {
+        getFriendsLocation();
+    });
 
 }
 
@@ -922,6 +934,11 @@ const sleep = (milliseconds) => {
         setGeolocationSupported(true)   
       }
 
+      function closeBottomDrawer(){
+        setOpen(!open);
+        setClickedFriends(false);
+      }
+
     return (
     
         <div>
@@ -939,9 +956,8 @@ const sleep = (milliseconds) => {
             <Drawer 
                 anchor='bottom'
                 transitionDuration	= {280}
-                
                 open={open}
-                onClose={() => setOpen(!open)}>
+                onClose={() => closeBottomDrawer()}>
                     <div style={{maxHeight:"60vh", minHeight:"200px"}}>
                         <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                         <div>
@@ -949,7 +965,7 @@ const sleep = (milliseconds) => {
                                 {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{languageTags.addButton}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{languageTags.removeButton}</Button>}
                                 <h2 id="nameField" style={{marginBottom:"10px"}}>{obj.properties.name}</h2>
                             </div>
-                            <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>
+                           {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>}
                         </div>
                         </div>
                     </div>
@@ -1130,7 +1146,20 @@ function addAllLayersToMap(map){
                 "icon-image": "friends-marker", // this will put little croissants on our map
                 "icon-padding": 0,
                 "icon-allow-overlap": true,
-                "icon-size": 0.1
+                "icon-size": 0.1,
+                'text-field': ['get', 'title'],
+                'text-font': [
+                'Open Sans Semibold',
+                'Arial Unicode MS Bold'
+                ],
+                'text-offset': [0, 1],
+                'text-anchor': 'top',
+               
+            },
+            paint: {
+                "text-color": "#000000",
+                "text-halo-color": "#fff",
+                "text-halo-width": 4
             }
     });
 }

@@ -19,6 +19,8 @@ import MapSearch from "./MapSearch";
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
+import ImportExportIcon from '@mui/icons-material/ImportExport';
+import AltRouteIcon from '@mui/icons-material/AltRoute';
 
 let map = null;
 let countUserPoints = 0;
@@ -41,6 +43,7 @@ let userEnabledMapboxLocation = false;
 let coordsForGpsSearch = [];
 let lastSentCoordinates = [];
 let currentLineCoords = [];
+let saveRouteName = "";
 
     export function setFilter(newFilter){
         filter = newFilter;
@@ -98,7 +101,7 @@ let currentLineCoords = [];
         setCurrentNotSortedPointsRouteOutput(data);
         setCurrentRouteOutput(sortedIDs)
         setCurrentDurationInMinutes(Math.round(route.duration / 60));
-        setCurrentKilometers(Math.round(route.distance / 1000 * 10) / 10)
+        setCurrentKilometers(Math.round(route.distance / 1000 * 10) / 10);
         currentLineCoords = route.coords;
         map.addSource('route1', {
             'type': 'geojson',
@@ -187,7 +190,7 @@ function BaseMap (props) {
     const [currentAddedPoints, setCurrentAddedPoints] = useState([]);
 
     const[avgRating, setAvgRating] = useState(0);
-
+   
     const [currentRandomLocation, setCurrentRandomLocation] = useState(false);
 
     const [languageTags, setLanguageTags] = useState({  
@@ -218,6 +221,10 @@ function BaseMap (props) {
     const [gpsActive, setGpsActive] = useState(false);
     const [geolocationSupported, setGeolocationSupported] = useState(true);
     const [unableToRetrieveLocation, setUnableToRetrieveLocation] = useState(false);
+
+    const[clickedImportRouteButton, setClickedImportRouteButton] = useState(false);
+
+    const[routeNames, setRotueNames] = useState(["Route 1", "Route 2", "Route 3"]);                                            
 
     useEffect(() =>{
         
@@ -461,7 +468,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             if (UserAgent.search(/(iphone|ipod|opera mini|fennec|palm|blackberry|android|symbian|series60)/) < 0) {
 
                 const feature = e.features[0];
-
                 // create popup node
                 setImage("");
                 try{
@@ -854,11 +860,69 @@ const sleep = (milliseconds) => {
 
     }
 
-    function handlePointListClick(obj){
+    async function handlePointListClick(obj){
+
         if(!obj["properties"]["id"].includes("randomPoint")){
+            //set image
+            try{
+                let newimageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${obj.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
+                if(imageSrc != newimageSrc)
+                    setImage(newimageSrc);
+            }catch(e){}
+            setShowAddButton(false);
             setObj(obj);
             setOpen(true);
         }
+    }
+
+    function selectRouteFromToDatabase(nameRoute){
+        testRoute = [];
+        setCurrentAddedPoints(testRoute);
+        setCurrentNotSortedPointsRouteOutput(testRoute);
+        setCurrentSortedPointsRouteOutput(testRoute);
+
+        let ids = ["W231493074","Q14549240","W48368395"];
+        let names = ["Kapuzinerkirche St. Katharina","St. Gotthard und St. Erhard (Brixen)","Pfarrkirche St. Michael - Parrocchia San Michele"];
+        let wikidata = ["Q15116261","Q14549240","Q2083121"];
+        let coordinates = [[11.659417748451233, 46.712910269264114],[11.655566096305847, 46.71583246963658],[11.657588481903076, 46.71635841212009]];
+        
+        for(let i = 0; i < ids.length; i++){
+            let obj = {
+                "type": "Feature",
+                "properties": {
+                    "id": ids[i],
+                    "name": names[i],
+                    "wikidata": wikidata[i]
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": coordinates[i]
+                }
+            }
+            testRoute.push(obj);
+        }
+        setCurrentAddedPoints(testRoute);
+        setClickedImportRouteButton(false);
+        setCurrentNotSortedPointsRouteOutput(testRoute);
+        console.log(testRoute)
+    }
+
+    function saveCurrentRouteToDatabase(data, name){
+        console.log(data[0])
+        console.log(name)
+        if(name === ""){
+            return;
+        }
+
+        //for each loop on data
+        data.map((item,i) => {
+            console.log(item["properties"]["id"])
+            console.log(item["properties"]["name"])
+            console.log(item["properties"]["wikidata"])
+            console.log(item["geometry"]["coordinates"])
+            //save to database
+        });
+
     }
 
 
@@ -884,9 +948,23 @@ const sleep = (milliseconds) => {
         </div>
     );
 
+        function handleSaveRouteNameChange(e){
+            saveRouteName = e.target.value;
+        }
+
       const ShowIfEnoughPoints = (props) => {
             return(
-                <div>            
+                <div>     
+                    <Card  sx={{mt:1.5, ml:1, mr:1}} >
+                            <OutlinedInput
+                                id="outlined-adornment-weight"
+                                fullWidth
+                                placeholder={"Name to save current route"}
+                                onChange={handleSaveRouteNameChange}
+                                endAdornment={<Button onClick={() => saveCurrentRouteToDatabase(testRoute, saveRouteName)}><SaveIcon/></Button>}
+                                inputProps={{'aria-label': 'weight',}}/>
+                    </Card>
+
                     <Box  sx={{mt:2, ml:1, mr:1}}>
                         <Button variant="contained" sx={{minHeight: 50}} fullWidth disabled={showLoadingCircleRoute} onClick={() => postRoute(currentAddedPoints, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData)}>
                             <RouteIcon />{languageTags.calculateBestRouteButton} 
@@ -973,16 +1051,39 @@ const sleep = (milliseconds) => {
                     <div key={item["id"]+i}>
                         <Typography sx={{ml:1, mr:1}}><strong> {i+1}.</strong> {item.name}</Typography>
                         {i < currentSortedPointsRouteOutput.length-1 ? <Typography style={{height:"22.5px"}} sx={{ml:0.9}} ><ArrowCircleDownIcon fontSize='small'/></Typography> : <Typography sx={{mb:1}} ></Typography>}
-                        
                     </div>
                 );
             })}
         </div>
     );
 
+    const ShowOldRoutes = () => (
+          
+        <div>
+        {routeNames.map((item,i) => {
+            return (
+                <div key={item+i}>
+                    <Card sx={{mt:1, mb:1}}>
+                        <Button variant="contained" onClick={() => selectRouteFromToDatabase(item)} fullWidth sx={{mt:1}}>{item}<AltRouteIcon/></Button>
+                    </Card>
+                </div>
+            );
+        })}
+        </div>
+  );
+
+
       const ShowIfNotEnoughPoints = () => {
         return(
             <div>
+                
+                    <Card sx={{mt:1.5, ml:1, mr:1}} >
+                           
+                              <Button style={{minWidth:"100%", minHeight: "50px"}} variant="contained" onClick={() => setClickedImportRouteButton(true)}>IMPORT SAVED ROUTES<ImportExportIcon/></Button>
+                            {clickedImportRouteButton ?  <ShowOldRoutes/> : null } 
+                    </Card>
+                    
+                      
                 <Card sx={{mt:3, mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={7}><Typography variant='h6' fontWeight={500} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.errorNoRoute}</Typography>
                     <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.errorNoRouteDescription}</Typography>
                 </Card>
@@ -1026,7 +1127,6 @@ const sleep = (milliseconds) => {
         let formdata = new FormData();
         formdata.append("rating", newRating);
         formdata.append("sight_id", obj["properties"]["wikidata"]);
-
         fetch(`http://localhost:5000/add-rating`, {
             method: "POST",
             credentials: "include",

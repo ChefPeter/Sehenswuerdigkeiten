@@ -9,7 +9,7 @@ import GpsOffIcon from '@mui/icons-material/GpsOff';
 import RouteIcon from '@mui/icons-material/Route';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
-import { Box, Button, Card, Chip, CircularProgress, Drawer, FormControlLabel, OutlinedInput, Switch, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Card, Chip, CircularProgress, Drawer, Container, FormControlLabel, OutlinedInput, Switch, Tooltip, Typography } from "@mui/material";
 import Zoom from '@mui/material/Zoom';
 import mapboxgl from "mapbox-gl";
 import React, { useEffect, useRef, useState } from "react";
@@ -123,7 +123,7 @@ let currentLineCoords = [];
             'paint': {
                 'line-color': '#3cb2d0',
                 'line-width': {
-                    'base': 1,
+                    'base': 0.5,
                     'stops': [
                       [1, 0.5],
                       [3, 2],
@@ -135,8 +135,8 @@ let currentLineCoords = [];
                   }
             }
         });
-        var url = 'https://cdn.iconscout.com/icon/free/png-256/arrow-fat-right-3609681-3014880.png';
-        
+
+        let url = 'https://i.imgur.com/2y57KdU.png';
         map.loadImage(url, function(err, image2) {
             if(!map.hasImage('arrow')){
           if (err) {
@@ -152,11 +152,11 @@ let currentLineCoords = [];
             'source': 'route1',
             'layout': {
               'symbol-placement': 'line',
-              'symbol-spacing': 1,
+              'symbol-spacing': 20,
               'icon-allow-overlap': true,
               // 'icon-ignore-placement': true,
               'icon-image': 'arrow',
-              'icon-size': 0.1,
+              'icon-size': 0.9,
               'visibility': 'visible'
             }
           });
@@ -556,7 +556,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     'paint': {
                         'line-color': '#3cb2d0',
                         'line-width': {
-                            'base': 1,
+                            'base': 0.5,
                             'stops': [
                               [1, 0.5],
                               [3, 2],
@@ -568,7 +568,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                           }
                     }
                 });
-                var url = 'https://cdn.iconscout.com/icon/free/png-256/arrow-fat-right-3609681-3014880.png';
+                var url = 'https://i.imgur.com/2y57KdU.png';
                 map.loadImage(url, function(err, image2) {
                   if (err) {
                     console.error('err image', err);
@@ -581,11 +581,11 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     'source': 'route1',
                     'layout': {
                       'symbol-placement': 'line',
-                      'symbol-spacing': 1,
+                      'symbol-spacing': 20,
                       'icon-allow-overlap': true,
                       // 'icon-ignore-placement': true,
                       'icon-image': 'arrow',
-                      'icon-size': 0.1,
+                      'icon-size': 0.9,
                       'visibility': 'visible'
                     }
                   });
@@ -856,8 +856,10 @@ const sleep = (milliseconds) => {
     }
 
     function handlePointListClick(obj){
-        setObj(obj);
-        setOpen(true);
+        if(!obj["properties"]["id"].includes("randomPoint")){
+            setObj(obj);
+            setOpen(true);
+        }
     }
 
 
@@ -872,7 +874,8 @@ const sleep = (milliseconds) => {
                        
                         <Button style={{minHeight: "42px", minWidth:"50px", maxHeight:"42px", margin:"auto", marginLeft:"15px", marginRight:"10px",  borderRadius:"15px"}} 
                             key={item["properties"]["id"]} color="error" variant="contained"
-                            onClick={ () => handleRemoveItem(item["properties"]["id"])}>
+                            onClick={ () => handleRemoveItem(item["properties"]["id"])}
+                            >
                             <DeleteIcon />
                         </Button>
 
@@ -1022,7 +1025,12 @@ const sleep = (milliseconds) => {
 
       function closeBottomDrawer(){
         setOpen(!open);
-        setClickedFriends(false);
+
+        //set timeout for 1 second
+        setTimeout(() => {
+            setClickedFriends(false);
+        }, 350);
+       
       }
 
     return (

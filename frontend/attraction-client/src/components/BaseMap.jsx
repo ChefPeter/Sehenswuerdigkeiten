@@ -9,7 +9,7 @@ import GpsOffIcon from '@mui/icons-material/GpsOff';
 import RouteIcon from '@mui/icons-material/Route';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
-import { Box, Button, Card, Chip, CircularProgress, Drawer, Container, FormControlLabel, OutlinedInput, Switch, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Card, Chip, CircularProgress, Drawer, Rating, FormControlLabel, OutlinedInput, Switch, Tooltip, Typography } from "@mui/material";
 import Zoom from '@mui/material/Zoom';
 import mapboxgl from "mapbox-gl";
 import React, { useEffect, useRef, useState } from "react";
@@ -186,6 +186,8 @@ function BaseMap (props) {
     const [currentNotSortedPointsRouteOutput, setCurrentNotSortedPointsRouteOutput] = useState([]);
     const [currentAddedPoints, setCurrentAddedPoints] = useState([]);
 
+    const[avgRating, setAvgRating] = useState(0);
+
     const [currentRandomLocation, setCurrentRandomLocation] = useState(false);
 
     const [languageTags, setLanguageTags] = useState({  
@@ -200,7 +202,6 @@ function BaseMap (props) {
                                                         yourPoints: "Current Points",
                                                         currentRoute: "Current Route",
                                                         minutes: "Minutes",
-                                                        routeName: "Route name",
                                                         calculateBestRouteButton: "CALCULATE BEST ROUTE",
                                                         exploreRandomLocation: "EXPLORE A RANDOM LOCATION",
                                                         returnToStart: "Return to start point",
@@ -234,7 +235,6 @@ function BaseMap (props) {
                 yourPoints: "Aktuelle Punkte",
                 currentRoute: "Current Route",
                 minutes: "Minuten",
-                routeName: "Routenname",
                 calculateBestRouteButton: "OPTIMALE ROUTE BERECHNEN",
                 exploreRandomLocation: "ZUFÄLLIG ERKUNDEN",
                 returnToStart: "Zum Startpunkt zurückkehren",
@@ -261,7 +261,6 @@ function BaseMap (props) {
                 yourPoints: "Punti correnti",
                 currentRoute: "Percorso attuale",
                 minutes: "Minuti",
-                routeName: "Nome del percorso",
                 calculateBestRouteButton: "CALCOLA IL PERCORSO OTTIMALE",
                 exploreRandomLocation: "ESPLORARE UN LUOGO CASUALE",
                 returnToStart: "Tornare al punto di partenza",
@@ -288,7 +287,6 @@ function BaseMap (props) {
                 yourPoints: "Current Points",
                 currentRoute: "Current Route",
                 minutes: "Minutes",
-                routeName: "Route name",
                 calculateBestRouteButton: "CALCULATE BEST ROUTE",
                 exploreRandomLocation: "EXPLORE A RANDOM LOCATION",
                 returnToStart: "Return to start point",
@@ -499,6 +497,12 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             setObj(e.features[0]);
             console.log(e.features[0]);
             setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
+            //get request with fetch
+            fetch("http://localhost:5000/rating?"+new URLSearchParams({sight_id: e["features"][0]["properties"]["id"]}), {
+                method: "get",
+                credentials: 'include'
+            }).then(res => res.json()).then(data => setAvgRating(data.avg));
+           
             setOpen(true);
         }
     });
@@ -506,7 +510,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         setClickedFriends(true);
         if (e.features.length) {
             setObj(e.features[0]);
-            setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
+            setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["wikidata"]));
             setOpen(true);
         }
     });
@@ -741,12 +745,6 @@ const sleep = (milliseconds) => {
         }
     }
 
-    function saveCurrentRouteToDatabase(){
-
-        console.log("lol")
-
-    }
-
     function enable3D(){
         setEnabled3D(!enabled3D);
 
@@ -887,17 +885,7 @@ const sleep = (milliseconds) => {
 
       const ShowIfEnoughPoints = (props) => {
             return(
-                <div>
-                    <Card  sx={{mt:1.5, ml:1, mr:1}} >
-                            <OutlinedInput
-                                id="outlined-adornment-weight"
-                                fullWidth
-                                placeholder={languageTags.routeName}
-                                onChange={(e) => console.log(e.value)}
-                                endAdornment={<Button onClick={() => saveCurrentRouteToDatabase()}><SaveIcon/></Button>}
-                                inputProps={{'aria-label': 'weight',}}/>
-                    </Card>
-                    
+                <div>            
                     <Box  sx={{mt:2, ml:1, mr:1}}>
                         <Button variant="contained" sx={{minHeight: 50}} fullWidth disabled={showLoadingCircleRoute} onClick={() => postRoute(currentAddedPoints, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData)}>
                             <RouteIcon />{languageTags.calculateBestRouteButton} 
@@ -953,8 +941,8 @@ const sleep = (milliseconds) => {
 
                     { didCalculateRoute ?
                     <div>
-                        <div>
-                            <img src={`http://openweathermap.org/img/wn/${weatherData.icon}.png`} alt='weather' ></img>
+                        <div style={{ display:"flex", alignItems:"center"}}>
+                            <img style={{height:"50px", marginLeft:"5px"}} src={`http://openweathermap.org/img/wn/${weatherData.icon}.png`} alt='weather' ></img>
                             <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{Math.round(weatherData.temp - 273.15) + "°C"}</strong></Typography>
                         </div>
                         <Card sx={{ mb:3, ml:1, mr:1, pt:1, pb:0.5}} style={{borderRadius:"8px"}} elevation={4}>
@@ -979,16 +967,15 @@ const sleep = (milliseconds) => {
       const SortedRouteNames = () => (
           
           <div>  
-        {currentSortedPointsRouteOutput.map((item,i) => {
-            
-            return (
-                <div key={item["id"]+i}>
-                    <Typography sx={{ml:1, mr:1}}><strong> {i+1}.</strong> {item.name}</Typography>
-                    {i < currentSortedPointsRouteOutput.length-1 ? <Typography style={{height:"22.5px"}} sx={{ml:0.9}} ><ArrowCircleDownIcon fontSize='small'/></Typography> : <Typography sx={{mb:1}} ></Typography>}
-                    
-                </div>
-            );
-        })}
+            {currentSortedPointsRouteOutput.map((item,i) => {
+                return (
+                    <div key={item["id"]+i}>
+                        <Typography sx={{ml:1, mr:1}}><strong> {i+1}.</strong> {item.name}</Typography>
+                        {i < currentSortedPointsRouteOutput.length-1 ? <Typography style={{height:"22.5px"}} sx={{ml:0.9}} ><ArrowCircleDownIcon fontSize='small'/></Typography> : <Typography sx={{mb:1}} ></Typography>}
+                        
+                    </div>
+                );
+            })}
         </div>
     );
 
@@ -1033,6 +1020,27 @@ const sleep = (milliseconds) => {
        
       }
 
+      function ratingChange(newRating, obj){
+        console.log(newRating)
+
+        let formdata = new FormData();
+        formdata.append("rating", newRating);
+        formdata.append("sight_id", obj["properties"]["wikidata"]);
+
+        fetch(`http://localhost:5000/add-rating`, {
+            method: "POST",
+            credentials: "include",
+            body: formdata
+        }).then(() => {
+            fetch("http://localhost:5000/rating?"+new URLSearchParams({sight_id: obj["properties"]["wikidata"]}), {
+                method: "get",
+                credentials: 'include'
+            }).then(res => res.json()).then(data => console.log(data.avg));
+           
+        });
+        
+      }
+
     return (
     
         <div>
@@ -1057,8 +1065,9 @@ const sleep = (milliseconds) => {
                         <div>
                             <div> 
                                 {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{languageTags.addButton}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{languageTags.removeButton}</Button>}
-                                <h2 id="nameField" style={{marginBottom:"10px"}}>{obj.properties.name}</h2>
+                                <h2 id="nameField" style={{marginBottom:"1px"}}>{obj.properties.name}</h2>
                             </div>
+                            <Rating sx={{mb:1}} name="rating-attractions" onChange={(event, newValue) => {ratingChange(newValue, obj)}} value={avgRating} precision={0.5} />
                            {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>}
                         </div>
                         </div>

@@ -34,6 +34,7 @@ const GroupSettings = (props) => {
    const [title, setTitle] = useState("Title");
    const [searchTextTag, setSearchTextTag] = useState("Search a friend");
 
+   //const [showLoadingBar, setShowLoadingBar] = useState(true);
    const [searchParams, setSearchParams] = useSearchParams();
    const name = searchParams.get("name");
 
@@ -48,6 +49,8 @@ const GroupSettings = (props) => {
       setTitle("Group: ");
       setSearchTextTag("Search a member");
    }
+
+   //setShowLoadingBar(false);
   }, [props.l1]);
 
   const handleSearchFriendInput = (event)=>{
@@ -59,26 +62,27 @@ const GroupSettings = (props) => {
         <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
           <SideBar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
           <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{title + name}</h2>
-          
-          <TextField
-            style={{width: "calc(100vw - 30px)", marginLeft:"0.625em"}}
-            id=""
-            type="text"
-            label={searchTextTag}
-            variant="filled"
-            onChange={handleSearchFriendInput}
-            InputProps={{endAdornment: <Button onClick={() => console.log(props)}><PersonAddIcon/></Button>}}
-          />
+          {/* { showLoadingBar ? 
+               <LinearProgress color="inherit"/>
+          : null} */}
+
+          <div id="alignSearchBar">
+            <TextField
+              style={{ marginLeft: "0.625em"}}
+              id="searchBarFriends"
+              type="text"
+              label={searchTextTag}
+              variant="filled"
+              onChange={handleSearchFriendInput}
+              InputProps={{endAdornment: <Button onClick={() => console.log(props)}><PersonAddIcon/></Button>}}
+            />
+          </div>
 
           <div id="freunde" >
             <List>
               <FriendItem name="Peter" description="Ich bin Peter" key="" profilePicture="" l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>
               <FriendItem name="Lukas" description="Ich bin Lukas" key="" profilePicture="" l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>
               <FriendItem name="Olli" description="Ich bin Olli" key="" profilePicture="" l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>
-            
-              {
-                              
-              }
             
             </List>
           </div>

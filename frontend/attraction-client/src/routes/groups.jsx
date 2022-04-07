@@ -1,11 +1,11 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Button, Card, TextField } from "@mui/material";
+import { Button, Card, TextField, LinearProgress } from "@mui/material";
 import List from '@mui/material/List';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import GroupItem from "../components/GroupItem";
 import Sidebar from "../components/Sidebar";
-import "../routes/styles/contact.css";
+import "../routes/styles/friends.css";
 
 // Define theme settings
 const light = {
@@ -25,6 +25,8 @@ function Groups(props) {
   let createGroupInput = "";
   const [titleText, setTitleText] = useState("Title");
   const [textfieldTextTag, setTextfieldTextTag] = useState("Create Group");
+
+  const [showLoadingBar, setShowLoadingBar] = useState(true);
 
   useEffect(() => {
     if(props.l1 == "de") {
@@ -64,6 +66,8 @@ function Groups(props) {
       credentials: "include"
     }).then(res => res.json())
     .then(res => setGroups(res));
+
+    setShowLoadingBar(false);
   }, []);
 
   
@@ -73,18 +77,23 @@ function Groups(props) {
       <Card style={{minHeight: "100vh", borderRadius:"0px"}} >
 
       <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
-
       <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{titleText}</h2>
     
-      <TextField
-        style={{width: "calc(100vw - 30px)", marginLeft:"0.625em"}}
-        id="createGroupField"
-        type="text"
-        label={textfieldTextTag}
-        variant="filled"
-        onChange={handleCreateGroupInput}
-        InputProps={{endAdornment:<Button onClick={createGroup}><AddIcon></AddIcon></Button>}}
-      />
+      { showLoadingBar ? 
+        <LinearProgress color="inherit"/>
+      : null}
+
+      <div id="alignSearchBar">
+        <TextField
+          style={{ marginLeft: "0.625em"}}
+          id="searchBarFriends"
+          type="text"
+          label={textfieldTextTag}
+          variant="filled"
+          onChange={handleCreateGroupInput}
+          InputProps={{endAdornment:<Button onClick={createGroup}><AddIcon></AddIcon></Button>}}
+        />
+      </div>
  
 
       <div id="freunde">

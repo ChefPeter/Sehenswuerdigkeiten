@@ -245,8 +245,13 @@ function Profile(props) {
                           <Button variant="contained" sx={{width:"6ch", height:"6ch"}} onClick={() => saveShowLocation()}><SaveIcon /></Button>
                         </Box>
                     </div>
-                    <Typography sx={{mt:2}} variant='h5'>You visited following POIs:</Typography>
-                    <VisitedSights></VisitedSights>
+                    {visitedSights.length > 0 ?
+                      <div>
+                        <Typography sx={{mt:2}} variant='h5'>You visited following POIs:</Typography>
+                        <VisitedSights></VisitedSights>
+                      </div>
+                    : null}
+                    
                 </div>
                 
               </div> 

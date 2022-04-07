@@ -335,7 +335,8 @@ useEffect(() => {
            
             //posts location every 10 secs
             interval1 =  setInterval(async () => {
-                if((lastPositionByMapboxGeolocate.length === 2) && (lastPositionByMapboxGeolocate[0] !== lastSentCoordinates[0] && lastPositionByMapboxGeolocate[1] !== lastSentCoordinates[1])){
+                
+                if((lastPositionByMapboxGeolocate.length === 2) && ((lastSentCoordinates[0] != lastPositionByMapboxGeolocate[0]) || (lastSentCoordinates[1] != lastPositionByMapboxGeolocate[1]))){
                     let formData = new FormData();
                     formData.append('latitude', lastPositionByMapboxGeolocate[1]);
                     formData.append('longtitude', lastPositionByMapboxGeolocate[0]);
@@ -345,8 +346,8 @@ useEffect(() => {
                         credentials: 'include'
                     });
                     lastSentCoordinates = lastPositionByMapboxGeolocate;
-                } 
-            }, 12000)
+                }
+            }, 6000)
 
         });
 
@@ -498,7 +499,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             console.log(e.features[0]);
             setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
             //get request with fetch
-            fetch("http://localhost:5000/rating?"+new URLSearchParams({sight_id: e["features"][0]["properties"]["id"]}), {
+            fetch("http://localhost:5000/rating?"+new URLSearchParams({sight_id: e["features"][0]["properties"]["wikidata"]}), {
                 method: "get",
                 credentials: 'include'
             }).then(res => res.json()).then(data => setAvgRating(data.avg));
@@ -1016,13 +1017,12 @@ const sleep = (milliseconds) => {
         //set timeout for 1 second
         setTimeout(() => {
             setClickedFriends(false);
+            setAvgRating(0);
         }, 350);
        
       }
 
       function ratingChange(newRating, obj){
-        console.log(newRating)
-
         let formdata = new FormData();
         formdata.append("rating", newRating);
         formdata.append("sight_id", obj["properties"]["wikidata"]);
@@ -1035,8 +1035,7 @@ const sleep = (milliseconds) => {
             fetch("http://localhost:5000/rating?"+new URLSearchParams({sight_id: obj["properties"]["wikidata"]}), {
                 method: "get",
                 credentials: 'include'
-            }).then(res => res.json()).then(data => console.log(data.avg));
-           
+            }).then(res => res.json()).then(data => setAvgRating(data.avg));
         });
         
       }
@@ -1067,7 +1066,7 @@ const sleep = (milliseconds) => {
                                 {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{languageTags.addButton}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{languageTags.removeButton}</Button>}
                                 <h2 id="nameField" style={{marginBottom:"1px"}}>{obj.properties.name}</h2>
                             </div>
-                            <Rating sx={{mb:1}} name="rating-attractions" onChange={(event, newValue) => {ratingChange(newValue, obj)}} value={avgRating} precision={0.5} />
+                            {clickedFriends ? null :  <Rating sx={{mb:1}} name="rating-attractions" onChange={(event, newValue) => {ratingChange(newValue, obj)}} value={avgRating} precision={0.5} />}
                            {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>}
                         </div>
                         </div>

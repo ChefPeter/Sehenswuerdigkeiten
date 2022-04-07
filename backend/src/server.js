@@ -43,6 +43,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const busboy = require("express-busboy");
 const path = require("path");
+const https = require("https");
+const fs = require("fs");
 
 const app = express();
 
@@ -131,3 +133,15 @@ app.get("/debug", (req, res) => {
 });
 
 app.listen(5000, () => console.log("Server running on http://localhost:5000"));
+
+/*
+const httpsServer = https.createServer({
+    key: fs.readFileSync("server.key", "utf-8"),
+    cert: fs.readFileSync("server.crt", "utf-8")
+}, app);
+
+httpsServer.listen(8443);
+
+app.listen(5000, () => console.log("Server running on http://10.10.30.18:5000"));
+
+*/

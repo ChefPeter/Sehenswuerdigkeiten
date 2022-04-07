@@ -81,7 +81,6 @@ function Friends(props) {
         let file = (await fileProfilePicture); //.blob()
         
         if(file.status === 400){
-          console.log("no profile")
           file = "/broken-image.jpg";
         }else{
          
@@ -153,12 +152,13 @@ function Friends(props) {
 
     return (
       <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
+        { showLoadingBar ? 
+               <LinearProgress color="inherit"/>
+          : null}
         <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
           <SideBar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
           <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{title}</h2>
-          { showLoadingBar ? 
-               <LinearProgress color="inherit"/>
-          : null}
+          
 
           
           <div id="alignSearchBar">

@@ -74,38 +74,43 @@ function Groups(props) {
   return (
     
     <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
-      <Card style={{minHeight: "100vh", borderRadius:"0px"}} >
-
-      <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
-      <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{titleText}</h2>
-    
       { showLoadingBar ? 
-        <LinearProgress color="inherit"/>
-      : null}
+               <LinearProgress color="inherit"/>
+          : 
+          <Card style={{minHeight: "100vh", borderRadius:"0px"}} >
 
-      <div id="alignSearchBar">
-        <TextField
-          style={{ marginLeft: "0.625em"}}
-          id="searchBarFriends"
-          type="text"
-          label={textfieldTextTag}
-          variant="filled"
-          onChange={handleCreateGroupInput}
-          InputProps={{endAdornment:<Button onClick={createGroup}><AddIcon></AddIcon></Button>}}
-        />
-      </div>
- 
+          <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
+          <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{titleText}</h2>
 
-      <div id="freunde">
+
+          <div id="alignSearchBar">
+            <TextField
+              style={{ marginLeft: "0.625em"}}
+              id="searchBarFriends"
+              type="text"
+              label={textfieldTextTag}
+              variant="filled"
+              onChange={handleCreateGroupInput}
+              InputProps={{endAdornment:<Button onClick={createGroup}><AddIcon></AddIcon></Button>}}
+            />
+          </div>
+    
+
+          <div id="freunde">
+          
+            <List>
+
+              {groups.map((e,i) =>  <GroupItem name={e.groupname} groupID={e.group_id} key={"group_"+i} profilePicture={e.profilePicture}></GroupItem>)}
+            
+            </List>
+            
+          </div>
+          </Card>
+          
+          
+      }
+
       
-        <List>
-
-          {groups.map((e,i) =>  <GroupItem name={e.groupname} groupID={e.group_id} key={"group_"+i} profilePicture={e.profilePicture}></GroupItem>)}
-         
-        </List>
-        
-      </div>
-      </Card>
     </ThemeProvider>
 
   );

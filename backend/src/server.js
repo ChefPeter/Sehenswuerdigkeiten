@@ -123,7 +123,6 @@ app.get("/visibility", isAuthenticated, async(req, res) => sendGetResponse(await
 app.get("/group-members", isAuthenticated, async(req, res) => sendGetResponse(await getGroupMembers(req), res));
 //app.get("/logged-in", (req, res) => res.send(req.session));
 
-
 app.get("/", isAuthenticated, async(req, res) => {
     res.status(200).send("Everything worked! " + req.session.username);
 });

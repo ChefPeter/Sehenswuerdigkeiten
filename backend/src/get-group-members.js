@@ -1,3 +1,6 @@
+const mysql = require("mysql");
+const util = require("util");
+
 async function getGroupMembers(request) {
     // Schauen ob Pflichtfelder ausgefüllt sind
     if (!request.query.group_id) return null;
@@ -17,8 +20,8 @@ async function getGroupMembers(request) {
         );
         if (result[0].c === 0) return null;
         return Array.from(await query(
-            `SELECT username FROM users_usergroups AS ug
-                JOIN users AS u ug.username=u.username
+            `SELECT u.username AS username, u.user_desc AS description FROM users_usergroups AS ug
+                JOIN users AS u ON ug.username = u.username
                 WHERE ug.group_id=${request.query.group_id}`
         ));
 

@@ -11,7 +11,7 @@ import SuccessSnackbar from "../components/SuccessSnackbar";
 import "./styles/friends.css";
 import { useSearchParams } from "react-router-dom";
 
-let searchFriendInput = "";
+//let searchFriendInput = "";
 // Define theme settings
 const light = {
   palette: {
@@ -30,15 +30,23 @@ const dark = {
 
 const GroupSettings = (props) => {
 
-   //Language Tags
-   const [title, setTitle] = useState("Title");
-   const [searchTextTag, setSearchTextTag] = useState("Search a friend");
+  //Language Tags
+  const [title, setTitle] = useState("Title");
+  const [searchTextTag, setSearchTextTag] = useState("Search a friend");
 
-   //const [showLoadingBar, setShowLoadingBar] = useState(true);
-   const [searchParams, setSearchParams] = useSearchParams();
-   const name = searchParams.get("name");
+  const [searchFriendInput, setSearchFriendInput] = useState("");
 
-  useEffect(() => {
+  //const [showLoadingBar, setShowLoadingBar] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const name = searchParams.get("name");
+
+  const [members, setMembers] = useState([]);
+  const profilePictures = [];
+
+  const [error, setError] = useState(false);
+  const [errorText, setErrorText] = useState("");
+
+  useEffect(async () => {
     if(props.l1 == "de") {
       setTitle("Gruppe: ");
       setSearchTextTag("Suche ein Mitglied");
@@ -50,11 +58,46 @@ const GroupSettings = (props) => {
       setSearchTextTag("Search a member");
    }
 
+    fetch("http://localhost:5000/group-members?"+new URLSearchParams({group_id: searchParams.get("group_id")}), {
+     method: "GET",
+     credentials: "include"
+    })
+    .then(res => res.json())
+    .then(res => {
+      setMembers(res)
+    });
+
    //setShowLoadingBar(false);
   }, [props.l1]);
 
   const handleSearchFriendInput = (event)=>{
-    searchFriendInput = event.target.value;
+    setSearchFriendInput(event.target.value);
+    //searchFriendInput = event.target.value;
+  };
+
+  const addMember = () => {
+    // Add member to group
+    let formData = new FormData();
+    formData.append("username", searchFriendInput);
+    formData.append("group_id", searchParams.get("group_id"));
+
+    fetch("http://localhost:5000/add-to-group", {
+      method: "POST",
+      body: formData,
+      credentials: "include"
+    })
+    .then(res => {
+      if (res.status === 200) {
+        window.location.reload();
+      } else {
+        res.text().then(res => {
+          setTimeout(() => setError(false), 2500);
+          setSearchFriendInput("");
+          setErrorText(res);
+          setError(true);
+        });
+      }
+    });
   };
 
     return (
@@ -73,20 +116,21 @@ const GroupSettings = (props) => {
               type="text"
               label={searchTextTag}
               variant="filled"
+              value={searchFriendInput}
               onChange={handleSearchFriendInput}
-              InputProps={{endAdornment: <Button onClick={() => console.log(props)}><PersonAddIcon/></Button>}}
+              InputProps={{endAdornment: <Button onClick={addMember}><PersonAddIcon/></Button>}}
             />
           </div>
 
           <div id="freunde" >
             <List>
-              <FriendItem name="Peter" description="Ich bin Peter" key="" profilePicture="" l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>
-              <FriendItem name="Lukas" description="Ich bin Lukas" key="" profilePicture="" l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>
-              <FriendItem name="Olli" description="Ich bin Olli" key="" profilePicture="" l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>
-            
+              {
+                members.map((member, i) => <FriendItem name={member.username} description={member.description} key={"member_"+i} l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>)
+              }
             </List>
           </div>
       </Card>
+      <ErrorSnackbar openErrorSnack={error} errorMessage={errorText}></ErrorSnackbar>
     </ThemeProvider>
     );
   

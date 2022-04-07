@@ -6,6 +6,9 @@ async function addToGroup(request) {
     // Schauen ob Pflichtfelder ausgefüllt sind
     if (!checkMandatoryFields(request.body)) return "Nicht alle Pflichtfelder sind ausgefüllt!";
 
+    // friend lowercase machen
+    request.body.username = request.body.username.toLowerCase();
+
     // Add friend to group
     let conn;
     try {

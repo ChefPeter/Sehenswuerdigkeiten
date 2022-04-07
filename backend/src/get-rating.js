@@ -17,7 +17,7 @@ async function getRating(request) {
         let result = await query(
             `SELECT AVG(rating) AS avg FROM ratings WHERE sight_id='${request.query.sight_id}'`
         );
-        return result[0].avg;
+        return result[0];
     } catch(e) {
         console.error(e);
         return "Fehler mit der Datenbank!";

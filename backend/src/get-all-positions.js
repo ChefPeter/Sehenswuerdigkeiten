@@ -12,7 +12,7 @@ async function getAllPositions(request) {
         });
         const query = util.promisify(conn.query).bind(conn);
         return Array.from(await query(
-            `SELECT u.latitude AS latitude, u.longtitude AS longtitude FROM users AS u
+            `SELECT u.latitude AS latitude, u.longtitude AS longtitude, u.username AS username FROM users AS u
                 JOIN friends AS f ON f.user1 = u.username OR f.user2 = u.username
                 WHERE (f.user1 = "${request.session.username}" OR f.user2 = "${request.session.username}") AND
                     u.username != "${request.session.username}" AND

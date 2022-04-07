@@ -20,8 +20,8 @@ import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
 
-let globvalal;
 let map = null;
+let countUserPoints = 0;
 let marker;
 let testRoute = [];
 let radiusForPointerSearch = 1;
@@ -67,6 +67,7 @@ let currentLineCoords = [];
 
         if(data.length < 2){
             if (map.getSource('route1')) {
+                map.removeLayer("arrow-layer");
                 map.removeLayer("layer1");
                 map.removeSource('route1');
             }
@@ -87,10 +88,11 @@ let currentLineCoords = [];
         }).then(res => res.json())
             .then(res => {route = res.route; sortedIDs = res.sortedIDs; weather = res.weather});
         if (map.getSource('route1')) {
+            map.removeLayer("arrow-layer");
             map.removeLayer("layer1");
             map.removeSource('route1');
         }
-        console.log(weather);
+        
         setWeatherData({ icon: weather.weather[0].icon, temp: weather.main.temp });
         setDidCalculateRoute(true);
         setCurrentNotSortedPointsRouteOutput(data);
@@ -113,14 +115,51 @@ let currentLineCoords = [];
             'id': 'layer1',
             'type': 'line',
             'source': 'route1',
+            'filter': ['==', '$type', 'LineString'],
             'layout': {
                 'line-join': 'round',
                 'line-cap': 'round'
             },
             'paint': {
-                'line-color': 'yellow',
-                'line-width': 5
+                'line-color': '#3cb2d0',
+                'line-width': {
+                    'base': 1,
+                    'stops': [
+                      [1, 0.5],
+                      [3, 2],
+                      [4, 2.5],
+                      [8, 3],
+                      [15, 6],
+                      [22, 8]
+                    ]
+                  }
             }
+        });
+        var url = 'https://cdn.iconscout.com/icon/free/png-256/arrow-fat-right-3609681-3014880.png';
+        
+        map.loadImage(url, function(err, image2) {
+            if(!map.hasImage('arrow')){
+          if (err) {
+            console.error('err image', err);
+            return;
+          }
+          map.addImage('arrow', image2);
+        }
+
+          map.addLayer({
+            'id': 'arrow-layer',
+            'type': 'symbol',
+            'source': 'route1',
+            'layout': {
+              'symbol-placement': 'line',
+              'symbol-spacing': 1,
+              'icon-allow-overlap': true,
+              // 'icon-ignore-placement': true,
+              'icon-image': 'arrow',
+              'icon-size': 0.1,
+              'visibility': 'visible'
+            }
+          });
         });
         setShowLoadingCircleRoute(false)
        
@@ -283,6 +322,8 @@ function BaseMap (props) {
         
     const [obj, setObj] = useState({properties: {name: 'test'}});
     const [markerCoords, setMarkerCoords] = useState([]);
+    const [clickedFriends, setClickedFriends] = useState(false);
+
 
 useEffect(() => {
 
@@ -293,7 +334,6 @@ useEffect(() => {
         geolocate.on('geolocate', function(e) {
             setGpsActive(true);
             lastPositionByMapboxGeolocate = [e.coords.longitude, e.coords.latitude];
-            console.log("position: " +  lastPositionByMapboxGeolocate);
            
             //posts location every 10 secs
             interval1 =  setInterval(async () => {
@@ -301,7 +341,6 @@ useEffect(() => {
                     let formData = new FormData();
                     formData.append('latitude', lastPositionByMapboxGeolocate[1]);
                     formData.append('longtitude', lastPositionByMapboxGeolocate[0]);
-                    console.log("poooost")
                     fetch("http://localhost:5000/add-position", {
                         method: "post",
                         body: formData,
@@ -309,9 +348,10 @@ useEffect(() => {
                     });
                     lastSentCoordinates = lastPositionByMapboxGeolocate;
                 } 
-            }, 15000)
+            }, 12000)
 
         });
+
 
         setTimeout(async () => {
             getFriendsLocation();
@@ -320,7 +360,7 @@ useEffect(() => {
         //gets location of friends every 10 secs
         let interval2 = setInterval(async () => {
             getFriendsLocation()
-        }, 15000);
+        }, 12000);
 
         return () => {
             clearInterval(interval1);
@@ -348,49 +388,53 @@ async function getFriendsLocation(){
     });
     let locationOfFriends = await positions.json();
     let positionsFriends = [];
-    console.log(locationOfFriends)
-  //  locationOfFriends = [{longtitude: 20, latitude: 40},{longtitude: 30, latitude: 40},{longtitude: 20, latitude: 30},{longtitude: 50, latitude: 40}];
     for(let i = 0; i<locationOfFriends.length; i++){
         if(locationOfFriends[i]["longtitude"] !== null || locationOfFriends[i]["latitude"] !== null){
-            positionsFriends.push({type:"Feature",geometry:{type:"Point",coordinates:[locationOfFriends[i]["longtitude"],locationOfFriends[i]["latitude"]]},properties:{id:"id"+i,name:"name"+i}});
+            positionsFriends.push({type:"Feature",geometry:{type:"Point",coordinates:[locationOfFriends[i]["longtitude"],locationOfFriends[i]["latitude"]]},properties:{id:"name"+i,name:locationOfFriends[i]["username"],title:locationOfFriends[i]["username"]}});
         }
     }
-   
+
     if(positionsFriends.length !== 0){
-        map.getSource("friends-points-data").setData({type: "FeatureCollection", features: positionsFriends});
+        try{map.getSource("friends-points-data").setData({type: "FeatureCollection", features: positionsFriends});}
+        catch (e){}
     }
         return null;
 
 }
 
 async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen){
-  
+    
     setEnabled3D(false);
 
     if(theme === "light"){
-        theme = "mapbox://styles/mapbox/light-v10";
+        theme = "mapbox://styles/mapbox/streets-v11";
     }else if(theme === "satellite"){
-        theme = "mapbox://styles/mapbox/satellite-v9";
+        theme = "mapbox://styles/mapbox/satellite-streets-v11";
     }else {
         theme = "mapbox://styles/mapbox/navigation-night-v1";
     }
+    
+    let zoom = 12;
+    let center = [11.65598, 46.71503];
+    if(lastCoords.length !== 0)
+        center = lastCoords;
+    else
+        lastCoords = [11.65598, 46.71503];
 
     if(map !== null){
         try{
+            center = map.getCenter();
+            zoom = map.getZoom();
             map.remove();
         }catch(e){}
     }
-        
-
-    if(lastCoords.length === 0)
-        lastCoords =  [11.65598, 46.71503];
-
+    
     map = new mapboxgl.Map({
         container: "mapContainer",
         style: theme,
-        zoom: 12,
+        zoom: zoom,
         maxPitch: 85,
-        center: lastCoords,
+        center: center,
         minZoom: 1,
     });
     map.addControl(new mapboxgl.ScaleControl({ position: 'bottom-left' }));
@@ -458,11 +502,19 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             setOpen(true);
         }
     });
+    map.on("click", "friends-points-layer", e => {
+        setClickedFriends(true);
+        if (e.features.length) {
+            setObj(e.features[0]);
+            setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
+            setOpen(true);
+        }
+    });
 
     map.on("dblclick", (e) => {
         let coords = [e.lngLat.lng, e.lngLat.lat];
         let popupNode  = document.createElement("div");
-        ReactDOM.render(<div><Button variant="contained" onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch)} >Search here?</Button></div>, popupNode);
+        ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch)} >Search here?</Button><Button sx={{mt:2, mb:2}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);
         popUpRef.current
             .setLngLat(coords)
             .setDOMContent(popupNode)
@@ -474,7 +526,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             if(currentGlobalResults["features"].length > 0){
                 //could take some time till layer exists
                 while(map.getSource("attraction-points-data") == undefined){
-                    await sleep(125);
+                    await sleep(100);
                 }
                 map.getSource("attraction-points-data").setData(currentGlobalResults);
             }
@@ -496,23 +548,69 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     'id': 'layer1',
                     'type': 'line',
                     'source': 'route1',
+                    'filter': ['==', '$type', 'LineString'],
                     'layout': {
                         'line-join': 'round',
                         'line-cap': 'round'
                     },
                     'paint': {
-                        'line-color': 'yellow',
-                        'line-width': 5
+                        'line-color': '#3cb2d0',
+                        'line-width': {
+                            'base': 1,
+                            'stops': [
+                              [1, 0.5],
+                              [3, 2],
+                              [4, 2.5],
+                              [8, 3],
+                              [15, 6],
+                              [22, 8]
+                            ]
+                          }
                     }
                 });
+                var url = 'https://cdn.iconscout.com/icon/free/png-256/arrow-fat-right-3609681-3014880.png';
+                map.loadImage(url, function(err, image2) {
+                  if (err) {
+                    console.error('err image', err);
+                    return;
+                  }try{
+                  map.addImage('arrow', image2);}catch(e){}
+                  map.addLayer({
+                    'id': 'arrow-layer',
+                    'type': 'symbol',
+                    'source': 'route1',
+                    'layout': {
+                      'symbol-placement': 'line',
+                      'symbol-spacing': 1,
+                      'icon-allow-overlap': true,
+                      // 'icon-ignore-placement': true,
+                      'icon-image': 'arrow',
+                      'icon-size': 0.1,
+                      'visibility': 'visible'
+                    }
+                  });
+                });
             }
-        } catch (e){};
-    });
-   
-    const sleep = (milliseconds) => {
-        return new Promise(resolve => setTimeout(resolve, milliseconds))
-      }
 
+            if(lastCoords.length !== 0){
+                let marker2 = new mapboxgl.Marker();
+                // setMarkerCoords(coords)
+                marker2.setLngLat(lastCoords).addTo(map);
+                globalPopup2 = marker2;
+            }
+            
+        } catch (e){};
+        
+    });
+
+    delay(1200).then(() => {
+        getFriendsLocation();
+    });
+
+}
+
+const sleep = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
     function pointIsInRoute(id){
@@ -539,6 +637,12 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         add_marker(markerCoords);
 
         flyToLocation(markerCoords, radiusForPointerSearch, false)
+    }
+
+    function handleAddClickedByUserPointToRoute(coords){
+        //maybe add a marker or something
+        popUpRef.current.remove();
+        addClickedByUserPointToRoute(coords);
     }
 
     function locationButtonClick(){
@@ -568,7 +672,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 navigator.geolocation.getCurrentPosition(success, error);
             }
         }
-        console.log(lastPositionByMapboxGeolocate);
         delay(1000).then(() => {
             if(lastPositionByMapboxGeolocate.length !== 0)
                 setGpsActive(true);
@@ -605,9 +708,16 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         for(let i = 0; i<testRoute.length; i++)
             if(obj["properties"]["id"]===testRoute[i]["properties"]["id"])
                 return;
-
+        
         testRoute.push(obj);
         setShowAddButton(false);
+        setCurrentAddedPoints(testRoute);
+    }
+
+    function addClickedByUserPointToRoute(coords){
+        countUserPoints++;
+        let objLocal = '{"geometry":{"type":"Point","coordinates":['+coords[0]+','+coords[1]+']},"type":"Feature","properties":{"id":"randomPoint'+countUserPoints+'","name":"Random Point '+countUserPoints+'","wikidata":"nodata"}}';
+        testRoute.push(JSON.parse(objLocal));
         setCurrentAddedPoints(testRoute);
     }
 
@@ -626,6 +736,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         setCurrentNotSortedPointsRouteOutput([]);
         if (map.getSource('route1')) {
             map.removeLayer("layer1");
+            map.removeLayer('arrow-layer');
             map.removeSource('route1');
         }
     }
@@ -909,6 +1020,11 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         setGeolocationSupported(true)   
       }
 
+      function closeBottomDrawer(){
+        setOpen(!open);
+        setClickedFriends(false);
+      }
+
     return (
     
         <div>
@@ -926,9 +1042,8 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             <Drawer 
                 anchor='bottom'
                 transitionDuration	= {280}
-                
                 open={open}
-                onClose={() => setOpen(!open)}>
+                onClose={() => closeBottomDrawer()}>
                     <div style={{maxHeight:"60vh", minHeight:"200px"}}>
                         <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
                         <div>
@@ -936,7 +1051,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                                 {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{languageTags.addButton}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{languageTags.removeButton}</Button>}
                                 <h2 id="nameField" style={{marginBottom:"10px"}}>{obj.properties.name}</h2>
                             </div>
-                            <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>
+                           {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>}
                         </div>
                         </div>
                     </div>
@@ -984,7 +1099,6 @@ async function getLocationData(lon, lat, radius, filters)
         credentials: 'include',
     }).then(res => res.json())
     .then(res => data = res);
-    console.log(data);
     return {type: "FeatureCollection", features: data};
 }
 
@@ -1033,8 +1147,6 @@ export async function flyToLocation (coords, radius, newCoordinates = false){
     currentGlobalResults = results;
     // update "attraction-points-data" source with new data
     // all layers that consume the "attraction-points-data" data source will be updated automatically
-    console.log("res")
-    console.log(results)
     map.getSource("attraction-points-data").setData(results);
     
 }
@@ -1120,7 +1232,20 @@ function addAllLayersToMap(map){
                 "icon-image": "friends-marker", // this will put little croissants on our map
                 "icon-padding": 0,
                 "icon-allow-overlap": true,
-                "icon-size": 0.1
+                "icon-size": 0.1,
+                'text-field': ['get', 'title'],
+                'text-font': [
+                'Open Sans Semibold',
+                'Arial Unicode MS Bold'
+                ],
+                'text-offset': [0, 1],
+                'text-anchor': 'top',
+               
+            },
+            paint: {
+                "text-color": "#000000",
+                "text-halo-color": "#fff",
+                "text-halo-width": 4
             }
     });
 }

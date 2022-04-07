@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./styles/start.css";
 
-
 function Approve(props) {
 
     const navigate = useNavigate();

@@ -531,6 +531,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             .setDOMContent(popupNode)
             .addTo(map);
     });
+   
     
     delay(100).then(async () => {
         try{
@@ -541,67 +542,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 }
                 map.getSource("attraction-points-data").setData(currentGlobalResults);
             }
-
-            //route exists -> draw new
-            if(currentLineCoords.length !== 0){
-                map.addSource('route1', {
-                    'type': 'geojson',
-                    'data': {
-                        'type': 'Feature',
-                        'properties': {},
-                        'geometry': {
-                            'type': 'LineString',
-                            'coordinates': currentLineCoords
-                        }
-                    }
-                });
-                map.addLayer({
-                    'id': 'layer1',
-                    'type': 'line',
-                    'source': 'route1',
-                    'filter': ['==', '$type', 'LineString'],
-                    'layout': {
-                        'line-join': 'round',
-                        'line-cap': 'round'
-                    },
-                    'paint': {
-                        'line-color': '#3cb2d0',
-                        'line-width': {
-                            'base': 0.5,
-                            'stops': [
-                              [1, 0.5],
-                              [3, 2],
-                              [4, 2.5],
-                              [8, 3],
-                              [15, 6],
-                              [22, 8]
-                            ]
-                          }
-                    }
-                });
-                var url = 'https://i.imgur.com/2y57KdU.png';
-                map.loadImage(url, function(err, image2) {
-                  if (err) {
-                    console.error('err image', err);
-                    return;
-                  }try{
-                  map.addImage('arrow', image2);}catch(e){}
-                  map.addLayer({
-                    'id': 'arrow-layer',
-                    'type': 'symbol',
-                    'source': 'route1',
-                    'layout': {
-                      'symbol-placement': 'line',
-                      'symbol-spacing': 20,
-                      'icon-allow-overlap': true,
-                      // 'icon-ignore-placement': true,
-                      'icon-image': 'arrow',
-                      'icon-size': 0.9,
-                      'visibility': 'visible'
-                    }
-                  });
-                });
-            }
+            console.log(currentLineCoords.length)
 
             if(lastCoords.length !== 0){
                 let marker2 = new mapboxgl.Marker();
@@ -611,7 +552,71 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             }
             
         } catch (e){};
-        
+        delay(200).then(() => {
+            try {
+                //route exists -> draw new
+                if(currentLineCoords.length !== 0){
+                    map.addSource('route1', {
+                        'type': 'geojson',
+                        'data': {
+                            'type': 'Feature',
+                            'properties': {},
+                            'geometry': {
+                                'type': 'LineString',
+                                'coordinates': currentLineCoords
+                            }
+                        }
+                    });
+                    map.addLayer({
+                        'id': 'layer1',
+                        'type': 'line',
+                        'source': 'route1',
+                        'filter': ['==', '$type', 'LineString'],
+                        'layout': {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        'paint': {
+                            'line-color': '#3cb2d0',
+                            'line-width': {
+                                'base': 0.5,
+                                'stops': [
+                                [1, 0.5],
+                                [3, 2],
+                                [4, 2.5],
+                                [8, 3],
+                                [15, 6],
+                                [22, 8]
+                                ]
+                            }
+                        }
+                    });
+                    var url = 'https://i.imgur.com/2y57KdU.png';
+                    map.loadImage(url, function(err, image2) {
+                    if (err) {
+                        console.error('err image', err);
+                        return;
+                    }try{
+                    map.addImage('arrow', image2);}catch(e){}
+                    map.addLayer({
+                        'id': 'arrow-layer',
+                        'type': 'symbol',
+                        'source': 'route1',
+                        'layout': {
+                        'symbol-placement': 'line',
+                        'symbol-spacing': 20,
+                        'icon-allow-overlap': true,
+                        // 'icon-ignore-placement': true,
+                        'icon-image': 'arrow',
+                        'icon-size': 0.9,
+                        'visibility': 'visible'
+                        }
+                    });
+                    });
+                }
+            }catch (e){}
+        });
+
     });
 
     delay(1200).then(() => {
@@ -913,7 +918,8 @@ const sleep = (milliseconds) => {
             speed: 1.5,
             essential: true // this animation is considered essential with respect to prefers-reduced-motion
         });
-
+        postRoute(testRoute, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData);
+        setOpenRouteDrawer(false);
     }
 
     function saveCurrentRouteToDatabase(data, name){
@@ -923,14 +929,30 @@ const sleep = (milliseconds) => {
             return;
         }
 
+        let ids= [], names = [], wikidata = [], coordinates = [];
         //for each loop on data
-        data.map((item,i) => {
-            console.log(item["properties"]["id"])
-            console.log(item["properties"]["name"])
-            console.log(item["properties"]["wikidata"])
-            console.log(item["geometry"]["coordinates"])
-            //save to database
+        data.map(item => {
+            ids.push(item.properties.id);
+            names.push(item.properties.name);
+            wikidata.push(item.properties.wikidata);
+            coordinates.push(item.geometry.coordinates);
         });
+        console.log(names)
+        //create formdata
+        let formData = new FormData();
+        formData.append("name", name);
+        formData.append("ids", ids);
+        formData.append("names", names);
+        formData.append("wikidata", wikidata);
+        formData.append("coordinates", coordinates);
+
+        //post
+        fetch("http://localhost:5000/save-route", {
+            method: "post",
+            body: formData,
+            credentials:"include"
+        })
+
 
     }
 

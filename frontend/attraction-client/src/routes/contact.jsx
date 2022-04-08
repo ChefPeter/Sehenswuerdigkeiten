@@ -7,7 +7,6 @@ import Sidebar from "../components/Sidebar";
 import SuccessSnackbar from '../components/SuccessSnackbar';
 import "../routes/styles/contact.css";
 
-
 // Define theme settings
 const light = {
   palette: {
@@ -30,7 +29,6 @@ function Contact(props) {
   const [colorTextfield, setColorTextfield] = useState("#f5f5f5");
   const[colorFontTextfield, setColorFontTextfield] = useState("#424242");
 
-  const [title, setTitle] = useState("Title");
   const[headTextTag, setHeadTextTag] = useState("Please simply write your request in the text field. We will get back to you as soon as possible!");
   const[textfieldTag, setTextfieldTag] = useState("Type your message!");
   const[buttonTextTag, setButtonTextTag] = useState("SEND MESSAGE");
@@ -50,24 +48,20 @@ function Contact(props) {
 
   //LANGUAGE USE EFFECT [props.l1]
   useEffect(() => {
-    console.log("efffect")
-    
+
     if(props.l1 == "de") {
-      setTitle("Kontakt");
       setHeadTextTag("Bitte schreibe dein Anliegen einfach in das Textfeld. Wir werden uns so schnell wie möglich bei dir melden!");
       setTextfieldTag("Gib deine Nachricht ein!");
       setButtonTextTag("NACHRICHT ABSENDEN");
       setErrorMessageTag("Deine Nachricht konnte nicht verschickt werden!");
       setSuccessMessageTag("Deine Nachricht wurde verschickt!");
     } else if(props.l1 == "it") {
-      setTitle("Contatto");
       setHeadTextTag("Per favore, scrivi semplicemente la tua richiesta nel campo di testo. Vi risponderemo il più presto possibile!");
       setTextfieldTag("Scrivi il tuo messaggio");
       setButtonTextTag("INVIA MESSAGGIO");
       setErrorMessageTag("Il tuo messaggio non può essere inviato!");
       setSuccessMessageTag("Il tuo messaggio è stato inviato!");
     } else {
-      setTitle("Contact");
       setHeadTextTag("Please simply write your request in the text field. We will get back to you as soon as possible!");
       setTextfieldTag("Type your message!");
       setButtonTextTag("SEND MESSAGE");
@@ -105,9 +99,7 @@ const handleCloseSuccessSnackbar = (event, reason) => {
         <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
        
         <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2} />
-
-        <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{title}</h2>
-        <div id="rand">
+        <div id="rand" style={{marginTop: "calc(16.5px + 3.2em)"}}>
           <div>
             <h4>{headTextTag}</h4>
           </div>
@@ -143,7 +135,7 @@ function sendContactMessage(setOpenErrorSnack, setOpenSuccessSnack) {
   let formData = new FormData();
   formData.append('content', contactInput);
 
-  fetch("http://localhost:5000/report", {
+  fetch("http://10.10.30.18:5000/report", {
       method: "post",
       body: formData,
       credentials: 'include'

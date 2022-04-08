@@ -38,10 +38,14 @@ async function checkCredentials(params) {
             database: process.env.DB_DATABASE
         });
         const query = util.promisify(conn.query).bind(conn);
+        const salt = await query(
+            `SELECT salt FROM users WHERE username='${params.username}'`
+        );
+        if (!salt[0].salt) return "Benutzername oder Passwort ist falsch!";
         const result = await query(
             `SELECT approved FROM users
                 WHERE username='${params.username}' AND 
-                    password='${crypto.createHash("sha256").update(params.password).digest("hex")}'`
+                    password='${crypto.createHash("sha256").update(salt[0].salt+params.password).digest("hex")}'`
         );
         if (result.length < 1) return "Benutzername oder Passwort ist falsch!";
         if (result[0].approved === 0) return "Der Benutzer wurde noch nicht bestätigt!";

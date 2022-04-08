@@ -77,9 +77,13 @@ async function changePassword(params) {
             database: process.env.DB_DATABASE
         });
         const query = util.promisify(conn.query).bind(conn);
+        const salt = await query(
+            `SELECT salt FROM users WHERE email='${params.email}'`
+        );
+        if (!salt[0].salt) return "Fehler mit der Datenbank!";
         const result = await query(
             `UPDATE users SET
-                password='${crypto.createHash("sha256").update(params["new-password"]).digest("hex")}',
+                password='${crypto.createHash("sha256").update(salt[0].salt+params["new-password"]).digest("hex")}',
                 reset_token=NULL,
                 reset_time=NULL
                 WHERE email='${params.email}'`

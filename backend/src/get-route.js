@@ -2,6 +2,10 @@ const mysql = require("mysql");
 const util = require("util");
 
 async function getRoute(request) {
+
+    // Schauen ob Pflichtfleder ausgefüllt sind
+    if (!request.query.route_name) return null;
+
     let conn;
     try {
         conn = mysql.createConnection({

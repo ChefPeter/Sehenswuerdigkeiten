@@ -104,12 +104,14 @@ async function insertUser(params) {
         });
         const query = util.promisify(conn.query).bind(conn);
         const token = crypto.randomBytes(500).toString('base64').replace(/\W/g, '');
+        const salt = crypto.randomBytes(50).toString('base64').replace(/\W/g, '');
         const result = await query(
             `INSERT INTO users
             (
                 username,
                 email,
                 password,
+                salt,
                 date_created,
                 last_time_active,
                 approved,
@@ -119,7 +121,8 @@ async function insertUser(params) {
             (
                 '${params.username}',
                 '${params.email}',
-                '${crypto.createHash("sha256").update(params.password).digest("hex")}',
+                '${crypto.createHash("sha256").update(salt+params.password).digest("hex")}',
+                '${salt}',
                 NOW(),
                 NOW(),
                 false,

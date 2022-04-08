@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
 	username VARCHAR(100) PRIMARY KEY,
     email VARCHAR(100),
     password VARCHAR(500),
+    salt VARCHAR(100),
     date_created date,
 	last_time_active datetime,
     user_desc VARCHAR(2000),

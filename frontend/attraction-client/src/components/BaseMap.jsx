@@ -21,6 +21,7 @@ import MapSearch from "./MapSearch";
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
 
 let map = null;
 let countUserPoints = 0;
@@ -190,7 +191,8 @@ function BaseMap (props) {
     const [currentAddedPoints, setCurrentAddedPoints] = useState([]);
 
     const[avgRating, setAvgRating] = useState(0);
-   
+    const[howManyReviews, setHowManyReviews] = useState(0);
+
     const [currentRandomLocation, setCurrentRandomLocation] = useState(false);
 
     const [languageTags, setLanguageTags] = useState({  
@@ -214,9 +216,15 @@ function BaseMap (props) {
                                                         startAtMyCurrentPositionDisabledTooltipTag: "Set your location on the map to use this feature.",
                                                         flyTo: "You fly to: ",
                                                         unableToRetrieveLocation: "Unable to retrieve your location!",
-                                                        gpsNotSupported: "GPS is not supported on your device."
+                                                        gpsNotSupported: "GPS is not supported on your device.",
+                                                        ratingSuccessText: "Rating saved successfully"
                                                     });
 
+
+    const [ratingErrorText, setRatingErrorText] = useState("Error while rating the POI.");
+
+    const [showRatingErrorSnackbar, setShowRatingErrorSnackbar] = useState(false);
+    const [showRatingSuccessSnackbar, setShowRatingSuccessSnackbar] = useState(false);
 
     const [gpsActive, setGpsActive] = useState(false);
     const [geolocationSupported, setGeolocationSupported] = useState(true);
@@ -251,8 +259,10 @@ function BaseMap (props) {
                 startAtMyCurrentPositionDisabledTooltipTag: "Setze deine Position auf der Karte um diese Einstellung zu verwenden.",
                 flyTo: "Du fliegst nach: ",
                 unableToRetrieveLocation: "Deine Position kann nicht festgestellt werden!",
-                gpsNotSupported: "Die GPS Funktion wird für dein Gerät nicht unterstützt."
+                gpsNotSupported: "Die GPS Funktion wird für dein Gerät nicht unterstützt.",
+                ratingSuccessText: "Bewertung erfolgreich gespeichert"
             });
+            setRatingErrorText("Fehler beim Bewerten der POI.");
 
         }else if(props.l1 === "it"){
 
@@ -277,9 +287,10 @@ function BaseMap (props) {
                 startAtMyCurrentPositionDisabledTooltipTag: "Imposta la tua posizione sulla mappa per utilizzare questa funzione.",
                 flyTo: "Si vola verso: ",
                 unableToRetrieveLocation: "Impossibile recuperare la tua posizione!",
-                gpsNotSupported: "Il GPS non è supportato sul tuo dispositivo."
+                gpsNotSupported: "Il GPS non è supportato sul tuo dispositivo.",
+                ratingSuccessText: "Voto salvato con successo"
             });
-
+            setRatingErrorText("Errore durante il voto della segnaletica.");
         } else {
 
             setLanguageTags({  
@@ -303,9 +314,10 @@ function BaseMap (props) {
                 startAtMyCurrentPositionDisabledTooltipTag: "Set your location on the map to use this feature.",
                 flyTo: "You fly to: ",
                 unableToRetrieveLocation: "Unable to retrieve your location!",
-                gpsNotSupported: "GPS is not supported on your device."
+                gpsNotSupported: "GPS is not supported on your device.",
+                ratingSuccessText: "Rating saved successfully"
             });
-
+            setRatingErrorText("Error while rating the POI.");
         }
 
     },[props.l1]);
@@ -427,20 +439,33 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         theme = "mapbox://styles/mapbox/navigation-night-v1";
     }
     
-    let zoom = 12;
-    let center = [11.65598, 46.71503];
-    if(lastCoords.length !== 0)
-        center = lastCoords;
-    else
-        lastCoords = [11.65598, 46.71503];
-
+    let zoom;
+    let center;
+  
     if(map !== null){
         try{
             center = map.getCenter();
             zoom = map.getZoom();
             map.remove();
-        }catch(e){}
+        }catch (e){
+            center = [11.65598, 46.71503];
+            zoom=12;
+            if(lastCoords.length !== 0)
+                center = lastCoords;
+            else
+                lastCoords = [11.65598, 46.71503];
+        }
     }
+    else {
+        center = [11.65598, 46.71503];
+        zoom=12;
+        if(lastCoords.length !== 0)
+            center = lastCoords;
+        else
+            lastCoords = [11.65598, 46.71503];
+    }
+    if(lastCoords.length === 0)
+        lastCoords = [11.65598, 46.71503];
     
     map = new mapboxgl.Map({
         container: "mapContainer",
@@ -515,7 +540,10 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             fetch("http://localhost:5000/rating?"+new URLSearchParams({sight_id: e["features"][0]["properties"]["wikidata"]}), {
                 method: "get",
                 credentials: 'include'
-            }).then(res => res.json()).then(data => setAvgRating(data.avg));
+            }).then(res => res.json()).then(data => {
+                setAvgRating(data.avg)
+                setHowManyReviews(data.count)
+            });
            
             setOpen(true);
         }
@@ -549,7 +577,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 }
                 map.getSource("attraction-points-data").setData(currentGlobalResults);
             }
-            console.log(currentLineCoords.length)
 
             if(lastCoords.length !== 0){
                 let marker2 = new mapboxgl.Marker();
@@ -739,7 +766,6 @@ const sleep = (milliseconds) => {
         testRoute.push(obj);
         selectedSights.features.push(obj);
         map.getSource('selected-attraction-points-data').setData(selectedSights);
-        console.log(selectedSights);
         setShowAddButton(false);
         setCurrentAddedPoints(testRoute);
     }
@@ -886,10 +912,7 @@ const sleep = (milliseconds) => {
         if(!obj["properties"]["id"].includes("randomPoint")){
             //set image
             try{
-                console.log(obj.properties.wikidata);
-              
                 let newimageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${obj.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
-                console.log(newimageSrc);
                 setImage(newimageSrc);
                 setShowLoadingInsteadPicture(false);  
             }catch(e){}
@@ -958,8 +981,6 @@ const sleep = (milliseconds) => {
     }
 
     function saveCurrentRouteToDatabase(data, name){
-        console.log(data[0])
-        console.log(name)
         if(name === ""){
             return;
         }
@@ -972,7 +993,6 @@ const sleep = (milliseconds) => {
             wikidata.push(item.properties.wikidata);
             coordinates.push(item.geometry.coordinates);
         });
-        console.log(names)
         //create formdata
         let formData = new FormData();
         formData.append("route_name", name);
@@ -988,8 +1008,8 @@ const sleep = (milliseconds) => {
             credentials:"include"
         });
 
-        setRouteNames([...routeNames, name]);
-       
+        setRouteNames([...routeNames, {route_name: name}]);
+  
     }
 
 
@@ -1027,9 +1047,10 @@ const sleep = (milliseconds) => {
                                 id="outlined-adornment-weight"
                                 fullWidth
                                 placeholder={"Name to save current route"}
+                                inputProps={{ maxLength: 299, 'aria-label': 'weight'}}
                                 onChange={handleSaveRouteNameChange}
                                 endAdornment={<Button onClick={() => saveCurrentRouteToDatabase(testRoute, saveRouteName)}><SaveIcon/></Button>}
-                                inputProps={{'aria-label': 'weight',}}/>
+                               />
                     </Card>
 
                     <Box  sx={{mt:2, ml:1, mr:1}}>
@@ -1128,7 +1149,7 @@ const sleep = (milliseconds) => {
                 return (
                     <div key={item["route_name"]+i}>
                         <Card sx={{mt:1, mb:1}}>
-                            <Button variant="contained" onClick={() => selectRouteFromToDatabase(item["route_name"])} fullWidth sx={{mt:1}}>{item["route_name"]}<AltRouteIcon/></Button>
+                            <Button variant="contained" sx={{wordWrap:"break-word", mt:1}} onClick={() => selectRouteFromToDatabase(item["route_name"])} fullWidth >{item["route_name"]}<AltRouteIcon/></Button>
                         </Card>
                     </div>
                 );
@@ -1160,13 +1181,21 @@ const sleep = (milliseconds) => {
           return;
         setShowSuccessSnack(false);
       };
-
       const handleGpsErrorsnack = (event, reason) => {
         if (reason === 'clickaway')
           return;
         setUnableToRetrieveLocation(false);
       };
-
+      const handleCloseRatingSuccessSnackbar = (event, reason) => {
+        if (reason === 'clickaway')
+          return;
+        setShowRatingSuccessSnackbar(false);
+      };
+      const handleCloseRatingErrorSnackbar = (event, reason) => {
+        if (reason === 'clickaway')
+          return;
+        setShowRatingErrorSnackbar(false);
+      };
       const handleGeolocationErrorsnack = (event, reason) => {
         if(reason === "clickaway")
             return;
@@ -1184,22 +1213,32 @@ const sleep = (milliseconds) => {
        
       }
 
-      function ratingChange(newRating, obj){
-        let formdata = new FormData();
-        formdata.append("rating", newRating);
-        formdata.append("sight_id", obj["properties"]["wikidata"]);
-        fetch(`http://localhost:5000/add-rating`, {
-            method: "POST",
-            credentials: "include",
-            body: formdata
-        }).then(() => {
-            fetch("http://localhost:5000/rating?"+new URLSearchParams({sight_id: obj["properties"]["wikidata"]}), {
-                method: "get",
-                credentials: 'include'
-            }).then(res => res.json()).then(data => setAvgRating(data.avg));
-        });
-        
-      }
+        async function ratingChange(newRating, obj){
+            setShowRatingErrorSnackbar(false);
+            setShowRatingSuccessSnackbar(false);
+            let formdata = new FormData();
+            formdata.append("rating", newRating);
+            formdata.append("sight_id", obj["properties"]["wikidata"]);
+            fetch(`http://localhost:5000/add-rating`, {
+                method: "POST",
+                credentials: "include",
+                body: formdata
+            }).then(res =>  {
+                if(res.status === 200){
+                    setShowRatingSuccessSnackbar(true);
+                    fetch("http://localhost:5000/rating?"+new URLSearchParams({sight_id: obj["properties"]["wikidata"]}), {
+                    method: "get",
+                    credentials: 'include'
+                    }).then(res => res.json()).then(data => {
+                        setAvgRating(data.avg)
+                        setHowManyReviews(data.count)
+                    });
+                }else{
+                    setShowRatingErrorSnackbar(true);
+                    res.text().then(t => setRatingErrorText(t));
+                }
+            }); 
+        }
 
     return (
 
@@ -1227,7 +1266,7 @@ const sleep = (milliseconds) => {
                                 {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{languageTags.addButton}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{languageTags.removeButton}</Button>}
                                 <h2 id="nameField" style={{marginBottom:"1px"}}>{obj.properties.name}</h2>
                             </div>
-                            {clickedFriends ? null :  <Rating sx={{mb:1}} name="rating-attractions" onChange={(event, newValue) => {ratingChange(newValue, obj)}} value={avgRating} precision={0.5} />}
+                            {clickedFriends ? null :  <Box sx={{display: 'flex',alignItems: 'center',}}> <Rating sx={{mb:1}} name="rating-attractions" onChange={(event, newValue) => {ratingChange(newValue, obj)}} value={avgRating} precision={0.5} />  <Box sx={{ ml: 1, mb:1 }}>({howManyReviews})</Box> </Box> }
                         {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>}
                         </div>
                         </div>
@@ -1246,7 +1285,7 @@ const sleep = (milliseconds) => {
                         {currentAddedPoints.length > 0 || currentSortedPointsRouteOutput.length > 1 ? <ShowIfEnoughPoints didCalculateRoute={didCalculateRoute} /> : <ShowIfNotEnoughPoints />}
                     
                         <Box  sx={{mt:2, ml:1, mr:1}}>
-                            <Button variant="contained" disabled={disableHandleRandomLocationButton} sx={{minHeight: 50}} fullWidth onClick={() => handleRandomLocationButton()}>{languageTags.exploreRandomLocation}</Button>
+                            <Button variant="contained" disabled={disableHandleRandomLocationButton} sx={{minHeight: 50}} fullWidth onClick={() => handleRandomLocationButton()}>{languageTags.exploreRandomLocation} <ShuffleIcon/> </Button>
                         </Box>
                     
                     </div>
@@ -1256,6 +1295,9 @@ const sleep = (milliseconds) => {
             <SuccessSnackbar openSuccessSnack={showSuccessSnack} successMessage={languageTags.flyTo + currentRandomLocation} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
             <ErrorSnackbar openErrorSnack={unableToRetrieveLocation} errorMessage={languageTags.unableToRetrieveLocation} handleClose={handleGpsErrorsnack}></ErrorSnackbar>
             <ErrorSnackbar openErrorSnack={!geolocationSupported} errorMessage={languageTags.gpsNotSupported} handleClose={handleGeolocationErrorsnack}></ErrorSnackbar>
+
+            <SuccessSnackbar openSuccessSnack={showRatingSuccessSnackbar} successMessage={languageTags.ratingSuccessText} handleClose={handleCloseRatingSuccessSnackbar}></SuccessSnackbar>
+            <ErrorSnackbar openErrorSnack={showRatingErrorSnackbar} errorMessage={ratingErrorText} handleClose={handleCloseRatingErrorSnackbar}></ErrorSnackbar>
 
         </div>
     );

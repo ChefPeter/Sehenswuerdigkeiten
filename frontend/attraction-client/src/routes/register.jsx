@@ -119,9 +119,9 @@ function Register(props) {
         <div id="widthTextfields">
           <div id="textFieldsLogin">
 
-              <TextField sx={{ marginBottom: 1 }} autoFocus fullWidth id="filled-basic" label={languageTags.usernameTextfield} variant="filled" onChange={getUsernameValue} />
+              <TextField sx={{ marginBottom: 1 }} autoFocus fullWidth id="filled-basic"  inputProps={{ maxLength: 99 }} label={languageTags.usernameTextfield} variant="filled" onChange={getUsernameValue} />
              
-              <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-basic" label="Email" variant="filled" onChange={getEmailValue} />
+              <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-basic" label="Email"  inputProps={{ maxLength: 99 }} variant="filled" onChange={getEmailValue} />
               
               <TextField sx={{ marginBottom: 1 }} fullWidth id="filled-password-input" label={languageTags.passwordTextfield} type="password" autoComplete="current-password" variant="filled" onChange={getPasswordValue} />
              

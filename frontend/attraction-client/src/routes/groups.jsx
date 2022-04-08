@@ -115,6 +115,7 @@ function Groups(props) {
               label={textfieldTextTag}
               variant="filled"
               value={createGroupInput}
+              inputProps={{ maxLength: 99 }}
               onChange={handleCreateGroupInput}
               InputProps={{endAdornment:<Button onClick={createGroup}><AddIcon></AddIcon></Button>}}
             />

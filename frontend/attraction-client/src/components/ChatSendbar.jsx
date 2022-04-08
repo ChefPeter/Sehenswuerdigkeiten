@@ -66,10 +66,8 @@ function ChatSendbar (props) {
                 });
                 let container = new DataTransfer();
                 container.items.add(file);
-                console.log(container);
                 document.getElementById("audioUpload").files = container.files;
                 //document.getElementById("audioUpload").value = URL.createObjectURL(new Blob(recordedChunks));
-                console.log("Bis do geats!");
                 sendAudio(file);
                 //downloadLink.href = URL.createObjectURL(new Blob(recordedChunks));
                 //downloadLink.download = 'acetest.wav';
@@ -137,7 +135,7 @@ function ChatSendbar (props) {
         <Container>
         
             <TextField
-                
+                inputProps={{ maxLength: 9999 }}
                 style={{width:"60%"}}
                 id="chatMessageInput"
                 type="text"

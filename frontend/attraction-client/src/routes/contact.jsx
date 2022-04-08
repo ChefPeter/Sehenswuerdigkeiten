@@ -129,9 +129,9 @@ const handleCloseSuccessSnackbar = (event, reason) => {
             
                 <div>
                   <TextareaAutosize
-                    maxLength={500}
+                    maxLength={999}
                     aria-label="minimum height"
-                    minRows={12}
+                    minRows={6}
                     placeholder={languageTags.textField}
                     style={{backgroundColor: colorTextfield, color: colorFontTextfield, width: "calc(100% - 10px)", marginTop: "10px", marginBottom: "5px", resize: "none", fontSize:"large", paddingLeft: "5px", paddingRight: "5px", paddingTop: "5px", paddingBottom:"5px"}}
                     onChange={getInputValue}

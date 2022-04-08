@@ -34,7 +34,6 @@ const dark = {
     this.updateChat();
     //const [searchParams, setSearchParams] = useSearchParams();
     //const name = searchParams.get("name");
-    //console.log();
     //console.log(new URLSearchParams(this.props.location.search).get("name"));
     
     const [messages, setMessages] = useState([]);

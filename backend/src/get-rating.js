@@ -17,10 +17,8 @@ async function getRating(request) {
         const query = util.promisify(conn.query).bind(conn);
         console.log(request.query.sight_id)
         let result = await query(
-            `SELECT AVG(rating) AS avg FROM ratings WHERE sight_id="${request.query.sight_id}";`
-           // `SELECT AVG(rating) AS avg FROM ratings WHERE sight_id='${request.query.sight_id}'`
+            `SELECT AVG(rating) AS avg, COUNT(*) AS count FROM ratings WHERE sight_id="${request.query.sight_id}";`
         );
-        console.log(result[0]);
         return result[0];
     } catch(e) {
         console.error(e);

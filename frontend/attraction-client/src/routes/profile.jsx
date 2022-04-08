@@ -48,6 +48,7 @@ function Profile(props) {
   const [buttonTextTag, setButtonTextTag] = useState("SAVE");
   const [showLocationTag, setShowLocationTag] = useState("Show my location to friends");
   const [showLocationTooltipTag, setShowLocationTooltipTag] = useState("If you activate this setting your friends will see your live location. (Only works if you use the location tool on the map.)");
+  const [visitedPOIsTag, setVisitedPOIsTag] = useState("You have visited the following sights: ");
 
   const [visitedSights, setVisitedSights] = useState([]);
 
@@ -73,16 +74,19 @@ function Profile(props) {
   useEffect(() => {
     //language was changed
     if(props.l1 == "de") {
+      setVisitedPOIsTag("Du hast folgende Sehenswürdigkeiten besucht: ");
       setButtonTextTag("SPEICHERN");
       setShowLocationTag("Zeig meinen Freunden meine Position");
       setShowLocationTooltipTag("Sollte diese Einstellung aktiviert sein, wird deine Live Position deinen Freunden angezeigt. (Funktioniert nur, wenn das Positionstool auf der Karte verwendet wird.)");
       if(descriptionLabel !== "") setDescriptionLabel("Beschreibung");
     } else if(props.l1 == "it") {
+      setVisitedPOIsTag("Hai visitato i seguenti luoghi: ")
       setButtonTextTag("SALVARE");
       setShowLocationTag("Mostrare la mia posizione agli amici");
       setShowLocationTooltipTag("Se attivi questa impostazione i tuoi amici vedranno la tua posizione dal vivo. (Funziona solo se usi lo strumento di localizzazione sulla mappa).");
       if(descriptionLabel !== "") setDescriptionLabel("Discrizione");
     } else {
+      setVisitedPOIsTag("You have visited the following sights: ");
       setButtonTextTag("SAVE");
       setShowLocationTag("Show my location to friends");
       setShowLocationTooltipTag("If you activate this setting your friends will see your live location. (Only works if you use the location tool on the map.)");
@@ -197,18 +201,15 @@ function Profile(props) {
   }
 
   const VisitedSights = () => (
-   
     <div>
       {visitedSights.map((sight, index) => {
         return (
-           <Card elevation={0} key={sight.sight_id}>{index+1}. {sight.sightname}</Card>  
+           <Card sx={{pt:0.2,pl:0.7,pb:0.2,pr:1}} elevation={0} key={sight.sight_id}>{index+1}. {sight.sightname}</Card>  
         );
         })}
     </div>
-);
+  );
     
-  
-
     return (
     
         <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
@@ -253,7 +254,7 @@ function Profile(props) {
                         </div>
                         {visitedSights.length > 0 ?
                           <div>
-                            <Typography sx={{mt:2}} variant='h5'>You visited following POIs:</Typography>
+                            <Typography sx={{mt:2}} variant='h5'>{visitedPOIsTag}</Typography>
                             <VisitedSights></VisitedSights>
                           </div>
                         : null}

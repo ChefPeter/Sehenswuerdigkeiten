@@ -169,6 +169,7 @@ function Friends(props) {
                   id="searchBarFriends"
                   type="text"
                   label={searchTextTag}
+                  inputProps={{ maxLength: 99 }}
                   variant="filled"
                   onChange={handleSearchFriendInput}
                   InputProps={{endAdornment: <Button onClick={() => handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage, props.l1)}><PersonAddIcon/></Button>}}

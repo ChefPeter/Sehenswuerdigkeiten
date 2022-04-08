@@ -124,6 +124,7 @@ const GroupSettings = (props) => {
                 label={searchTextTag}
                 variant="filled"
                 value={searchFriendInput}
+                inputProps={{ maxLength: 99 }}
                 onChange={handleSearchFriendInput}
                 InputProps={{endAdornment: <Button onClick={addMember}><PersonAddIcon/></Button>}}
               />

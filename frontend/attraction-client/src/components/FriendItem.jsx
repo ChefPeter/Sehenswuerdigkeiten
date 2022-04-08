@@ -10,22 +10,7 @@ function FriendItem(props) {
     const navigate = useNavigate();
     
     const [showDescription, setShowDescription] = useState(false); 
-    const [followPositionTag, setFollowPositionTag] = useState("FOLLOW POSITION");
 
-
-    useEffect(() => {
-      if(props.l1 == "de") {
-        setFollowPositionTag("POSITON FOLGEN");
-      } else if(props.l1 == "it") {
-        setFollowPositionTag("SEGUI POSIZIONE");
-      } else {
-        setFollowPositionTag("FOLLOW POSITION");
-      }
-
-    }, [props.l1]);
-    
-
-  
     return (
       <div>
         
@@ -56,7 +41,6 @@ function FriendItem(props) {
       <Card id="friendCard"> 
         
         <Button variant="conatined" onClick={() => navigate("/chat?"+new URLSearchParams({name: props.name}), {state: {l1: props.l1, l2: props.l2, t1: props.t1, t2: props.t2}})}>CHAT</Button> 
-        <Button variant="conatined" onClick={() => handleFollowPosition()}>{followPositionTag}</Button> 
         
         {props.showDeleteButton ?
           <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleRemoveFriend(props.name)}><ClearIcon/></Button>
@@ -93,11 +77,6 @@ function handleRemoveFriend(name){
 
 
 }
-
-function handleFollowPosition(){
-  console.log("hallo")
-}
-
 
 function openFriendMenu(setShowDescription, state){
 

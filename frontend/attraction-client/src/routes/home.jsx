@@ -28,7 +28,6 @@ function Home(props) {
   
   useEffect(() => {
     setLoggedIn(checkCurrentlyLoggedIn());
-    console.log(loggedIn)
   }, []);
  
   return (

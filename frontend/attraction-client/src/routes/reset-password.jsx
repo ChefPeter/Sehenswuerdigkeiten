@@ -55,9 +55,9 @@ function ResetPassword() {
 }
 
 function post (setErrorText, setShowErrorAlert, setShowInfoAlert, email, token){
-    console.log(email)
-    console.log(passwordInput)
-    console.log(retypePasswordInput)
+    //console.log(email)
+    //console.log(passwordInput)
+    //console.log(retypePasswordInput)
 
 
     let formData = new FormData();
@@ -66,7 +66,7 @@ function post (setErrorText, setShowErrorAlert, setShowInfoAlert, email, token){
     formData.append('reset-token',token)
     formData.append('email', email);
 
-    fetch("http://10.171.155.127:5000/reset-password", {
+    fetch("http://localhost:5000/reset-password", {
         method: "post",
         body: formData
     }).then(res => {

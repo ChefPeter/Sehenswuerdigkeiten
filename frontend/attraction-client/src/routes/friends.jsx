@@ -10,7 +10,7 @@ import SideBar from "../components/Sidebar";
 import SuccessSnackbar from "../components/SuccessSnackbar";
 import "./styles/friends.css";
 
-let searchFriendInput = "";
+//let searchFriendInput = "";
 // Define theme settings
 const light = {
   palette: {
@@ -38,6 +38,7 @@ function Friends(props) {
   const [openErrorSnack, setOpenErrorSnack] = useState(false);
   const [successMessage, setSuccessMessage] = useState("Success");
   const [errorMessage, setErrorMessage] = useState("Error");
+  const [searchFriendInput, setSearchFriendInput] = useState("");
 
    //Language Tags
    const [title, setTitle] = useState("Title");
@@ -133,7 +134,7 @@ function Friends(props) {
   }, []);
 
   const handleSearchFriendInput = (event)=>{
-    searchFriendInput = event.target.value;
+    setSearchFriendInput(event.target.value);
   };
 
   const handleCloseErrorSnackbar = (event, reason) => {
@@ -149,6 +150,39 @@ function Friends(props) {
   
     setOpenSuccessSnack(false);
   };
+
+  function handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage, language){
+
+    console.log(searchFriendInput);
+  
+    setOpenErrorSnack(false);
+    setOpenSuccessSnack(false);
+  
+    let formData = new FormData();
+    formData.append('friend', searchFriendInput);
+  
+    fetch("http://localhost:5000/add-friend", {
+        method: "post",
+        body: formData,
+        credentials: 'include'
+    }).then(res => {
+        if (res.status == 400 || res.status === 401) {
+            res.text().then(e =>  setErrorMessage(e))
+            setOpenErrorSnack(true);
+        } else {
+            // Infofeld sichtbar machen
+            if(language = "de")
+                 setSuccessMessage("Freundschaftsanfrage verschickt!");
+            else if(language = "it")
+                 setSuccessMessage("Richiesta di amicizia inviata!");
+            else
+                 setSuccessMessage("Friend request sent!");
+            
+           setOpenSuccessSnack(true);
+        }
+        setSearchFriendInput("");
+    });
+  }
 
     return (
       <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
@@ -169,6 +203,7 @@ function Friends(props) {
               type="text"
               label={searchTextTag}
               variant="filled"
+              value={searchFriendInput}
               onChange={handleSearchFriendInput}
               InputProps={{endAdornment: <Button onClick={() => handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage, props.l1)}><PersonAddIcon/></Button>}}
             />
@@ -203,41 +238,5 @@ function Friends(props) {
     );
   
 }
-
-
-function handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage, language){
-
-  console.log(searchFriendInput);
-
-  setOpenErrorSnack(false);
-  setOpenSuccessSnack(false);
-
-  let formData = new FormData();
-  formData.append('friend', searchFriendInput);
-
-  fetch("http://localhost:5000/add-friend", {
-      method: "post",
-      body: formData,
-      credentials: 'include'
-  }).then(res => {
-      if (res.status == 400 || res.status === 401) {
-          res.text().then(e =>  setErrorMessage(e))
-          setOpenErrorSnack(true);
-      } else {
-          // Infofeld sichtbar machen
-          if(language = "de")
-               setSuccessMessage("Freundschaftsanfrage verschickt!");
-          else if(language = "it")
-               setSuccessMessage("Richiesta di amicizia inviata!");
-          else
-               setSuccessMessage("Friend request sent!");
-          
-         setOpenSuccessSnack(true);
-      }
-  });
-
-
-}
-
 
 export default Friends;

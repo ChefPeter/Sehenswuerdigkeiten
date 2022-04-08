@@ -19,9 +19,15 @@ async function addToGroup(request) {
             database: process.env.DB_DATABASE
         });
         const query = util.promisify(conn.query).bind(conn);
-
-        // Schauen ob man die Rechte hat
+        // Schauen ob es den Benutzer überhaupt gibt
         let result = await query(
+            `SELECT COUNT(*) AS c FROM users WHERE username = '${request.body.username}'`
+        );
+        if (result[0].c === 0) {
+            return "Der Benutzer existiert nicht!";
+        }
+        // Schauen ob man die Rechte hat
+        result = await query(
             `SELECT COUNT(*) AS c FROM users_usergroups
                 WHERE username='${request.session.username}' AND group_id=${request.body.group_id}`
         );

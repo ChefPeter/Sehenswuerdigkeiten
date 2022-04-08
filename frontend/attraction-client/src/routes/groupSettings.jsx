@@ -1,15 +1,14 @@
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { Button, Card, LinearProgress, TextField, Typography } from "@mui/material";
+import { Button, Card, TextField } from "@mui/material";
 import List from '@mui/material/List';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import ErrorSnackbar from "../components/ErrorSnackbar";
 import FriendItem from "../components/FriendItem";
-import IncomingRequest from "../components/IncomingRequest";
 import SideBar from "../components/Sidebar";
-import SuccessSnackbar from "../components/SuccessSnackbar";
+import { checkCurrentlyLoggedIn } from "../functions/checkLoggedIn";
 import "./styles/friends.css";
-import { useSearchParams } from "react-router-dom";
 
 //let searchFriendInput = "";
 // Define theme settings
@@ -45,6 +44,12 @@ const GroupSettings = (props) => {
 
   const [error, setError] = useState(false);
   const [errorText, setErrorText] = useState("");
+
+  const[loggedIn, setLoggedIn] = useState(false);
+  
+  useEffect(() => {
+    setLoggedIn(checkCurrentlyLoggedIn());
+  }, []);
 
   useEffect(async () => {
     if(props.l1 == "de") {
@@ -102,35 +107,39 @@ const GroupSettings = (props) => {
 
     return (
       <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
-        <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
-          <SideBar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
-          <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{title + name}</h2>
-          {/* { showLoadingBar ? 
-               <LinearProgress color="inherit"/>
-          : null} */}
+        {loggedIn ?
+          <div>
+          <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
+            <SideBar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
+            <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{title + name}</h2>
+            {/* { showLoadingBar ? 
+                <LinearProgress color="inherit"/>
+            : null} */}
 
-          <div id="alignSearchBar">
-            <TextField
-              style={{ marginLeft: "0.625em"}}
-              id="searchBarFriends"
-              type="text"
-              label={searchTextTag}
-              variant="filled"
-              value={searchFriendInput}
-              onChange={handleSearchFriendInput}
-              InputProps={{endAdornment: <Button onClick={addMember}><PersonAddIcon/></Button>}}
-            />
-          </div>
+            <div id="alignSearchBar">
+              <TextField
+                style={{ marginLeft: "0.625em"}}
+                id="searchBarFriends"
+                type="text"
+                label={searchTextTag}
+                variant="filled"
+                value={searchFriendInput}
+                onChange={handleSearchFriendInput}
+                InputProps={{endAdornment: <Button onClick={addMember}><PersonAddIcon/></Button>}}
+              />
+            </div>
 
-          <div id="freunde" >
-            <List>
-              {
-                members.map((member, i) => <FriendItem showDeleteButton={false} name={member.username} description={member.description} key={"member_"+i} l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>)
-              }
-            </List>
-          </div>
-      </Card>
-      <ErrorSnackbar openErrorSnack={error} errorMessage={errorText}></ErrorSnackbar>
+            <div id="freunde" >
+              <List>
+                {
+                  members.map((member, i) => <FriendItem showDeleteButton={false} name={member.username} description={member.description} key={"member_"+i} l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>)
+                }
+              </List>
+            </div>
+        </Card>
+        <ErrorSnackbar openErrorSnack={error} errorMessage={errorText}></ErrorSnackbar>
+        </div>
+      : null}
     </ThemeProvider>
     );
   

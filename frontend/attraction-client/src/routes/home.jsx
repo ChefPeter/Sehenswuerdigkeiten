@@ -5,6 +5,8 @@ import BaseMap from '../components/BaseMap';
 import Sidebar from "../components/Sidebar";
 import "./styles/home.css";
 import "./styles/start.css";
+import {useState, useEffect} from 'react';
+import { checkCurrentlyLoggedIn } from "../functions/checkLoggedIn";
 
 // Define theme settings
 const light = {
@@ -22,33 +24,25 @@ const dark = {
 
 function Home(props) {
 
+  const[loggedIn, setLoggedIn] = useState(false);
+  
+  useEffect(() => {
+    setLoggedIn(checkCurrentlyLoggedIn());
+    console.log(loggedIn)
+  }, []);
  
-    return (
-      <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
-        
+  return (
+    <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
+      {loggedIn ?
         <Card id="container" style={{borderRadius:"0px"}}>
           <BaseMap l1={props.l1} t1={props.t1} />
           
           <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2} />
         </Card>
-
-      </ThemeProvider>
-    );
+      : null}
+    </ThemeProvider>
+  );
   
-}
-
-//<Button id="testButton" onClick={() => {console.log("test");}}>Post Route</Button>
-//checks if logged in
-function handle(){
-  fetch("http://localhost:5000/logged-in", {
-    method: "GET",
-  }).then(res => {
-    //not logged in
-    console.log(res)
-    if (res.status == 400) {
-        //window.location.href="/login";
-    } 
-  });
 }
 
 export default Home;

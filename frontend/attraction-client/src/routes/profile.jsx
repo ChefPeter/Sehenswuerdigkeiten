@@ -15,6 +15,7 @@ import Save from '@mui/icons-material/Save';
 import { CircularProgress } from '@mui/material';
 import { Typography } from '@mui/material';
 import { LinearProgress } from '@mui/material';
+import { checkCurrentlyLoggedIn } from "../functions/checkLoggedIn";
 
 // Define theme settings
 const light = {
@@ -52,7 +53,9 @@ function Profile(props) {
 
   const [showMyLocationToFriends, setShowMyLocationToFriends] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
-  const[fullyLoadedPage, setFullyLoadedPage] = useState(false)
+  const[fullyLoadedPage, setFullyLoadedPage] = useState(false);
+
+  const[loggedIn, setLoggedIn] = useState(false);
 
   const  handleCloseSuccessSnackbar = (event, reason) =>  {
     if (reason === 'clickaway') {
@@ -90,7 +93,9 @@ function Profile(props) {
 
 
   useEffect(async() => {
-   
+
+      setLoggedIn(checkCurrentlyLoggedIn());
+
       const resultUsername = await fetch("http://localhost:5000/username", {
         method: "get",
         credentials: 'include'
@@ -207,61 +212,63 @@ function Profile(props) {
     return (
     
         <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
-        <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
-        <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
-        {fullyLoadedPage ? 
-              <div id='description' style={{marginTop: "calc(16.5px + 3.5em)"}}>
+          {loggedIn ?
+            <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
+            <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
+            {fullyLoadedPage ? 
+                  <div id='description' style={{marginTop: "calc(16.5px + 3.5em)"}}>
 
-              { false ?
-                <TextField type="file" ></TextField>
-              : null}
-              <input type="file" id="fileInputUpload" hidden onChange={() => handleFileUpload(setShowInfo, setShowError, setSuccessDescription, setErrorDescription, props.l1, setProfilePicture)} ></input>
+                  { false ?
+                    <TextField type="file" ></TextField>
+                  : null}
+                  <input type="file" id="fileInputUpload" hidden onChange={() => handleFileUpload(setShowInfo, setShowError, setSuccessDescription, setErrorDescription, props.l1, setProfilePicture)} ></input>
 
-                <div id='profil'>
-                  
-                    <Avatar alt="Avatar" src={profilePicture} onClick={() => document.getElementById("fileInputUpload").click()}
-                        sx={{ width: 80, height: 80 }}
-                    />
-                </div>
-                <div id='unten'>
-                    <div>
-                        <h2>{username}</h2>
+                    <div id='profil'>
+                      
+                        <Avatar alt="Avatar" src={profilePicture} onClick={() => document.getElementById("fileInputUpload").click()}
+                            sx={{ width: 80, height: 80 }}
+                        />
                     </div>
-                    <div id='abstand'>
-                        <TextField
-                            fullWidth
-                            id="outlined-multiline-static"
-                            label={descriptionLabel}
-                            multiline
-                            rows={4}
-                            defaultValue={description}
-                            onChange={getDescriptionValue}/>
+                    <div id='unten'>
+                        <div>
+                            <h2>{username}</h2>
+                        </div>
+                        <div id='abstand'>
+                            <TextField
+                                fullWidth
+                                id="outlined-multiline-static"
+                                label={descriptionLabel}
+                                multiline
+                                rows={4}
+                                defaultValue={description}
+                                onChange={getDescriptionValue}/>
+                        </div>
+                        <div>
+                            <Button fullWidth style={{height: "43px"}} onClick={() => handleSaveNewDescription(descriptionInput ,setShowInfo,setShowError, setSuccessDescription, setErrorDescription, didChangeDescription,  setDidChangeDescription, props.l1, setShowLoading)} variant="contained"> {showLoading ? <CircularProgress size={25} color='inherit'/> : buttonTextTag} </Button>
+                            <Box sx={{mt:2.5, pt:1, pb:1}} elevation={0} style={{display:"flex"}}> 
+                              <FormControlLabel  control={<Tooltip placement="bottom" disableFocusListener enterTouchDelay={50}  title={showLocationTooltipTag} TransitionComponent={Zoom} arrow>
+                                  <Checkbox onChange={(e) => changedCheckBox(e.target.checked)} checked={showMyLocationToFriends} /></Tooltip> } label={showLocationTag} /> 
+                              <Button variant="contained" sx={{width:"6ch", height:"6ch"}} onClick={() => saveShowLocation()}><SaveIcon /></Button>
+                            </Box>
+                        </div>
+                        {visitedSights.length > 0 ?
+                          <div>
+                            <Typography sx={{mt:2}} variant='h5'>You visited following POIs:</Typography>
+                            <VisitedSights></VisitedSights>
+                          </div>
+                        : null}
+                        
                     </div>
-                    <div>
-                        <Button fullWidth style={{height: "43px"}} onClick={() => handleSaveNewDescription(descriptionInput ,setShowInfo,setShowError, setSuccessDescription, setErrorDescription, didChangeDescription,  setDidChangeDescription, props.l1, setShowLoading)} variant="contained"> {showLoading ? <CircularProgress size={25} color='inherit'/> : buttonTextTag} </Button>
-                        <Box sx={{mt:2.5, pt:1, pb:1}} elevation={0} style={{display:"flex"}}> 
-                          <FormControlLabel  control={<Tooltip placement="bottom" disableFocusListener enterTouchDelay={50}  title={showLocationTooltipTag} TransitionComponent={Zoom} arrow>
-                              <Checkbox onChange={(e) => changedCheckBox(e.target.checked)} checked={showMyLocationToFriends} /></Tooltip> } label={showLocationTag} /> 
-                          <Button variant="contained" sx={{width:"6ch", height:"6ch"}} onClick={() => saveShowLocation()}><SaveIcon /></Button>
-                        </Box>
-                    </div>
-                    {visitedSights.length > 0 ?
-                      <div>
-                        <Typography sx={{mt:2}} variant='h5'>You visited following POIs:</Typography>
-                        <VisitedSights></VisitedSights>
-                      </div>
-                    : null}
                     
-                </div>
-                
-              </div> 
-          : <LinearProgress color="inherit"/>}
-      
-        <SuccessSnackbar openSuccessSnack={showInfo} successMessage={successDescription} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
-        <ErrorSnackbar openSuccessSnack={showError} successMessage={errorDescription} handleClose={handleCloseErrorSnackbar}></ErrorSnackbar>
-         
-    
-        </Card>
+                  </div> 
+              : <LinearProgress color="inherit"/>}
+          
+            <SuccessSnackbar openSuccessSnack={showInfo} successMessage={successDescription} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
+            <ErrorSnackbar openSuccessSnack={showError} successMessage={errorDescription} handleClose={handleCloseErrorSnackbar}></ErrorSnackbar>
+            
+        
+            </Card>
+         : null}
         </ThemeProvider>
       
     );

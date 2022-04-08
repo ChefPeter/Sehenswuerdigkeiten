@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { checkCookie } from "../functions/cookieManager";
 import './styles/app.css';
 import "./styles/login.css";
+import { autoLogin } from "../functions/checkLoggedIn";
 
 let usernameInput = "";
 let passwordInput = "";
@@ -26,15 +27,6 @@ function Login(props) {
 
   });
 
-
-  //Language Settings
-  const[usernameTextfieldTag, setUsernameTextfieldTag] = useState("Username");
-  const[passwordTextfieldTag, setPasswordTextfieldTag] = useState("Password");
-  const[loginButtonTag, setLoginButtonTag] = useState("LOGIN");
-  const[newUserButtonTag, setNewUserButtonTag] = useState("NEW USER?");
-  const[resetPasswordButtonTag, setResetPasswordButtonTag] = useState("RESET PASSWORD");
-  const[errorFieldTitleTag, setErrorFieldTitleTag] = useState("Error");
-
   const[languageTags, setLanguageTags] = useState({
                                                     usernameTextfield: "Username",
                                                     passwordTextfield: "Password",
@@ -47,7 +39,7 @@ function Login(props) {
   useEffect(() => {
 
     if(props.l1 == "de") {
-
+      autoLogin();
       setLanguageTags({
                         usernameTextfield: "Benutzername",
                         passwordTextfield: "Passwort",
@@ -88,6 +80,7 @@ function Login(props) {
 
   const [errorText, setErrorText] = useState("Error");
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [loadLogin, setLoadLogin] = useState(false);
 
   return (
     
@@ -105,7 +98,7 @@ function Login(props) {
                     e.preventDefault();
                 }}}/>
               </div>
-              <Button fullWidth id='btnLoginPage' variant="conained" onClick={ () => post(setErrorText, setShowErrorAlert)}>{languageTags.loginButton}</Button>    
+              <Button fullWidth id='btnLoginPage' disabled={loadLogin}  variant="conained" onClick={ () => post(setErrorText, setShowErrorAlert, setLoadLogin)}> {loadLogin ? <CircularProgress color="inherit" /> : languageTags.loginButton} </Button>    
             
               <Button fullWidth id='btnLoginPage' variant="conained" onClick={() => navigate("/register")}>{languageTags.newUserButton}</Button>
               
@@ -133,8 +126,8 @@ function Login(props) {
   );
 }
 
-function post (setErrorText, setShowErrorAlert){
-
+function post (setErrorText, setShowErrorAlert, setLoadLogin){
+  setLoadLogin(true);
   let formData = new FormData();
   formData.append('username', usernameInput);
   formData.append('password', passwordInput)
@@ -144,32 +137,14 @@ function post (setErrorText, setShowErrorAlert){
       body: formData,
       credentials: 'include'
   }).then(res => {
+    setLoadLogin(false);
       if (res.status == 400) { // error at login
           res.text().then(e => setErrorText(e));
           setShowErrorAlert(true);
       } else { // login worked
-         console.log("JAWOLL")
          window.location.href="/home";
-         
       }
   });
 }
-
-
-function handle(){
-  fetch("http://localhost:5000/logged-in", {
-    method: "GET",
-    credentials: "include"
-  })
-  .then(res => res.text())
-  .then(res => {
-    //not logged in
-    console.log(res)
-    //if (res.status == 400) {
-        //window.location.href="/login";
-    //} 
-  });
-}
-
 
 export default Login;

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import ErrorSnackbar from '../components/ErrorSnackbar';
 import Sidebar from "../components/Sidebar";
 import SuccessSnackbar from '../components/SuccessSnackbar';
+import { checkCurrentlyLoggedIn } from "../functions/checkLoggedIn";
 import "../routes/styles/contact.css";
 
 // Define theme settings
@@ -38,6 +39,11 @@ function Contact(props) {
     successMessage: "Your message has been sent!"
   });
 
+  const[loggedIn, setLoggedIn] = useState(false);
+  
+  useEffect(() => {
+    setLoggedIn(checkCurrentlyLoggedIn());
+  }, []);
 
   //THEME USE EFFECT [props.t1]
   useEffect(() => {
@@ -111,36 +117,39 @@ const handleCloseSuccessSnackbar = (event, reason) => {
   
     return (
         <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
-        
-        <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
-       
-        <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2} />
-        <div id="rand" style={{marginTop: "calc(16.5px + 3.2em)"}}>
-          <div>
-            <h4>{languageTags.headText}</h4>
-          </div>
-         
+          {loggedIn ? 
             <div>
-              <TextareaAutosize
-                maxLength={500}
-                aria-label="minimum height"
-                minRows={12}
-                placeholder={languageTags.textField}
-                style={{backgroundColor: colorTextfield, color: colorFontTextfield, width: "calc(100% - 10px)", marginTop: "10px", marginBottom: "5px", resize: "none", fontSize:"large", paddingLeft: "5px", paddingRight: "5px", paddingTop: "5px", paddingBottom:"5px"}}
-                onChange={getInputValue}
-                
-              />  
-            </div>
-            <div>
-              <Button  style={{width: "100%",  height: "43px"}} variant="contained" onClick={() => contactInput.length > 0 ? sendContactMessage(setOpenErrorSnack, setOpenSuccessSnack) : console.log("errro")}>{languageTags.buttonText}</Button>
-         
-          </div>
-          </div>
+            <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
+          
+            <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2} />
+            <div id="rand" style={{marginTop: "calc(16.5px + 3.2em)"}}>
+              <div>
+                <h4>{languageTags.headText}</h4>
+              </div>
+            
+                <div>
+                  <TextareaAutosize
+                    maxLength={500}
+                    aria-label="minimum height"
+                    minRows={12}
+                    placeholder={languageTags.textField}
+                    style={{backgroundColor: colorTextfield, color: colorFontTextfield, width: "calc(100% - 10px)", marginTop: "10px", marginBottom: "5px", resize: "none", fontSize:"large", paddingLeft: "5px", paddingRight: "5px", paddingTop: "5px", paddingBottom:"5px"}}
+                    onChange={getInputValue}
+                    
+                  />  
+                </div>
+                <div>
+                  <Button  style={{width: "100%",  height: "43px"}} variant="contained" onClick={() => contactInput.length > 0 ? sendContactMessage(setOpenErrorSnack, setOpenSuccessSnack) : console.log("errro")}>{languageTags.buttonText}</Button>
+            
+              </div>
+              </div>
 
-          <ErrorSnackbar openErrorSnack={openErrorSnack} errorMessage={languageTags.errorMessage} handleClose={handleCloseErrorSnackbar} ></ErrorSnackbar>
-          <SuccessSnackbar openSuccessSnack={openSuccessSnack} successMessage={languageTags.successMessage} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
-      
-          </Card>
+              <ErrorSnackbar openErrorSnack={openErrorSnack} errorMessage={languageTags.errorMessage} handleClose={handleCloseErrorSnackbar} ></ErrorSnackbar>
+              <SuccessSnackbar openSuccessSnack={openSuccessSnack} successMessage={languageTags.successMessage} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
+          
+              </Card>
+            </div>
+          : null}
         </ThemeProvider>
     );
   

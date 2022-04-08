@@ -38,7 +38,7 @@ function FriendItem(props) {
             secondary={
               <React.Fragment>
                 <Typography
-                  sx={{ display: 'inline' }}
+                  sx={{ display: 'inline', wordWrap: 'break-word' }}
                   component="span"
                   variant="body2"
                   color="text.primary"

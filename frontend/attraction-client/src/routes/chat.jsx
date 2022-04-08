@@ -6,8 +6,8 @@ import ChatSendbar from "../components/ChatSendbar";
 import LeftMessage from "../components/LeftMessage";
 import RightMessage from "../components/RightMessage";
 import Sidebar from "../components/Sidebar";
+import { checkCurrentlyLoggedIn } from "../functions/checkLoggedIn";
 import "./styles/chat.css";
-
 
 let searchFriendInput = "";
 // Define theme settings
@@ -125,6 +125,11 @@ const Chat = (props) => {
 
     const [username, setUsername] = useState("");
 
+    const[loggedIn, setLoggedIn] = useState(false);
+  
+    useEffect(() => {
+      setLoggedIn(checkCurrentlyLoggedIn());
+    }, []);
 
     function func () {
 
@@ -180,59 +185,63 @@ const Chat = (props) => {
     
     return (
         <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
-          <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
-          <Card style={{width:"100vw", borderRadius:"0px"}}>
-            <Card elevation={4} sx={{
-                    marginTop: 8.5, 
-                    marginLeft: 1, 
-                    marginRight: 1, 
-                    paddingTop: 1,
-                    paddingBottom: 1,
-                    paddingRight: 1,
-                    paddingLeft: 1}}>{writingTag}<strong>{name}</strong></Card>
-          
-                <Card elevation={4} sx={{
-                    marginTop: 1.5, 
-                    marginLeft: 1, 
-                    marginRight: 1, 
-                    paddingTop: 1,
-                    paddingBottom: 1,
-                    paddingRight: 1,
-                    paddingLeft: 1}}>
-                    
-                    {messages.map((message, i) => {
-                      if (message.is_file) {
-                        if (message.sender !== username) {
-                          return <LeftMessage key={"message_"+i} path={message.content} time={message["message_timestamp"]}></LeftMessage>
-                        } else {
-                          return <RightMessage key={"message_"+i} path={message.content} time={message["message_timestamp"]}></RightMessage>
-                        }
-                      } else {
-                        if (message.sender !== username) {
-                          return <LeftMessage key={"message_"+i} message={message.content} time={message["message_timestamp"]}></LeftMessage>
-                        } else if (!message.sender) {
-                          return <LeftMessage key={"message_"+i} message={message.content} time={message["message_timestamp"]}></LeftMessage>
-                        } else {
-                          return <RightMessage key={"message_"+i} message={message.content} time={message["message_timestamp"]}></RightMessage>
-                        }
-                      }
-                    })}
-
-                    
-                </Card>
-
+          {loggedIn ? 
+            <div>
+            <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
+            <Card style={{width:"100vw", borderRadius:"0px"}}>
+              <Card elevation={4} sx={{
+                      marginTop: 8.5, 
+                      marginLeft: 1, 
+                      marginRight: 1, 
+                      paddingTop: 1,
+                      paddingBottom: 1,
+                      paddingRight: 1,
+                      paddingLeft: 1}}>{writingTag}<strong>{name}</strong></Card>
+            
                   <Card elevation={4} sx={{
-                    marginBottom: 2,
-                    marginTop: 1, 
-                    marginLeft: 1, 
-                    marginRight: 1, 
-                    paddingTop: 2,
-                    paddingBottom: 2,
-                    paddingRight: 1,
-                    paddingLeft: 1}}>
-                <ChatSendbar name={friend} labelField={textfieldTag}></ChatSendbar>
+                      marginTop: 1.5, 
+                      marginLeft: 1, 
+                      marginRight: 1, 
+                      paddingTop: 1,
+                      paddingBottom: 1,
+                      paddingRight: 1,
+                      paddingLeft: 1}}>
+                      
+                      {messages.map((message, i) => {
+                        if (message.is_file) {
+                          if (message.sender !== username) {
+                            return <LeftMessage key={"message_"+i} path={message.content} time={message["message_timestamp"]}></LeftMessage>
+                          } else {
+                            return <RightMessage key={"message_"+i} path={message.content} time={message["message_timestamp"]}></RightMessage>
+                          }
+                        } else {
+                          if (message.sender !== username) {
+                            return <LeftMessage key={"message_"+i} message={message.content} time={message["message_timestamp"]}></LeftMessage>
+                          } else if (!message.sender) {
+                            return <LeftMessage key={"message_"+i} message={message.content} time={message["message_timestamp"]}></LeftMessage>
+                          } else {
+                            return <RightMessage key={"message_"+i} message={message.content} time={message["message_timestamp"]}></RightMessage>
+                          }
+                        }
+                      })}
+
+                      
+                  </Card>
+
+                    <Card elevation={4} sx={{
+                      marginBottom: 2,
+                      marginTop: 1, 
+                      marginLeft: 1, 
+                      marginRight: 1, 
+                      paddingTop: 2,
+                      paddingBottom: 2,
+                      paddingRight: 1,
+                      paddingLeft: 1}}>
+                  <ChatSendbar name={friend} labelField={textfieldTag}></ChatSendbar>
+                  </Card>
                 </Card>
-                </Card>
+              </div>
+          : null}
         </ThemeProvider>
     );
 

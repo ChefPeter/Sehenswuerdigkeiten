@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import GroupItem from "../components/GroupItem";
 import Sidebar from "../components/Sidebar";
 import "../routes/styles/friends.css";
+import { checkCurrentlyLoggedIn } from "../functions/checkLoggedIn";
 
 // Define theme settings
 const light = {
@@ -60,7 +61,12 @@ function Groups(props) {
   }
 
   const [groups, setGroups] = useState([]);
+  const[loggedIn, setLoggedIn] = useState(false);
+    
   useEffect(() => {
+
+    setLoggedIn(checkCurrentlyLoggedIn());
+
     fetch("http://localhost:5000/groups", {
       method: "GET",
       credentials: "include"
@@ -68,15 +74,17 @@ function Groups(props) {
     .then(res => setGroups(res));
 
     setShowLoadingBar(false);
+
   }, []);
 
   
   return (
     
     <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
-      { showLoadingBar ? 
-               <LinearProgress color="inherit"/>
-          : 
+       {loggedIn ?
+         showLoadingBar ? 
+          <LinearProgress color="inherit"/>
+        : 
           <Card style={{minHeight: "100vh", borderRadius:"0px"}} >
 
           <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
@@ -107,10 +115,7 @@ function Groups(props) {
           </div>
           </Card>
           
-          
-      }
-
-      
+      : null}
     </ThemeProvider>
 
   );

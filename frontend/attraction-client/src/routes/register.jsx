@@ -5,6 +5,7 @@ import { checkCookie } from "../functions/cookieManager";
 import './styles/app.css';
 import "./styles/register.css";
 import './styles/start.css';
+import { autoLogin } from "../functions/checkLoggedIn";
 
 let usernameInput = "";
 let emailInput = "";
@@ -37,10 +38,12 @@ function Register(props) {
 
     useEffect(() => {
 
-        props.t2(checkCookie("theme"))
-        props.l2(checkCookie("language"))
+      autoLogin();
+
+      props.t2(checkCookie("theme"));
+      props.l2(checkCookie("language"));
     
-    });
+    }, []);
 
 
   const [languageTags, setLanguageTags] = useState({
@@ -56,45 +59,45 @@ function Register(props) {
   
     useEffect(() => {
 
-    if(props.l1 === "de") {
+      if(props.l1 === "de") {
 
-      setLanguageTags({
-                          usernameTextfield: "Benutzername",
-                          passwordTextfield: "Passwort",
-                          retypePasswordTextfield: "Passwort wiederholen",
-                          registerButton: "REGISTRIEREN",
-                          alreadyLoggedInButton: "SCHON ANGEMELDET?",
-                          errorFieldTitle: "Fehler",
-                          info1: "Eine Bestätigungsemail wurde versandt — ",
-                          info2: "Kontrolliere dein Email Postfach!"
-      });
+        setLanguageTags({
+                            usernameTextfield: "Benutzername",
+                            passwordTextfield: "Passwort",
+                            retypePasswordTextfield: "Passwort wiederholen",
+                            registerButton: "REGISTRIEREN",
+                            alreadyLoggedInButton: "SCHON ANGEMELDET?",
+                            errorFieldTitle: "Fehler",
+                            info1: "Eine Bestätigungsemail wurde versandt — unter Umständen könnte dies 1-2 Minuten dauern. ",
+                            info2: "Kontrolliere dein Email Postfach!"
+        });
 
 
-    } else if(props.l1 === "it") {
+      } else if(props.l1 === "it") {
 
-      setLanguageTags({
-                        usernameTextfield: "Nome utente",
-                        passwordTextfield: "Password",
-                        retypePasswordTextfield: "Ridigitare la password",
-                        registerButton: "Registra",
-                        alreadyLoggedInButton: "GIÀ REGISTRATO?",
-                        errorFieldTitle: "Errore",
-                        info1: "Una mail di conferma è stata inviata — ",
-                        info2: "Controlla la tua casella email!"
-      });
+        setLanguageTags({
+                          usernameTextfield: "Nome utente",
+                          passwordTextfield: "Password",
+                          retypePasswordTextfield: "Ridigitare la password",
+                          registerButton: "Registra",
+                          alreadyLoggedInButton: "GIÀ REGISTRATO?",
+                          errorFieldTitle: "Errore",
+                          info1: "Una mail di conferma è stata inviata — In certe circostanze, questo potrebbe richiedere 1-2 minuti. ",
+                          info2: "Controlla la tua casella email!"
+        });
 
-    } else {
+      } else {
 
-      setLanguageTags({
-                        usernameTextfield: "Username",
-                        passwordTextfield: "Password",
-                        retypePasswordTextfield: "Repeat Password",
-                        registerButton: "REGISTER",
-                        alreadyLoggedInButton: "ALREADY LOGGED IN?",
-                        errorFieldTitle: "Error",
-                        info1: "A confirmation email was sent — ",
-                        info2: "Check your mailbox!"
-      });
+        setLanguageTags({
+                          usernameTextfield: "Username",
+                          passwordTextfield: "Password",
+                          retypePasswordTextfield: "Repeat Password",
+                          registerButton: "REGISTER",
+                          alreadyLoggedInButton: "ALREADY LOGGED IN?",
+                          errorFieldTitle: "Error",
+                          info1: "A confirmation email was sent — Under certain circumstances, this could take 1-2 minutes. ",
+                          info2: "Check your mailbox!"
+        });
 
    }
    setFullyLoaded(true)

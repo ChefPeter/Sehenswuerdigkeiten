@@ -8,6 +8,7 @@ import FriendItem from "../components/FriendItem";
 import IncomingRequest from "../components/IncomingRequest";
 import SideBar from "../components/Sidebar";
 import SuccessSnackbar from "../components/SuccessSnackbar";
+import { checkCurrentlyLoggedIn } from "../functions/checkLoggedIn";
 import "./styles/friends.css";
 
 let searchFriendInput = "";
@@ -60,7 +61,11 @@ function Friends(props) {
    }
   }, [props.l1]);
 
+  const[loggedIn, setLoggedIn] = useState(false);
+
   useEffect(async() => {
+
+      setLoggedIn(checkCurrentlyLoggedIn());
 
       const resultFriends = await fetch("http://localhost:5000/friends", {
         method: "get",
@@ -91,11 +96,8 @@ function Friends(props) {
             file="/broken-image.jpg";
           }
         }
-        
         profilePictures.push(file);
-
       }
-      
       
       for(let i = 0; i<friends.length; i++){
 
@@ -115,7 +117,6 @@ function Friends(props) {
 
       }
       
-    
       //fetch friend requests
       const resultFriendRequests = await fetch("http://localhost:5000/pending-friends", {
         method: "get",
@@ -123,7 +124,6 @@ function Friends(props) {
       });
 
       let friendRequests = (await resultFriendRequests.json());
-
 
       setFriendRequests(friendRequests);
       setFriendsName(users);
@@ -146,59 +146,62 @@ function Friends(props) {
     if (reason === 'clickaway') {
       return;
     }
-  
     setOpenSuccessSnack(false);
   };
 
     return (
       <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
-        { showLoadingBar ? 
-               <LinearProgress color="inherit"/>
-          : null}
-        <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
-          <SideBar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
-          <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{title}</h2>
-          
+        {loggedIn ? 
+            <div>
+            { showLoadingBar ? 
+                  <LinearProgress color="inherit"/>
+              : null}
+            <Card style={{minHeight: "100vh", borderRadius:"0px"}}>
+              <SideBar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
+              <h2 style={{ marginLeft: "2.625em", display: "flex", alignItems: 'center', height: "3.25em" }}>{title}</h2>
+              
 
-          
-          <div id="alignSearchBar">
-          
-            <TextField
-              style={{ marginLeft: "0.625em"}}
-              id="searchBarFriends"
-              type="text"
-              label={searchTextTag}
-              variant="filled"
-              onChange={handleSearchFriendInput}
-              InputProps={{endAdornment: <Button onClick={() => handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage, props.l1)}><PersonAddIcon/></Button>}}
-            />
+              
+              <div id="alignSearchBar">
+              
+                <TextField
+                  style={{ marginLeft: "0.625em"}}
+                  id="searchBarFriends"
+                  type="text"
+                  label={searchTextTag}
+                  variant="filled"
+                  onChange={handleSearchFriendInput}
+                  InputProps={{endAdornment: <Button onClick={() => handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage, props.l1)}><PersonAddIcon/></Button>}}
+                />
 
-              { friendRequests.length > 0 ?
-              <Typography >
-                {incomingRequestTag}
-              </Typography>
-            : null }
+                  { friendRequests.length > 0 ?
+                  <Typography >
+                    {incomingRequestTag}
+                  </Typography>
+                : null }
 
+              </div>
+
+              
+              {friendRequests.map(e => <IncomingRequest name={e} ></IncomingRequest>)}
+
+
+              <div id="freunde" >
+              
+                <List>
+
+                  {friendsName.map((e,i) =>  <FriendItem showDeleteButton={true} name={e.name} description={e.description} key={e.name} profilePicture={profilePicture ? profilePicture[i] : null} l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>)}
+                
+                </List>
+                
+              </div>
+
+              <ErrorSnackbar openErrorSnack={openErrorSnack} errorMessage={errorMessage} handleClose={handleCloseErrorSnackbar} ></ErrorSnackbar>
+              <SuccessSnackbar openSuccessSnack={openSuccessSnack} successMessage={successMessage} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
+
+          </Card>
           </div>
-
-          
-          {friendRequests.map(e => <IncomingRequest name={e} ></IncomingRequest>)}
-
-
-          <div id="freunde" >
-          
-            <List>
-
-              {friendsName.map((e,i) =>  <FriendItem showDeleteButton={true} name={e.name} description={e.description} key={e.name} profilePicture={profilePicture ? profilePicture[i] : null} l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>)}
-            
-            </List>
-            
-          </div>
-
-          <ErrorSnackbar openErrorSnack={openErrorSnack} errorMessage={errorMessage} handleClose={handleCloseErrorSnackbar} ></ErrorSnackbar>
-          <SuccessSnackbar openSuccessSnack={openSuccessSnack} successMessage={successMessage} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
-
-      </Card>
+        : null}
     </ThemeProvider>
     );
   

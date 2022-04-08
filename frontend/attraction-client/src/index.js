@@ -19,6 +19,7 @@ import Register from "./routes/register";
 import RequestReset from "./routes/requestReset";
 import ResetPassword from './routes/reset-password';
 import ErrorPage from './routes/errorPage';
+import { useEffect } from 'react';
 
 const rootElement = document.getElementById("root");
 
@@ -34,9 +35,10 @@ const Routing = () => {
       <Route path="/" element={<Login t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
       <Route path="" element={<Login t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
       <Route path="login" element={<Login t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
-      
-      <Route path="home" element={<Home t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} /> } />
       <Route path="register" element={<Register t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
+      <Route path="*" element={<ErrorPage />} />
+
+      <Route path="home" element={<Home t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} /> } />
       <Route path="groups" element={<Groups t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
       <Route path="friends" element={<Friends t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
       <Route path="contact" element={<Contact t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
@@ -47,8 +49,8 @@ const Routing = () => {
       <Route path='legalnotice' element={<LegalNotice t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
       <Route path='chat' element={<Chat t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
       <Route path='groupSettings' element={<GroupSettings t1={globalTheme} t2={setGlobalTheme} l1={globalLanguage} l2={setGlobalLanguage} />} />
-      <Route path="*" element={<ErrorPage />} />
-
+      
+     
     </Routes>
 
   </BrowserRouter>

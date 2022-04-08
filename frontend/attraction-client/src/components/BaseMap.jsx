@@ -1,3 +1,4 @@
+import AltRouteIcon from '@mui/icons-material/AltRoute';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DirectionsIcon from '@mui/icons-material/Directions';
@@ -6,10 +7,11 @@ import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import GpsOffIcon from '@mui/icons-material/GpsOff';
+import ImportExportIcon from '@mui/icons-material/ImportExport';
 import RouteIcon from '@mui/icons-material/Route';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
-import { Box, Button, Card, Chip, CircularProgress, Drawer, Rating, FormControlLabel, OutlinedInput, Switch, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Card, Chip, CircularProgress, Drawer, FormControlLabel, OutlinedInput, Rating, Switch, Tooltip, Typography } from "@mui/material";
 import Zoom from '@mui/material/Zoom';
 import mapboxgl from "mapbox-gl";
 import React, { useEffect, useRef, useState } from "react";
@@ -19,8 +21,6 @@ import MapSearch from "./MapSearch";
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
-import ImportExportIcon from '@mui/icons-material/ImportExport';
-import AltRouteIcon from '@mui/icons-material/AltRoute';
 
 let map = null;
 let countUserPoints = 0;
@@ -171,7 +171,6 @@ let saveRouteName = "";
 
 function BaseMap (props) {
     
-
     const [showAddButton, setShowAddButton] = useState(true);
     const [openRouteDrawer, setOpenRouteDrawer] = useState(false);
     const [directionMode, setDirectionMode] = useState("driving");
@@ -330,9 +329,8 @@ function BaseMap (props) {
     const [markerCoords, setMarkerCoords] = useState([]);
     const [clickedFriends, setClickedFriends] = useState(false);
 
-
 useEffect(() => {
-
+        
         //Brixen
         lastCoords =  [11.65598, 46.71503];
         newMap(props.t1, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen);
@@ -990,6 +988,8 @@ const sleep = (milliseconds) => {
             credentials:"include"
         });
 
+        setRouteNames([...routeNames, name]);
+       
     }
 
 
@@ -1123,9 +1123,6 @@ const sleep = (milliseconds) => {
     );
 
     const ShowOldRoutes = () => (
-
-
-
         <div>
             {routeNames.map((item,i) => {
                 return (
@@ -1205,19 +1202,19 @@ const sleep = (milliseconds) => {
       }
 
     return (
-    
+
         <div>
             <div id="mapContainer" className="map"></div>
             <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
             <MapSearch l1={props.l1} directionMode={directionMode} setThemeMap={setThemeMap} themeMap={themeMap} enable3D={enable3D} enabled3D={enabled3D}></MapSearch>
             
             <div  id="test" style={{position: "fixed",top: "calc(100% - 150px)", left:"calc(100vw - 75px)"}}>
-               
+            
                 <Button style={{width:"60px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => setOpenRouteDrawer(!openRouteDrawer)}><DirectionsIcon fontSize="large" style={{color:"#2979ff"}} /></Button>
                 <Button style={{width:"60px",marginTop:"15px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} disabled={!geolocationSupported} variant="filled"  onClick={() => locationButtonClick()}> {gpsActive ? <GpsFixedIcon style={{color:"#2979ff"}} fontSize="large" /> : <GpsOffIcon style={{color:"grey"}}  fontSize='large'/>}  </Button>
             </div>
-
-          </div>
+    
+        </div>
             <Drawer 
                 anchor='bottom'
                 transitionDuration	= {280}
@@ -1231,13 +1228,13 @@ const sleep = (milliseconds) => {
                                 <h2 id="nameField" style={{marginBottom:"1px"}}>{obj.properties.name}</h2>
                             </div>
                             {clickedFriends ? null :  <Rating sx={{mb:1}} name="rating-attractions" onChange={(event, newValue) => {ratingChange(newValue, obj)}} value={avgRating} precision={0.5} />}
-                           {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>}
+                        {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>}
                         </div>
                         </div>
                     </div>
 
             </Drawer>
-         
+        
             <Drawer 
                 anchor='right'
                 transitionDuration	= {280}
@@ -1253,7 +1250,7 @@ const sleep = (milliseconds) => {
                         </Box>
                     
                     </div>
-               
+            
             </Drawer>
 
             <SuccessSnackbar openSuccessSnack={showSuccessSnack} successMessage={languageTags.flyTo + currentRandomLocation} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>

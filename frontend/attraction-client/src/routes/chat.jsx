@@ -237,7 +237,7 @@ const Chat = (props) => {
                       paddingBottom: 2,
                       paddingRight: 1,
                       paddingLeft: 1}}>
-                  <ChatSendbar name={friend} labelField={textfieldTag}></ChatSendbar>
+                  <ChatSendbar name={friend} labelField={textfieldTag} isGroup={groupID} groupID={groupID}></ChatSendbar>
                   </Card>
                 </Card>
               </div>

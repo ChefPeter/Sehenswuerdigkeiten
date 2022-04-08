@@ -19,6 +19,7 @@ const addPosition = require("./add-position");
 const addRating = require("./add-rating");
 const changeVisibility = require("./change-visibility");
 const addRoute = require("./add-route");
+const sendGroupMessage = require("./send-group-message");
 
 const getDescription = require("./get-description");
 const getFriends = require("./get-friends");
@@ -99,6 +100,7 @@ app.post("/route", async(req, res) => await getBestRoute(req, res));
 app.post("/create-group", isAuthenticated, async(req, res) => sendResponse(await createGroup(req), res));
 app.post("/leave-group", isAuthenticated, async(req, res) => sendResponse(await leaveGroup(req), res));
 app.post("/add-to-group", isAuthenticated, async(req, res) => sendResponse(await addToGroup(req), res));
+app.post("/send-group-message", isAuthenticated, async(req, res) => sendResponse(await sendGroupMessage(req), res));
 app.post("/sights", isAuthenticated, async(req, res) => await sendSights(req, res));
 app.post("/add-sight", isAuthenticated, async(req, res) => sendResponse(await addSight(req), res));
 app.post("/add-position", isAuthenticated, async(req, res) => sendResponse(await addPosition(req), res));

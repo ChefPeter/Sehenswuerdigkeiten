@@ -9,6 +9,10 @@ import React, { useState } from "react";
 
 function ChatSendbar (props) {
 
+    //console.log("---------------------");
+    //console.log(props.isGroup);
+    //console.log("---------------------");
+
     const [hideButton, setHideButton] = useState(true);
     const [message, setMessage] = useState("");
 
@@ -18,16 +22,26 @@ function ChatSendbar (props) {
     };
 
     const sendMessage = (event) => {
-
         let formData = new FormData();
-        formData.append('recipient', props.name);
-        formData.append('content', message);
+        if (!props.isGroup) {
+            formData.append('recipient', props.name);
+            formData.append('content', message);
 
-        fetch("http://localhost:5000/send-message", {
-            method: "post",
-            body: formData,
-            credentials: 'include'
-        });
+            fetch("http://localhost:5000/send-message", {
+                method: "post",
+                body: formData,
+                credentials: 'include'
+            });
+        } else {
+            formData.append('group_id', props.groupID);
+            formData.append('content', message);
+
+            fetch("http://localhost:5000/send-group-message", {
+                method: "post",
+                body: formData,
+                credentials: 'include'
+            });
+        }
         setMessage("");
     }
 
@@ -75,30 +89,48 @@ function ChatSendbar (props) {
 
     const sendPicture = (event) => {
         let formData = new FormData();
-        formData.append('file', document.getElementById("pictureUpload").files[0]);
-        formData.append('recipient', props.name);
+        if (!props.isGroup) {
+            formData.append('file', document.getElementById("pictureUpload").files[0]);
+            formData.append('recipient', props.name);
 
-        fetch("http://localhost:5000/send-message", {
-            method: "post",
-            body: formData,
-            credentials: 'include'
-        }).then(res => res.text())
-        .then(res => console.log(res))
+            fetch("http://localhost:5000/send-message", {
+                method: "post",
+                body: formData,
+                credentials: 'include'
+            })
+        } else {
+            formData.append('file', document.getElementById("pictureUpload").files[0]);
+            formData.append('group_id', props.groupID);
+
+            fetch("http://localhost:5000/send-group-message", {
+                method: "post",
+                body: formData,
+                credentials: 'include'
+            })
+        }
     } 
 
     const sendAudio = (audio) => {
-        //console.log(document.getElementById("audioUpload").files);
-        console.log(audio);
         let formData = new FormData();
-        formData.append('file', audio);
-        formData.append('recipient', props.name);
+        if (!props.isGroup) {
+            formData.append('file', audio);
+            formData.append('recipient', props.name);
 
-        fetch("http://localhost:5000/send-message", {
-            method: "post",
-            body: formData,
-            credentials: 'include'
-        }).then(res => res.text())
-        .then(res => console.log(res))
+            fetch("http://localhost:5000/send-message", {
+                method: "post",
+                body: formData,
+                credentials: 'include'
+            });
+        } else {
+            formData.append('file', audio);
+            formData.append('group_id', props.groupID);
+
+            fetch("http://localhost:5000/send-group-message", {
+                method: "post",
+                body: formData,
+                credentials: 'include'
+            });
+        }
     }
 
     return (

@@ -866,8 +866,8 @@ const sleep = (milliseconds) => {
             //set image
             try{
                 let newimageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${obj.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
-                if(imageSrc != newimageSrc)
-                    setImage(newimageSrc);
+                setImage(newimageSrc);
+                
             }catch(e){}
             setShowAddButton(false);
             setObj(obj);
@@ -904,7 +904,16 @@ const sleep = (milliseconds) => {
         setCurrentAddedPoints(testRoute);
         setClickedImportRouteButton(false);
         setCurrentNotSortedPointsRouteOutput(testRoute);
-        console.log(testRoute)
+
+        map.flyTo({
+            center: [
+                coordinates[0][0],
+                coordinates[0][1]
+            ],
+            speed: 1.5,
+            essential: true // this animation is considered essential with respect to prefers-reduced-motion
+        });
+
     }
 
     function saveCurrentRouteToDatabase(data, name){
@@ -1048,8 +1057,8 @@ const sleep = (milliseconds) => {
           <div>  
             {currentSortedPointsRouteOutput.map((item,i) => {
                 return (
-                    <div key={item["id"]+i}>
-                        <Typography sx={{ml:1, mr:1}}><strong> {i+1}.</strong> {item.name}</Typography>
+                    <div key={item["id"] ? item["id"]+i : item["properties"]["id"]+i}>
+                        <Typography sx={{ml:1, mr:1}}><strong> {i+1}.</strong> {item.name} </Typography>
                         {i < currentSortedPointsRouteOutput.length-1 ? <Typography style={{height:"22.5px"}} sx={{ml:0.9}} ><ArrowCircleDownIcon fontSize='small'/></Typography> : <Typography sx={{mb:1}} ></Typography>}
                     </div>
                 );

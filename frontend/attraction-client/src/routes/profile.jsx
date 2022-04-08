@@ -152,7 +152,7 @@ function Profile(props) {
       //save new value
       setShowError(false);
       setShowInfo(false);
-
+        
       //send data to server...
       let formData = new FormData();
       formData.append('value', currentShowLocation);

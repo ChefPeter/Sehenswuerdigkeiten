@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS users_sights (
     PRIMARY KEY (username, sight_id)
 );
 
-CREATE TABLE IF NOT EXISTS point (
+CREATE TABLE IF NOT EXISTS points (
     point_id VARCHAR(20) PRIMARY KEY,
     latitude DOUBLE,
     longitude DOUBLE,
@@ -118,11 +118,11 @@ CREATE TABLE IF NOT EXISTS point (
     wikidata VARCHAR(20)
 );
 
-CREATE TABLE IF NOT EXISTS route (
+CREATE TABLE IF NOT EXISTS routes (
     username VARCHAR(100),
     route_name VARCHAR(300),
     point_id VARCHAR(20),
-    FOREIGN KEY (point_id) REFERENCES point(point_id),
+    FOREIGN KEY (point_id) REFERENCES points(point_id),
     FOREIGN KEY (username) REFERENCES users(username),
     PRIMARY KEY (username, route_name, point_id)
 );

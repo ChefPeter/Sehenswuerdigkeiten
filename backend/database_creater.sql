@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS users_sights (
 CREATE TABLE IF NOT EXISTS points (
     point_id VARCHAR(20) PRIMARY KEY,
     latitude DOUBLE,
-    longitude DOUBLE,
+    longtitude DOUBLE,
     name VARCHAR(300),
     wikidata VARCHAR(20)
 );

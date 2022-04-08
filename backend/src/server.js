@@ -37,6 +37,8 @@ const getVisitedSights = require("./get-visited-sights");
 const getAllPositions = require("./get-all-positions");
 const getVisibility = require("./get-visibility");
 const getGroupMembers = require("./get-group-members");
+const getRouteNames = require("./get-route-names");
+
 
 const express = require("express");
 const session = require("express-session");
@@ -123,6 +125,7 @@ app.get("/visited-sights", isAuthenticated, async(req, res) => sendGetResponse(a
 app.get("/all-positions", isAuthenticated, async(req, res) => sendGetResponse(await getAllPositions(req), res));
 app.get("/visibility", isAuthenticated, async(req, res) => sendGetResponse(await getVisibility(req), res));
 app.get("/group-members", isAuthenticated, async(req, res) => sendGetResponse(await getGroupMembers(req), res));
+app.get("/route-names", isAuthenticated, async(req, res) => sendGetResponse(await getRouteNames(req), res));
 //app.get("/logged-in", (req, res) => res.send(req.session));
 
 app.get("/", isAuthenticated, async(req, res) => {

@@ -7,6 +7,7 @@ import GroupItem from "../components/GroupItem";
 import Sidebar from "../components/Sidebar";
 import "../routes/styles/friends.css";
 import { checkCurrentlyLoggedIn } from "../functions/checkLoggedIn";
+import SuccessSnackbar from '../components/SuccessSnackbar';
 
 // Define theme settings
 const light = {
@@ -23,9 +24,12 @@ const dark = {
 
 function Groups(props) {
 
-  let createGroupInput = "";
+  //let createGroupInput = "";
   const [titleText, setTitleText] = useState("Title");
   const [textfieldTextTag, setTextfieldTextTag] = useState("Create Group");
+  const [createGroupInput, setCreateGroupInput] = useState("");
+  const [openSuccesSnack, setOpenSuccesSnack] = useState(false);
+  const [successSnackMessage, setSuccessSnackMessage] = useState("");
 
   const [showLoadingBar, setShowLoadingBar] = useState(true);
 
@@ -44,8 +48,7 @@ function Groups(props) {
   }, [props.l1])
 
   const handleCreateGroupInput = (event)=>{
-    console.log(event.target.value)
-    createGroupInput = event.target.value;
+    setCreateGroupInput(event.target.value);
   };
 
   const createGroup = (event) => {
@@ -57,6 +60,19 @@ function Groups(props) {
       method: "POST",
       credentials: "include",
       body: formData
+    }).then(_ => {
+      setOpenSuccesSnack(true);
+      if (props.l1 == "de") {
+        setSuccessSnackMessage("Gruppe erstellt");
+      } else if (props.l1 == "it") {
+        setSuccessSnackMessage("Gruppo creato");
+      } else {
+        setSuccessSnackMessage("Group created");
+      }
+      setCreateGroupInput("");
+      setTimeout(() => {
+        window.location.reload();
+      }, 2500);
     });
   }
 
@@ -98,6 +114,7 @@ function Groups(props) {
               type="text"
               label={textfieldTextTag}
               variant="filled"
+              value={createGroupInput}
               onChange={handleCreateGroupInput}
               InputProps={{endAdornment:<Button onClick={createGroup}><AddIcon></AddIcon></Button>}}
             />
@@ -113,6 +130,7 @@ function Groups(props) {
             </List>
             
           </div>
+          <SuccessSnackbar openSuccessSnack={openSuccesSnack} successMessage={successSnackMessage}></SuccessSnackbar>
           </Card>
           
       : null}

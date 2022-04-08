@@ -948,6 +948,13 @@ const sleep = (milliseconds) => {
             speed: 1.5,
             essential: true // this animation is considered essential with respect to prefers-reduced-motion
         });
+        //featurecollection of testroute
+        /*let featureCollection = {
+            "type": "FeatureCollection",
+            "features": testRoute
+        }
+
+        map.getSource("selected-attractions-points-data").setData(featureCollection);*/
         postRoute(testRoute, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData);
         setOpenRouteDrawer(false);
     }

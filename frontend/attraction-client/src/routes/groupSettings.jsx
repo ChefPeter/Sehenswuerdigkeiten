@@ -125,7 +125,7 @@ const GroupSettings = (props) => {
           <div id="freunde" >
             <List>
               {
-                members.map((member, i) => <FriendItem name={member.username} description={member.description} key={"member_"+i} l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>)
+                members.map((member, i) => <FriendItem showDeleteButton={false} name={member.username} description={member.description} key={"member_"+i} l1={props.l1} l2={props.l2} t1={props.t1} t2={props.t2}></FriendItem>)
               }
             </List>
           </div>

@@ -9,7 +9,7 @@ function FriendItem(props) {
 
     const navigate = useNavigate();
     
-    const [showDescription, setShowDescription] = useState(false);    
+    const [showDescription, setShowDescription] = useState(false); 
     const [followPositionTag, setFollowPositionTag] = useState("FOLLOW POSITION");
 
 
@@ -57,8 +57,10 @@ function FriendItem(props) {
         
         <Button variant="conatined" onClick={() => navigate("/chat?"+new URLSearchParams({name: props.name}), {state: {l1: props.l1, l2: props.l2, t1: props.t1, t2: props.t2}})}>CHAT</Button> 
         <Button variant="conatined" onClick={() => handleFollowPosition()}>{followPositionTag}</Button> 
-        <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleRemoveFriend(props.name)}><ClearIcon/></Button>
         
+        {props.showDeleteButton ?
+          <Button id="buttonRemoveFriend" variant="conatined" onClick={() => handleRemoveFriend(props.name)}><ClearIcon/></Button>
+        : null}
       </Card> : null}
         
         <br></br>

@@ -109,3 +109,20 @@ CREATE TABLE IF NOT EXISTS users_sights (
     FOREIGN KEY (sight_id) REFERENCES sights(sight_id),
     PRIMARY KEY (username, sight_id)
 );
+
+CREATE TABLE IF NOT EXISTS point (
+    point_id VARCHAR(20) PRIMARY KEY,
+    latitude DOUBLE,
+    longitude DOUBLE,
+    name VARCHAR(300),
+    wikidata VARCHAR(20)
+);
+
+CREATE TABLE IF NOT EXISTS route (
+    username VARCHAR(100),
+    route_name VARCHAR(300),
+    point_id VARCHAR(20),
+    FOREIGN KEY (point_id) REFERENCES point(point_id),
+    FOREIGN KEY (username) REFERENCES users(username),
+    PRIMARY KEY (username, route_name, point_id)
+);

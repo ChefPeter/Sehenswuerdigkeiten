@@ -18,6 +18,7 @@ const  { addSight } = require("./add-sight");
 const addPosition = require("./add-position");
 const addRating = require("./add-rating");
 const changeVisibility = require("./change-visibility");
+const addRoute = require("./add-route");
 
 const getDescription = require("./get-description");
 const getFriends = require("./get-friends");
@@ -101,6 +102,7 @@ app.post("/add-sight", isAuthenticated, async(req, res) => sendResponse(await ad
 app.post("/add-position", isAuthenticated, async(req, res) => sendResponse(await addPosition(req), res));
 app.post("/add-rating", isAuthenticated, async(req, res) => sendResponse(await addRating(req), res));
 app.post("/change-visibility", isAuthenticated, async(req, res) => sendResponse(await changeVisibility(req), res));
+app.post("/add-route", isAuthenticated, async(req, res) => sendResponse(await addRoute(req), res));
 
 // GET REQUESTS
 app.get("/description", isAuthenticated, async(req, res) => sendGetResponse(await getDescription(req), res));

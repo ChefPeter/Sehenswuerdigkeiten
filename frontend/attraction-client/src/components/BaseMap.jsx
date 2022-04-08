@@ -26,6 +26,7 @@ let map = null;
 let countUserPoints = 0;
 let marker;
 let testRoute = [];
+let selectedSights = {"type": "FeatureCollection", "features": []};
 let radiusForPointerSearch = 1;
 let searchByMarker = false;
 let lastCoords = [];
@@ -65,7 +66,7 @@ let saveRouteName = "";
                 data.shift();
 
         if(startAtGps){//addpoint of gps to data
-            data.unshift(JSON.parse('{"geometry":{"type":"Point","coordinates":['+lastPositionByMapboxGeolocate+']},"type":"Feature","properties":{"id":"gpsLocatorId","name":"Your location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"attraction-points-layer","type":"symbol","source":"attraction-points-data","layout":{"icon-image":"marker--v1","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.08},"paint":{}},"source":"attraction-points-data","state":{}}'));
+            data.unshift(JSON.parse('{"geometry":{"type":"Point","coordinates":['+lastPositionByMapboxGeolocate+']},"type":"Feature","properties":{"id":"gpsLocatorId","name":"Your location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"attraction-points-layer","type":"symbol","source":"attraction-points-data","layout":{"icon-image":"marker-red","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.08},"paint":{}},"source":"attraction-points-data","state":{}}'));
         }
 
         if(data.length < 2){
@@ -714,9 +715,13 @@ const sleep = (milliseconds) => {
             }
         }
         if(index !== null)
-            testRoute.splice(index,1)
+        {
+            testRoute.splice(index, 1);
+            selectedSights.features.splice(index, 1);
+        }
             
         setCurrentAddedPoints(testRoute);
+        map.getSource('selected-attraction-points-data').setData(selectedSights);
     }
 
     function addPointToRouteButtonClicked(obj){
@@ -726,6 +731,9 @@ const sleep = (milliseconds) => {
                 return;
         
         testRoute.push(obj);
+        selectedSights.features.push(obj);
+        map.getSource('selected-attraction-points-data').setData(selectedSights);
+        console.log(selectedSights);
         setShowAddButton(false);
         setCurrentAddedPoints(testRoute);
     }
@@ -736,7 +744,7 @@ const sleep = (milliseconds) => {
         testRoute.push(JSON.parse(objLocal));
         setCurrentAddedPoints(testRoute);
     }
-
+    //remove
     const handleRemoveItem = (key) => {
         removePointFromRoute(key)
        /* testRoute = currentAddedPoints.filter(item => item["properties"]["id"] !== key);*/
@@ -747,9 +755,11 @@ const sleep = (milliseconds) => {
         currentLineCoords = [];
         setCurrentAddedPoints([])
         testRoute = [];
+        selectedSights.features = [];
         setDidCalculateRoute(false)
         setCurrentSortedPointsRouteOutput([]);
         setCurrentNotSortedPointsRouteOutput([]);
+        map.getSource('selected-attraction-points-data').setData(selectedSights);
         if (map.getSource('route1')) {
             map.removeLayer("layer1");
             map.removeLayer('arrow-layer');
@@ -1326,12 +1336,18 @@ export async function changedFilter(coords = false){
 }
 
 function addAllLayersToMap(map){
-    map.loadImage('https://img.icons8.com/color/344/marker--v1.png',
+    map.loadImage('https://i.imgur.com/cYaWaTU.png',
     function (error, image) {
         if (error) throw error;
-        map.addImage('marker--v1', image);
-    }
-    );
+        map.addImage('marker-red', image);
+    });
+
+    map.loadImage('https://i.imgur.com/Ve1mOzk.png', 
+    function(error, image) {
+        if(error) throw error;
+        map.addImage('marker-blue', image);
+    });
+    
     // add the data source for new a feature collection with no features
     map.addSource("attraction-points-data", {
         type: "geojson",
@@ -1347,10 +1363,30 @@ function addAllLayersToMap(map){
         type: "symbol",
         layout: {
             // full list of icons here: https://labs.mapbox.com/maki-icons
-            "icon-image": "marker--v1", // this will put little croissants on our map
+            "icon-image": "marker-red", // this will put little croissants on our map
             "icon-padding": 0,
             "icon-allow-overlap": true,
-            "icon-size": 0.08
+            "icon-size": 0.8
+        }
+    });
+
+    map.addSource("selected-attraction-points-data", {
+        type: 'geojson',
+        data: {
+            type: 'FeatureCollection',
+            features: []
+        }
+    });
+
+    map.addLayer({
+        id: 'selected-attraction-points-data',
+        source: 'selected-attraction-points-data',
+        type: 'symbol',
+        layout: {
+            'icon-image': 'marker-blue',
+            "icon-padding": 0,
+            "icon-allow-overlap": true,
+            "icon-size": 0.8
         }
     });
 

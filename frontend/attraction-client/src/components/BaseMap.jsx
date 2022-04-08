@@ -225,7 +225,7 @@ function BaseMap (props) {
 
     const[clickedImportRouteButton, setClickedImportRouteButton] = useState(false);
 
-    const[routeNames, setRotueNames] = useState(["Route 1", "Route 2", "Route 3"]);                                            
+    const[routeNames, setRouteNames] = useState([]);                                            
 
     useEffect(() =>{
         
@@ -336,6 +336,14 @@ useEffect(() => {
         //Brixen
         lastCoords =  [11.65598, 46.71503];
         newMap(props.t1, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen);
+        
+        
+        //fetch get request
+        fetch("http://localhost:5000/route-names", {
+            method: "GET",
+            credentials: "include"
+        }).then(res => res.json()).then(data => setRouteNames(data));
+        
         let interval1;
         geolocate.on('geolocate', function(e) {
             setGpsActive(true);
@@ -474,7 +482,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 try{
                     imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
                     if(imageSrc != undefined)
-                    setImage(imageSrc);
+                        setImage(imageSrc);
                 }catch(e){}
                 
                 setShowLoadingInsteadPicture(false);    
@@ -880,9 +888,12 @@ const sleep = (milliseconds) => {
         if(!obj["properties"]["id"].includes("randomPoint")){
             //set image
             try{
+                console.log(obj.properties.wikidata);
+              
                 let newimageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${obj.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
+                console.log(newimageSrc);
                 setImage(newimageSrc);
-                
+                setShowLoadingInsteadPicture(false);  
             }catch(e){}
             setShowAddButton(false);
             setObj(obj);
@@ -890,17 +901,26 @@ const sleep = (milliseconds) => {
         }
     }
 
-    function selectRouteFromToDatabase(nameRoute){
+    async function selectRouteFromToDatabase(nameRoute){
         testRoute = [];
         setCurrentAddedPoints(testRoute);
         setCurrentNotSortedPointsRouteOutput(testRoute);
         setCurrentSortedPointsRouteOutput(testRoute);
 
-        let ids = ["W231493074","Q14549240","W48368395"];
-        let names = ["Kapuzinerkirche St. Katharina","St. Gotthard und St. Erhard (Brixen)","Pfarrkirche St. Michael - Parrocchia San Michele"];
-        let wikidata = ["Q15116261","Q14549240","Q2083121"];
-        let coordinates = [[11.659417748451233, 46.712910269264114],[11.655566096305847, 46.71583246963658],[11.657588481903076, 46.71635841212009]];
-        
+        let ids=[],names=[],wikidata=[],coordinates=[];
+        await fetch("http://localhost:5000/route?"+new URLSearchParams({route_name: nameRoute}), {
+            method: "get",
+            credentials:"include"
+        }).then(res => res.json()).then(res => {
+            console.log(res)
+            res.map((obj, index) => {
+                ids.push(obj["point_id"]);
+                names.push(obj["name"]);
+                wikidata.push(obj["wikidata"]);
+                coordinates.push([obj["longtitude"], obj["latitude"]]);
+            });
+        }).catch(e => console.log(e));
+
         for(let i = 0; i < ids.length; i++){
             let obj = {
                 "type": "Feature",
@@ -919,7 +939,7 @@ const sleep = (milliseconds) => {
         setCurrentAddedPoints(testRoute);
         setClickedImportRouteButton(false);
         setCurrentNotSortedPointsRouteOutput(testRoute);
-
+       
         map.flyTo({
             center: [
                 coordinates[0][0],
@@ -950,19 +970,18 @@ const sleep = (milliseconds) => {
         console.log(names)
         //create formdata
         let formData = new FormData();
-        formData.append("name", name);
-        formData.append("ids", ids);
-        formData.append("names", names);
-        formData.append("wikidata", wikidata);
-        formData.append("coordinates", coordinates);
+        formData.append("route_name", name);
+        formData.append("ids", JSON.stringify(ids));
+        formData.append("names", JSON.stringify(names));
+        formData.append("wikidata", JSON.stringify(wikidata));
+        formData.append("coordinates", JSON.stringify(coordinates));
 
         //post
-        fetch("http://localhost:5000/save-route", {
+        fetch("http://localhost:5000/add-route", {
             method: "post",
             body: formData,
             credentials:"include"
-        })
-
+        });
 
     }
 
@@ -989,9 +1008,9 @@ const sleep = (milliseconds) => {
         </div>
     );
 
-        function handleSaveRouteNameChange(e){
-            saveRouteName = e.target.value;
-        }
+    function handleSaveRouteNameChange(e){
+        saveRouteName = e.target.value;
+    }
 
       const ShowIfEnoughPoints = (props) => {
             return(
@@ -1060,32 +1079,30 @@ const sleep = (milliseconds) => {
                     : null }
 
                     { didCalculateRoute ?
-                    <div>
-                        <div style={{ display:"flex", alignItems:"center"}}>
-                            <img style={{height:"50px", marginLeft:"5px"}} src={`http://openweathermap.org/img/wn/${weatherData.icon}.png`} alt='weather' ></img>
-                            <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{Math.round(weatherData.temp - 273.15) + "°C"}</strong></Typography>
+                        <div>
+                            <div style={{ display:"flex", alignItems:"center"}}>
+                                <img style={{height:"50px", marginLeft:"5px"}} src={`http://openweathermap.org/img/wn/${weatherData.icon}.png`} alt='weather' ></img>
+                                <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{Math.round(weatherData.temp - 273.15) + "°C"}</strong></Typography>
+                            </div>
+                            <Card sx={{ mb:3, ml:1, mr:1, pt:1, pb:0.5}} style={{borderRadius:"8px"}} elevation={4}>
+                                <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{languageTags.currentRoute}:</strong> {currentDurationInMinutes} {languageTags.minutes}, {currentKilometers} km, {returnToStart ?  currentSortedPointsRouteOutput.length-1 : currentSortedPointsRouteOutput.length} POIs</Typography>
+                                <SortedRouteNames></SortedRouteNames>
+                            </Card>
                         </div>
-                        <Card sx={{ mb:3, ml:1, mr:1, pt:1, pb:0.5}} style={{borderRadius:"8px"}} elevation={4}>
-                            <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{languageTags.currentRoute}:</strong> {currentDurationInMinutes} {languageTags.minutes}, {currentKilometers} km, {returnToStart ?  currentSortedPointsRouteOutput.length-1 : currentSortedPointsRouteOutput.length} POIs</Typography>
-                            <SortedRouteNames></SortedRouteNames>
-                        </Card>
-                      
-                        </div>
-                     : null}
+                    : null}
 
                     <Card sx={{ mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5, mt:4}} style={{ borderRadius:"8px"}} elevation={5}><Typography variant='h6' fontWeight={500} sx={{mt:0.8, mb:0.8}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.yourPoints}</Typography></Card>
 
                     <PointList></PointList>
                         
-                        <Box  sx={{mt:5, ml:1, mr:1, mb: 1}}>
-                            <Button color="error" fullWidth variant="contained" onClick={() => deleteHoleRoute()}><DeleteIcon />{languageTags.deleteHoleRouteButton}</Button>
-                        </Box>  
+                    <Box  sx={{mt:5, ml:1, mr:1, mb: 1}}>
+                        <Button color="error" fullWidth variant="contained" onClick={() => deleteHoleRoute()}><DeleteIcon />{languageTags.deleteHoleRouteButton}</Button>
+                    </Box>  
                 </div>
             );
       }
 
-      const SortedRouteNames = () => (
-          
+      const SortedRouteNames = () => ( 
           <div>  
             {currentSortedPointsRouteOutput.map((item,i) => {
                 return (
@@ -1099,31 +1116,30 @@ const sleep = (milliseconds) => {
     );
 
     const ShowOldRoutes = () => (
-          
-        <div>
-        {routeNames.map((item,i) => {
-            return (
-                <div key={item+i}>
-                    <Card sx={{mt:1, mb:1}}>
-                        <Button variant="contained" onClick={() => selectRouteFromToDatabase(item)} fullWidth sx={{mt:1}}>{item}<AltRouteIcon/></Button>
-                    </Card>
-                </div>
-            );
-        })}
-        </div>
-  );
 
+
+
+        <div>
+            {routeNames.map((item,i) => {
+                return (
+                    <div key={item["route_name"]+i}>
+                        <Card sx={{mt:1, mb:1}}>
+                            <Button variant="contained" onClick={() => selectRouteFromToDatabase(item["route_name"])} fullWidth sx={{mt:1}}>{item["route_name"]}<AltRouteIcon/></Button>
+                        </Card>
+                    </div>
+                );
+            })}
+        </div>
+    );
 
       const ShowIfNotEnoughPoints = () => {
         return(
             <div>
-                
-                    <Card sx={{mt:1.5, ml:1, mr:1}} >
-                           
-                              <Button style={{minWidth:"100%", minHeight: "50px"}} variant="contained" onClick={() => setClickedImportRouteButton(true)}>IMPORT SAVED ROUTES<ImportExportIcon/></Button>
-                            {clickedImportRouteButton ?  <ShowOldRoutes/> : null } 
-                    </Card>
-                    
+                <Card sx={{mt:1.5, ml:1, mr:1}} >
+                        
+                            <Button style={{minWidth:"100%", minHeight: "50px"}} variant="contained" onClick={() => setClickedImportRouteButton(true)}>IMPORT SAVED ROUTES<ImportExportIcon/></Button>
+                        {clickedImportRouteButton ?  <ShowOldRoutes/> : null } 
+                </Card>
                       
                 <Card sx={{mt:3, mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={7}><Typography variant='h6' fontWeight={500} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.errorNoRoute}</Typography>
                     <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.errorNoRouteDescription}</Typography>

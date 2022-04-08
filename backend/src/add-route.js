@@ -20,7 +20,7 @@ function checkMandatoryFields(params) {
     return fields.every(field => params[field]);
 }
 
-function insertRoute(request) {
+async function insertRoute(request) {
     let conn;
     try {
         conn = mysql.createConnection({

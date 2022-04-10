@@ -139,7 +139,7 @@ const handleCloseSuccessSnackbar = (event, reason) => {
                   />  
                 </div>
                 <div>
-                  <Button  style={{width: "100%",  height: "43px"}} variant="contained" onClick={() => contactInput.length > 0 ? sendContactMessage(setOpenErrorSnack, setOpenSuccessSnack) : console.log("errro")}>{languageTags.buttonText}</Button>
+                  <Button  style={{width: "100%",  height: "43px"}} variant="contained" onClick={() => contactInput.length > 0 ? sendContactMessage(setOpenErrorSnack, setOpenSuccessSnack) : null}>{languageTags.buttonText}</Button>
             
               </div>
               </div>
@@ -166,8 +166,6 @@ function sendContactMessage(setOpenErrorSnack, setOpenSuccessSnack) {
       credentials: 'include'
   }).then(res => {
       if (res.status == 400) {
-          console.log("fehler")
-          
           setOpenErrorSnack(false)
       } else {
           // Infofeld sichtbar machen

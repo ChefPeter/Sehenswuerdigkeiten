@@ -59,7 +59,7 @@ function RequestReset(props) {
 }
 
 function resetPassword(setErrorText, setShowErrorAlert, setShowInfoAlert) {
-    console.log(input)
+
     let formData = new FormData();
     formData.append('email', input);
 
@@ -76,7 +76,6 @@ function resetPassword(setErrorText, setShowErrorAlert, setShowInfoAlert) {
             setShowErrorAlert(false);
             setShowInfoAlert(true);
         }
-        console.log(res.status)
     });
 }
 

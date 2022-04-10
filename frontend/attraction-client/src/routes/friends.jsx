@@ -211,8 +211,6 @@ function Friends(props) {
 
 function handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessage, setErrorMessage, language){
 
-  console.log(searchFriendInput);
-
   setOpenErrorSnack(false);
   setOpenSuccessSnack(false);
 

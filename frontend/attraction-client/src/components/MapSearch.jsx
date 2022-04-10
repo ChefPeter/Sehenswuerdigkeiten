@@ -229,7 +229,7 @@ function MapSearch (props) {
 
     function sliderChange(event, value){
         setRadiusValue(value);
-        setRadiusForPointerSearch(value)
+        setRadiusForPointerSearch(value, props.showErrorSnack)
         if(selectedCityCoords.length !== 0){
             flyToLocation(selectedCityCoords, value, false);
         }
@@ -349,14 +349,14 @@ function MapSearch (props) {
         let obj = {architecture: s, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setArchitecture(!architecture)
         setFilter(obj);   
-        changedFilter();
+        changedFilter(false, props.showErrorSnack);
     }
     function handleClickCulture(){
         let s = !culture;
         let obj = {architecture: architecture, cultural: s, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setCulture(!culture)
         setFilter(obj);  
-        changedFilter();
+        changedFilter(false, props.showErrorSnack);
     }
 
     function handleClickHistorical(){
@@ -364,56 +364,56 @@ function MapSearch (props) {
         let obj = {architecture: architecture, cultural: culture, historic: s, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setHistorical(!historical)
         setFilter(obj);  
-        changedFilter();
+        changedFilter(false, props.showErrorSnack);
     }
     function handleClickNatural(){
         let s = !natural;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: s, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setNatural(!natural)
         setFilter(obj); 
-        changedFilter();
+        changedFilter(false, props.showErrorSnack);
     }
     function handleClickReligion(){
         let s = !religion;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: s, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setReligion(!religion)
         setFilter(obj); 
-        changedFilter();
+        changedFilter(false, props.showErrorSnack);
     }
     function handleClickTouristFacilities(){
         let s = !touristFacilities;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: s, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setTouristFacilities(!touristFacilities)
         setFilter(obj);  
-        changedFilter();
+        changedFilter(false, props.showErrorSnack);
     }
     function handleClickMuseums(){
         let s = !museums;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: s, palaces: palaces, malls: malls, churches: churches}
         setMuseums(!museums)
         setFilter(obj); 
-        changedFilter();
+        changedFilter(false, props.showErrorSnack);
     }
     function handleClickPalaces(){
         let s = !palaces;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: s, malls: malls, churches: churches}
         setPalaces(!palaces)
         setFilter(obj);  
-        changedFilter();
+        changedFilter(false, props.showErrorSnack);
     }
     function handleClickMalls(){
         let s = !malls;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: s, churches: churches}
         setMalls(!malls)
         setFilter(obj);  
-        changedFilter();
+        changedFilter(false, props.showErrorSnack);
     }
     function handleClickChurch(){
         let s = !churches;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: s}
         setChurches(!churches)
         setFilter(obj);
-        changedFilter();
+        changedFilter(false, props.showErrorSnack);
     }
 
 

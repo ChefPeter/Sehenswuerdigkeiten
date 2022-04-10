@@ -21,8 +21,7 @@ function Approve(props) {
         fetch("http://localhost:5000/approve", {
             method: "post",
             body: formData
-        }).then(res => res.text())
-        .then(res => console.log(res));
+        }).then(res => res.text());
 
       });
 

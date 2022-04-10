@@ -9,10 +9,6 @@ import React, { useState } from "react";
 
 function ChatSendbar (props) {
 
-    //console.log("---------------------");
-    //console.log(props.isGroup);
-    //console.log("---------------------");
-
     const [hideButton, setHideButton] = useState(true);
     const [message, setMessage] = useState("");
 

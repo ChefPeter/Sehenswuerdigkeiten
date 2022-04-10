@@ -55,10 +55,6 @@ function ResetPassword() {
 }
 
 function post (setErrorText, setShowErrorAlert, setShowInfoAlert, email, token){
-    console.log(email)
-    console.log(passwordInput)
-    console.log(retypePasswordInput)
-
 
     let formData = new FormData();
     formData.append('new-password', passwordInput);

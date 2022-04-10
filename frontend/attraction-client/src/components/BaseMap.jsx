@@ -78,10 +78,9 @@ let saveRouteName = "";
             }
             return;
         }
-            
         setShowLoadingCircleRoute(true) 
         let formData = new FormData();
-        let route, sortedIDs, weather;
+        let route, sortedIDs, weather, sortedCoords;
 
         formData.append('points', JSON.stringify(data));
         formData.append('vehicle', directionMode);
@@ -91,7 +90,7 @@ let saveRouteName = "";
             body: formData,
             credentials: 'include',
         }).then(res => res.json())
-            .then(res => {route = res.route; sortedIDs = res.sortedIDs; weather = res.weather});
+            .then(res => {route = res.route; sortedIDs = res.sortedIDs; sortedCoords = res.sortedCoords; weather = res.weather});
         if (map.getSource('route1')) {
             map.removeLayer("arrow-layer");
             map.removeLayer("layer1");
@@ -119,6 +118,8 @@ let saveRouteName = "";
         map.addLayer({
             'id': 'layer1',
             'type': 'line',
+            "icon-allow-overlap" : true,
+            "text-allow-overlap": true,
             'source': 'route1',
             'filter': ['==', '$type', 'LineString'],
             'layout': {
@@ -154,6 +155,8 @@ let saveRouteName = "";
           map.addLayer({
             'id': 'arrow-layer',
             'type': 'symbol',
+            "icon-allow-overlap" : true,
+            "text-allow-overlap": true,
             'source': 'route1',
             'layout': {
               'symbol-placement': 'line',
@@ -167,7 +170,67 @@ let saveRouteName = "";
           });
         });
         setShowLoadingCircleRoute(false)
-       
+     
+        //get coordinates of data
+        let coords = [];
+        for(let i = 0; i < data.length; i++){
+            coords.push(data[i]["geometry"]["coordinates"]);
+        }
+
+        let markersWithNumbers = [];
+        //positionsFriends.push({type:"Feature",geometry:{type:"Point",coordinates:[locationOfFriends[i]["longtitude"],locationOfFriends[i]["latitude"]]},properties:{id:"name"+i,name:locationOfFriends[i]["username"],title:locationOfFriends[i]["username"]}});
+
+        for(let i = 0; i<coords.length; i++){
+            if(coords[i][0] !== null || coords[i][1] !== null){
+                markersWithNumbers.push({type:"Feature",geometry:{type:"Point", coordinates: [coords[i][0],coords[i][1]]} , properties:{id:"coord"+i,title:i+1}});
+            }
+        }
+        //markersWitrhNumbers to geojson
+        let markersWithNumbersGeoJson = {
+            "type": "FeatureCollection",
+            "features": markersWithNumbers
+        };
+
+        if(map.getSource("selected-attractions-points-data")){
+            map.removeLayer("selected-attraction-points-layer");
+            map.removeSource("selected-attraction-points-data");
+        }
+        if(map.getSource("route-points-data")){
+            map.removeLayer("route-points-layer");
+            map.removeSource("route-points-data");
+        }
+        
+        //layer with points and data as points
+        map.addSource('route-points-data', {
+            'type': 'geojson',
+            'data': markersWithNumbersGeoJson,
+            tolerance: 0
+        });
+        map.addLayer({
+            id: "route-points-layer",
+            source: "route-points-data",
+            type: "symbol",
+            layout: {
+                "icon-image": "marker-blue",
+                "icon-padding": 0,
+                "icon-allow-overlap" : true,
+                "text-allow-overlap": true,
+                "icon-size": 0.8,
+                'text-field': ['get', 'title'],
+                'text-font': [
+                'Open Sans Semibold',
+                'Arial Unicode MS Bold'
+                ],
+                'text-offset': [0, 1.25],
+                'text-anchor': 'top',
+            },
+            paint: {
+                "text-color": "#000000",
+                "text-halo-color": "#fff",
+                "text-halo-width": 4
+            }
+    });
+
     }
 
 function BaseMap (props) {
@@ -217,7 +280,8 @@ function BaseMap (props) {
                                                         flyTo: "You fly to: ",
                                                         unableToRetrieveLocation: "Unable to retrieve your location!",
                                                         gpsNotSupported: "GPS is not supported on your device.",
-                                                        ratingSuccessText: "Rating saved successfully"
+                                                        ratingSuccessText: "Rating saved successfully",
+                                                        noPoisErrorText: "No POIs found in this area! Try to change your radius, filters or search at a new location.",
                                                     });
 
 
@@ -225,6 +289,7 @@ function BaseMap (props) {
 
     const [showRatingErrorSnackbar, setShowRatingErrorSnackbar] = useState(false);
     const [showRatingSuccessSnackbar, setShowRatingSuccessSnackbar] = useState(false);
+    const [showNoPoisFoundErrorSnackbar, setShowNoPoisFoundErrorSnackbar] = useState(false);
 
     const [gpsActive, setGpsActive] = useState(false);
     const [geolocationSupported, setGeolocationSupported] = useState(true);
@@ -260,7 +325,8 @@ function BaseMap (props) {
                 flyTo: "Du fliegst nach: ",
                 unableToRetrieveLocation: "Deine Position kann nicht festgestellt werden!",
                 gpsNotSupported: "Die GPS Funktion wird für dein Gerät nicht unterstützt.",
-                ratingSuccessText: "Bewertung erfolgreich gespeichert"
+                ratingSuccessText: "Bewertung erfolgreich gespeichert",
+                noPoisErrorText: "Keine Sehenswürdigkeiten in diesem Umkreis gefunden! Versuche deinen Radius oder deine Filter zu verändern oder probiere es mit einer neuen Suche.",
             });
             setRatingErrorText("Fehler beim Bewerten der POI.");
 
@@ -288,7 +354,8 @@ function BaseMap (props) {
                 flyTo: "Si vola verso: ",
                 unableToRetrieveLocation: "Impossibile recuperare la tua posizione!",
                 gpsNotSupported: "Il GPS non è supportato sul tuo dispositivo.",
-                ratingSuccessText: "Voto salvato con successo"
+                ratingSuccessText: "Voto salvato con successo",
+                noPoisErrorText: "Nessun POI trovato in questa zona! Prova a regolare il raggio o i filtri o cerca una nuova posizione.",
             });
             setRatingErrorText("Errore durante il voto della segnaletica.");
         } else {
@@ -315,7 +382,8 @@ function BaseMap (props) {
                 flyTo: "You fly to: ",
                 unableToRetrieveLocation: "Unable to retrieve your location!",
                 gpsNotSupported: "GPS is not supported on your device.",
-                ratingSuccessText: "Rating saved successfully"
+                ratingSuccessText: "Rating saved successfully",
+                noPoisErrorText: "No POIs found in this area! Try to adjust your radius or filters or search at a new location.",
             });
             setRatingErrorText("Error while rating the POI.");
         }
@@ -534,7 +602,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     map.on("click", "attraction-points-layer", e => {
         if (e.features.length) {
             setObj(e.features[0]);
-            console.log(e.features[0]);
             setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
             //get request with fetch
             fetch("http://localhost:5000/rating?"+new URLSearchParams({sight_id: e["features"][0]["properties"]["wikidata"]}), {
@@ -560,7 +627,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     map.on("dblclick", (e) => {
         let coords = [e.lngLat.lng, e.lngLat.lat];
         let popupNode  = document.createElement("div");
-        ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch)} >Search here?</Button><Button sx={{mt:2, mb:2}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);
+        ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar)} >Search here?</Button><Button sx={{mt:2, mb:2}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);
         popUpRef.current
             .setLngLat(coords)
             .setDOMContent(popupNode)
@@ -659,9 +726,9 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
 
 }
 
-const sleep = (milliseconds) => {
-    return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
+    const sleep = (milliseconds) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds))
+    }
 
     function pointIsInRoute(id){
         if (testRoute.some(item => item["properties"]["id"]===id)) 
@@ -673,7 +740,7 @@ const sleep = (milliseconds) => {
         marker.setLngLat(coords).addTo(map);
         globalPopup = marker;
     }
-    function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch) {
+    function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar) {
         if(globalPopup2 !== ""){
             globalPopup2.remove();
             globalPopup2 = "";
@@ -686,7 +753,7 @@ const sleep = (milliseconds) => {
         popUpRef.current.remove();
         add_marker(markerCoords);
 
-        flyToLocation(markerCoords, radiusForPointerSearch, false)
+        flyToLocation(markerCoords, radiusForPointerSearch, false, setShowNoPoisFoundErrorSnackbar)
     }
 
     function handleAddClickedByUserPointToRoute(coords){
@@ -902,7 +969,7 @@ const sleep = (milliseconds) => {
         let randomLocation = (await resultRandomLocation.json());
         setCurrentRandomLocation(randomLocation[2]);
         setShowSuccessSnack(true)
-        flyToLocation ([randomLocation[0], randomLocation[1]], 100, true);
+        flyToLocation ([randomLocation[0], randomLocation[1]], 100, true, setShowNoPoisFoundErrorSnackbar);
         setDisableHandleRandomLocationButton(false);
 
     }
@@ -933,14 +1000,13 @@ const sleep = (milliseconds) => {
             method: "get",
             credentials:"include"
         }).then(res => res.json()).then(res => {
-            console.log(res)
             res.map((obj, index) => {
                 ids.push(obj["point_id"]);
                 names.push(obj["name"]);
                 wikidata.push(obj["wikidata"]);
                 coordinates.push([obj["longtitude"], obj["latitude"]]);
             });
-        }).catch(e => console.log(e));
+        }).catch(e => {console.log(e)});
 
         for(let i = 0; i < ids.length; i++){
             let obj = {
@@ -969,13 +1035,6 @@ const sleep = (milliseconds) => {
             speed: 1.5,
             essential: true // this animation is considered essential with respect to prefers-reduced-motion
         });
-        //featurecollection of testroute
-        /*let featureCollection = {
-            "type": "FeatureCollection",
-            "features": testRoute
-        }
-
-        map.getSource("selected-attractions-points-data").setData(featureCollection);*/
         postRoute(testRoute, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData);
         setOpenRouteDrawer(false);
     }
@@ -1201,11 +1260,15 @@ const sleep = (milliseconds) => {
             return;
         setGeolocationSupported(true)   
       }
-
+      const handleNoPoisFoundErrorSnackbar = (event, reason) => {
+        if (reason === 'clickaway')
+            return;
+        setShowNoPoisFoundErrorSnackbar(false);
+        };
       function closeBottomDrawer(){
         setOpen(!open);
 
-        //set timeout for 1 second
+        //set timeout for 350 ms
         setTimeout(() => {
             setClickedFriends(false);
             setAvgRating(0);
@@ -1245,7 +1308,7 @@ const sleep = (milliseconds) => {
         <div>
             <div id="mapContainer" className="map"></div>
             <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
-            <MapSearch l1={props.l1} directionMode={directionMode} setThemeMap={setThemeMap} themeMap={themeMap} enable3D={enable3D} enabled3D={enabled3D}></MapSearch>
+            <MapSearch l1={props.l1} directionMode={directionMode} setThemeMap={setThemeMap} themeMap={themeMap} enable3D={enable3D} enabled3D={enabled3D} showErrorSnack={setShowNoPoisFoundErrorSnackbar}></MapSearch>
             
             <div  id="test" style={{position: "fixed",top: "calc(100% - 150px)", left:"calc(100vw - 75px)"}}>
             
@@ -1285,7 +1348,7 @@ const sleep = (milliseconds) => {
                         {currentAddedPoints.length > 0 || currentSortedPointsRouteOutput.length > 1 ? <ShowIfEnoughPoints didCalculateRoute={didCalculateRoute} /> : <ShowIfNotEnoughPoints />}
                     
                         <Box  sx={{mt:2, ml:1, mr:1}}>
-                            <Button variant="contained" disabled={disableHandleRandomLocationButton} sx={{minHeight: 50}} fullWidth onClick={() => handleRandomLocationButton()}>{languageTags.exploreRandomLocation} <ShuffleIcon/> </Button>
+                            <Button variant="contained" disabled={disableHandleRandomLocationButton} sx={{minHeight: 50}} fullWidth onClick={() => handleRandomLocationButton(setShowNoPoisFoundErrorSnackbar)}>{languageTags.exploreRandomLocation} <ShuffleIcon/> </Button>
                         </Box>
                     
                     </div>
@@ -1299,11 +1362,13 @@ const sleep = (milliseconds) => {
             <SuccessSnackbar openSuccessSnack={showRatingSuccessSnackbar} successMessage={languageTags.ratingSuccessText} handleClose={handleCloseRatingSuccessSnackbar}></SuccessSnackbar>
             <ErrorSnackbar openErrorSnack={showRatingErrorSnackbar} errorMessage={ratingErrorText} handleClose={handleCloseRatingErrorSnackbar}></ErrorSnackbar>
 
+            <ErrorSnackbar openErrorSnack={showNoPoisFoundErrorSnackbar} errorMessage={languageTags.noPoisErrorText} handleClose={handleNoPoisFoundErrorSnackbar}></ErrorSnackbar>
+
         </div>
     );
 };
 
-async function getLocationData(lon, lat, radius, filters)
+async function getLocationData(lon, lat, radius, filters, setShowNoPoisFoundErrorSnackbar)
 {
     let locationData = new FormData();
     let data;
@@ -1318,10 +1383,15 @@ async function getLocationData(lon, lat, radius, filters)
         credentials: 'include',
     }).then(res => res.json())
     .then(res => data = res);
+
+    if(data.length === 0) { // no pois found
+        setShowNoPoisFoundErrorSnackbar(true);
+    }
+
     return {type: "FeatureCollection", features: data};
 }
 
-export async function flyToLocation (coords, radius, newCoordinates = false){
+export async function flyToLocation (coords, radius, newCoordinates = false, setShowNoPoisFoundErrorSnackbar){
 
     let locationData = new FormData();
 
@@ -1361,7 +1431,7 @@ export async function flyToLocation (coords, radius, newCoordinates = false){
     lastRadius = radius;
 
     //const results1 = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius, filterToUse: filter });
-    const results = await getLocationData(coords[0], coords[1], radius, filter);
+    const results = await getLocationData(coords[0], coords[1], radius, filter, setShowNoPoisFoundErrorSnackbar);
     
     currentGlobalResults = results;
     // update "attraction-points-data" source with new data
@@ -1371,7 +1441,7 @@ export async function flyToLocation (coords, radius, newCoordinates = false){
 }
 
 //new Request has to be made
-export async function changedFilter(coords = false){
+export async function changedFilter(coords = false, setShowNoPoisFoundErrorSnackbar){
     
     clearTimeout(timerID)
 
@@ -1386,14 +1456,11 @@ export async function changedFilter(coords = false){
                 coords = lastCoords;
         }
         
-        const results = await getLocationData(coords[0], coords[1], lastRadius, filter);
+        const results = await getLocationData(coords[0], coords[1], lastRadius, filter, setShowNoPoisFoundErrorSnackbar);
         currentGlobalResults = results;
     
-        // update "random-points-data" source with new data
-        // all layers that consume the "random-points-data" data source will be updated automatically
         map.getSource("attraction-points-data").setData(results);
     }, 900)
-
 
 }
 
@@ -1424,8 +1491,7 @@ function addAllLayersToMap(map){
         source: "attraction-points-data",
         type: "symbol",
         layout: {
-            // full list of icons here: https://labs.mapbox.com/maki-icons
-            "icon-image": "marker-red", // this will put little croissants on our map
+            "icon-image": "marker-red",
             "icon-padding": 0,
             "icon-allow-overlap": true,
             "icon-size": 0.8
@@ -1441,7 +1507,7 @@ function addAllLayersToMap(map){
     });
 
     map.addLayer({
-        id: 'selected-attraction-points-data',
+        id: 'selected-attraction-points-layer',
         source: 'selected-attraction-points-data',
         type: 'symbol',
         layout: {
@@ -1466,8 +1532,6 @@ function addAllLayersToMap(map){
             features: []
         }
     });
-        
-    // now add the layer, and reference the data source above by name
     map.addLayer({
             id: "friends-points-layer",
             source: "friends-points-data",
@@ -1476,7 +1540,8 @@ function addAllLayersToMap(map){
                 // full list of icons here: https://labs.mapbox.com/maki-icons
                 "icon-image": "friends-marker", // this will put little croissants on our map
                 "icon-padding": 0,
-                "icon-allow-overlap": true,
+                "icon-allow-overlap" : true,
+                "text-allow-overlap": true,
                 "icon-size": 0.1,
                 'text-field': ['get', 'title'],
                 'text-font': [
@@ -1496,10 +1561,10 @@ function addAllLayersToMap(map){
 }
 
 
-export function setRadiusForPointerSearch (newRadius){
+export function setRadiusForPointerSearch (newRadius, setShowNoPoisFoundErrorSnackbar){
     radiusForPointerSearch = newRadius;
     if(searchByMarker)
-    flyToLocation(lastCoords, radiusForPointerSearch, false)
+        flyToLocation(lastCoords, radiusForPointerSearch, false, setShowNoPoisFoundErrorSnackbar, setShowNoPoisFoundErrorSnackbar)
 }
 
 export default BaseMap;

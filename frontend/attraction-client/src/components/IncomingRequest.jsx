@@ -30,8 +30,6 @@ function IncomingRequest(props) {
 
 function accepted(name){
 
-    console.log("accepted")
-
     let formData = new FormData();
     formData.append('friend', name);
   
@@ -53,8 +51,6 @@ function accepted(name){
 }
 
 function rejected(name){
-
-    console.log("rejected")
 
     let formData = new FormData();
     formData.append('friend', name);

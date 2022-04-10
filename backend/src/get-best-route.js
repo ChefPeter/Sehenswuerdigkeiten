@@ -70,16 +70,20 @@ async function getBestRoute(request, res) {
         coords.pop(); //last element is starting point
 
     let sortedIDs = [];
+    let sortedCoords = [];
     for(let i = 0; i<l; i++){
         for(let x = 0; x<l; x++){
-            if(coords[i][0] === p[x].geometry.coordinates[0] && coords[i][1] === p[x].geometry.coordinates[1])
+            if(coords[i][0] === p[x].geometry.coordinates[0] && coords[i][1] === p[x].geometry.coordinates[1]){
                 sortedIDs.push({id: p[x].properties.id, name: p[x].properties.name});
+                sortedCoords.push(p[x].geometry.coordinates);
+            }
         }
     }
 
-    if(request.body.returnToStart != "false")
+    if(request.body.returnToStart != "false"){
         sortedIDs.push(sortedIDs[0]);
-
+    }
+        
     //zwischen lat lon , zwischen zwei ; 25
     for(let count = 0; count < coords.length; count += 25)
     {
@@ -90,7 +94,7 @@ async function getBestRoute(request, res) {
     }
 
     let weather = await getDataFromURL(getWeatherURL(p[0].geometry.coordinates[1], p[0].geometry.coordinates[0]));
-    res.status(200).send(JSON.stringify({route: route, sortedIDs: sortedIDs, weather: weather}));
+    res.status(200).send(JSON.stringify({route: route, sortedIDs: sortedIDs, sortedCoords: sortedCoords, weather: weather}));
 
     /*for(let count = 1; count < coords.length; count++)
     {

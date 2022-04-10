@@ -7,10 +7,11 @@ import { checkCookie } from './functions/cookieManager';
 import './index.css';
 import Approve from './routes/approve';
 import Chat from './routes/chat';
-import GroupSettings from './routes/groupSettings';
 import Contact from "./routes/contact";
+import ErrorPage from './routes/errorPage';
 import Friends from "./routes/friends";
 import Groups from "./routes/groups";
+import GroupSettings from './routes/groupSettings';
 import Home from "./routes/home";
 import LegalNotice from './routes/legalnotice';
 import Login from "./routes/login";
@@ -18,8 +19,6 @@ import Profile from './routes/profile';
 import Register from "./routes/register";
 import RequestReset from "./routes/requestReset";
 import ResetPassword from './routes/reset-password';
-import ErrorPage from './routes/errorPage';
-import { useEffect } from 'react';
 
 const rootElement = document.getElementById("root");
 

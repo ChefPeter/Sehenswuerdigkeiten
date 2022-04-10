@@ -11,9 +11,10 @@ import ImportExportIcon from '@mui/icons-material/ImportExport';
 import RouteIcon from '@mui/icons-material/Route';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { Box, Button, Card, Chip, CircularProgress, Drawer, FormControlLabel, OutlinedInput, Rating, Switch, Tooltip, Typography } from "@mui/material";
 import Zoom from '@mui/material/Zoom';
-import mapboxgl from "mapbox-gl";
+import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import ErrorSnackbar from './ErrorSnackbar';
@@ -21,7 +22,6 @@ import MapSearch from "./MapSearch";
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
-import ShuffleIcon from '@mui/icons-material/Shuffle';
 
 let map = null;
 let countUserPoints = 0;
@@ -207,7 +207,7 @@ export function setFilter(newFilter){
             map.removeLayer("selected-attraction-points-layer");
             map.removeSource("selected-attraction-points-data");
         }
-        
+        console.log(markersWithNumbersGeoJson);
         //layer with points and data as points
         map.addSource('route-points-data', {
             'type': 'geojson',

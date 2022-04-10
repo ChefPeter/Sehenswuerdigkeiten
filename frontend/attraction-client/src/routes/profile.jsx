@@ -100,23 +100,23 @@ function Profile(props) {
 
       setLoggedIn(checkCurrentlyLoggedIn());
 
-      const resultUsername = await fetch("http://localhost:5000/username", {
+      const resultUsername = await fetch("https://10.10.30.18:8443/username", {
         method: "get",
         credentials: 'include'
       });
-      const resultDescription = await fetch("http://localhost:5000/description", {
+      const resultDescription = await fetch("https://10.10.30.18:8443/description", {
         method: "get",
         credentials: 'include'
       });
-      const fileProfilePicture = await fetch("http://localhost:5000/profile-picture", {
+      const fileProfilePicture = await fetch("https://10.10.30.18:8443/profile-picture", {
         method: "get",
         credentials: 'include'
       });
-      const activatedLocation = await fetch("http://localhost:5000/visibility",{
+      const activatedLocation = await fetch("https://10.10.30.18:8443/visibility",{
         method: "get",
         credentials: "include"
       });
-      const visitedSightsF = await fetch("http://localhost:5000/visited-sights",{
+      const visitedSightsF = await fetch("https://10.10.30.18:8443/visited-sights",{
         method: "get",
         credentials: "include"
       });
@@ -166,7 +166,7 @@ function Profile(props) {
       let formData = new FormData();
       formData.append('value', currentShowLocation);
  
-      fetch("http://localhost:5000/change-visibility", {
+      fetch("https://10.10.30.18:8443/change-visibility", {
           method: "post",
           body: formData,
           credentials: 'include'
@@ -284,7 +284,7 @@ function handleFileUpload(setShowInfo, setShowError, setSuccessDescription, setE
   
   formData.append('profile-picture', document.getElementById("fileInputUpload").files[0]);
   
-  fetch("http://localhost:5000/change-profile-picture", {
+  fetch("https://10.10.30.18:8443/change-profile-picture", {
       method: "post",
       body: formData,
       credentials: 'include'
@@ -331,7 +331,7 @@ function handleSaveNewDescription(description, setShowInfo, setShowError, setSuc
   
   formData.append('description', description);
 
-  fetch("http://localhost:5000/change-description", {
+  fetch("https://10.10.30.18:8443/change-description", {
       method: "post",
       body: formData,
       credentials: 'include'

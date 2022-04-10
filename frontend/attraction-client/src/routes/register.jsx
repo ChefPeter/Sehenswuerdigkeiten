@@ -174,7 +174,7 @@ function post (setErrorText, setShowErrorAlert, setShowInfoAlert){
     formData.append('email', emailInput);
     formData.append('password', passwordInput);
     formData.append('repeat-password', retypePasswordInput);
-    fetch("http://localhost:5000/register", {
+    fetch("https://10.10.30.18:8443/register", {
         method: "post",
         body: formData
     }).then(res => {

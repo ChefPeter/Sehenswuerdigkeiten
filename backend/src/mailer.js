@@ -35,7 +35,7 @@ class Mailer {
             "no-reply@city2go.com",
             "City2Go",
             fs.readFileSync("./email/register-email.html", 'utf-8').replace(/###HREF###/, 
-                "http://"+
+                "https://"+
                 process.env.ENV_HOST+
                 "/approve?"+ 
                 queryString.stringify({username: username, email: email, token: token})
@@ -51,7 +51,7 @@ class Mailer {
             "no-reply@city2go.com",
             "City2Go",
             fs.readFileSync("./email/reset-email.html", 'utf-8').replace(/###HREF###/, 
-                "http://"+
+                "https://"+
                 process.env.ENV_HOST+
                 "/reset-password?"+
                 queryString.stringify({username: username, email: email, token: token})

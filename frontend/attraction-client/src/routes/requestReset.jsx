@@ -63,7 +63,7 @@ function resetPassword(setErrorText, setShowErrorAlert, setShowInfoAlert) {
     let formData = new FormData();
     formData.append('email', input);
 
-    fetch("http://localhost:5000/request-reset", {
+    fetch("https://10.10.30.18:8443/request-reset", {
         method: "post",
         body: formData
     }).then(res => {

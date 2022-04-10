@@ -1,5 +1,5 @@
 const fetch = require("cross-fetch");
-const mysql = require("mysql");
+const mysql = require("mysql2);
 
 async function sendSights(req, res) {
     

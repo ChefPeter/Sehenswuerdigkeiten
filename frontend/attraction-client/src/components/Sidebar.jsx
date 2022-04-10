@@ -165,7 +165,7 @@ export default function SwipeableTemporaryDrawer(props) {
   function handleLogout() {
 
     //fetch post to logout
-    fetch('http://localhost:5000/logout', {
+    fetch('https://10.10.30.18:8443/logout', {
       method: 'POST',
       credentials: "include",
     }).then(response => {

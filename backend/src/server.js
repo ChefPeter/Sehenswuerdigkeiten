@@ -74,7 +74,8 @@ app.use(bodyParser.json());
 // Middleware für cors bei requests
 const corsConfig = {
     credentials: true,
-    origin: true,
+    //origin: true,
+    origin: "https:10.10.30.18:3000"
 };
 app.use(cors(corsConfig));
 
@@ -140,9 +141,9 @@ app.get("/debug", (req, res) => {
     res.sendStatus(200);
 });
 
-app.listen(5000, () => console.log("Server running on http://localhost:5000"));
+app.listen(5000, () => console.log("Server running on https://10.10.30.18:8443"));
 
-/*
+
 const httpsServer = https.createServer({
     key: fs.readFileSync("server.key", "utf-8"),
     cert: fs.readFileSync("server.crt", "utf-8")
@@ -151,5 +152,3 @@ const httpsServer = https.createServer({
 httpsServer.listen(8443);
 
 app.listen(5000, () => console.log("Server running on http://10.10.30.18:5000"));
-
-*/

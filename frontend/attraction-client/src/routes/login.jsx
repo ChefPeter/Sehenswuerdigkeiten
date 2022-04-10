@@ -132,7 +132,7 @@ function post (setErrorText, setShowErrorAlert, setLoadLogin){
   formData.append('username', usernameInput);
   formData.append('password', passwordInput)
 
-  fetch("http://localhost:5000/login", {
+  fetch("https://10.10.30.18:8443/login", {
       method: "post",
       body: formData,
       credentials: 'include'

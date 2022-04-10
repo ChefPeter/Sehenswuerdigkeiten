@@ -63,6 +63,10 @@ let saveRouteName = "";
 
     export async function postRoute(data, directionMode, setDidCalculateRoute, setCurrentRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData)
     {   
+        if(data.length < 1){
+            return;
+        }
+
         if(data[0]["properties"]["id"] === "gpsLocatorId")
                 data.shift();
 
@@ -75,6 +79,10 @@ let saveRouteName = "";
                 map.removeLayer("arrow-layer");
                 map.removeLayer("layer1");
                 map.removeSource('route1');
+            }
+            if(map.getSource("route-points-data")){
+                map.removeLayer("route-points-layer");
+                map.removeSource("route-points-data");
             }
             return;
         }
@@ -195,11 +203,6 @@ let saveRouteName = "";
             map.removeLayer("selected-attraction-points-layer");
             map.removeSource("selected-attraction-points-data");
         }
-        if(map.getSource("route-points-data")){
-            map.removeLayer("route-points-layer");
-            map.removeSource("route-points-data");
-        }
-        
         //layer with points and data as points
         map.addSource('route-points-data', {
             'type': 'geojson',
@@ -864,6 +867,10 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             map.removeLayer('arrow-layer');
             map.removeSource('route1');
         }
+        if(map.getSource('route-points-data')){
+            map.removeLayer('route-points-layer');
+            map.removeSource('route-points-data');
+        }
     }
 
     function enable3D(){
@@ -1208,7 +1215,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 return (
                     <div key={item["route_name"]+i}>
                         <Card sx={{mt:1, mb:1}}>
-                            <Button variant="contained" sx={{wordWrap:"break-word", mt:1}} onClick={() => selectRouteFromToDatabase(item["route_name"])} fullWidth >{item["route_name"]}<AltRouteIcon/></Button>
+                            <Button style={{backgroundColor:"#939ed5", width:"calc(100% - 10px)", marginLeft:"5px", marginRight:"5px"}} variant="contained" sx={{wordWrap:"break-word", mt:0.6}} onClick={() => selectRouteFromToDatabase(item["route_name"])} >{item["route_name"]}<AltRouteIcon/></Button>
                         </Card>
                     </div>
                 );
@@ -1220,7 +1227,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         return(
             <div>
                 <Card sx={{mt:1.5, ml:1, mr:1}} >
-                        
                             <Button style={{minWidth:"100%", minHeight: "50px"}} variant="contained" onClick={() => setClickedImportRouteButton(true)}>IMPORT SAVED ROUTES<ImportExportIcon/></Button>
                         {clickedImportRouteButton ?  <ShowOldRoutes/> : null } 
                 </Card>
@@ -1229,7 +1235,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.errorNoRouteDescription}</Typography>
                 </Card>
                 <Box  sx={{mt:2, ml:1, mr:1}}>
-                    <Button variant="contained" sx={{minHeight: 50}} fullWidth onClick={() => setOpenRouteDrawer(false)}>{languageTags.closeThisWindow}</Button>  
+                    <Button variant="contained" fullWidth onClick={() => setOpenRouteDrawer(false)}>{languageTags.closeThisWindow}</Button>  
                 </Box>
             </div>
         );
@@ -1348,7 +1354,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                         {currentAddedPoints.length > 0 || currentSortedPointsRouteOutput.length > 1 ? <ShowIfEnoughPoints didCalculateRoute={didCalculateRoute} /> : <ShowIfNotEnoughPoints />}
                     
                         <Box  sx={{mt:2, ml:1, mr:1}}>
-                            <Button variant="contained" disabled={disableHandleRandomLocationButton} sx={{minHeight: 50}} fullWidth onClick={() => handleRandomLocationButton(setShowNoPoisFoundErrorSnackbar)}>{languageTags.exploreRandomLocation} <ShuffleIcon/> </Button>
+                            <Button variant="contained" disabled={disableHandleRandomLocationButton} fullWidth onClick={() => handleRandomLocationButton(setShowNoPoisFoundErrorSnackbar)}>{languageTags.exploreRandomLocation} <ShuffleIcon/> </Button>
                         </Box>
                     
                     </div>

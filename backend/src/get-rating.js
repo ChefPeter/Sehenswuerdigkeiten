@@ -2,7 +2,6 @@ const mysql = require("mysql");
 const util = require("util");
 
 async function getRating(request) {
-   console.log(request.query.sight_id)
     // Schauen, ob Pflichtfelder ausgefüllt sind
     if (!request.query.sight_id) return null;
 
@@ -15,7 +14,6 @@ async function getRating(request) {
             database: process.env.DB_DATABASE
         });
         const query = util.promisify(conn.query).bind(conn);
-        console.log(request.query.sight_id)
         let result = await query(
             `SELECT AVG(rating) AS avg, COUNT(*) AS count FROM ratings WHERE sight_id="${request.query.sight_id}";`
         );

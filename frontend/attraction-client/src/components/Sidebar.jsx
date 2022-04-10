@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 import Dark_Mode from './dark_mode';
 import LanguageSelector from './LanguageSelector';
 import "./styles/sidebar.css";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 export default function SwipeableTemporaryDrawer(props) {
 
@@ -30,7 +31,8 @@ export default function SwipeableTemporaryDrawer(props) {
                                                       friends: "Friends",
                                                       contact: "Contact",
                                                       legalNotice: "Legal Notice",
-                                                      profile: "Profile"
+                                                      profile: "Profile",
+                                                      logout: "Logout"
   });
 
   //reacts only to language changes
@@ -44,7 +46,8 @@ export default function SwipeableTemporaryDrawer(props) {
                           friends: "Freunde",
                           contact: "Kontakt",
                           legalNotice: "Impressum",
-                          profile: "Profil"
+                          profile: "Profil",
+                          logout: "Ausloggen"
         });
 
     } else if(props.l1 == "it") {
@@ -55,7 +58,8 @@ export default function SwipeableTemporaryDrawer(props) {
                         friends: "Amici",
                         contact: "Contatto",
                         legalNotice: "Avviso legale",
-                        profile: "Profilo"
+                        profile: "Profilo",
+                        logout: "Logout"
       });
 
     } else {
@@ -66,7 +70,8 @@ export default function SwipeableTemporaryDrawer(props) {
                       friends: "Friends",
                       contact: "Contact",
                       legalNotice: "Legal Notice",
-                      profile: "Profile"
+                      profile: "Profile",
+                      logout: "Logout"
       });
 
     }
@@ -146,9 +151,30 @@ export default function SwipeableTemporaryDrawer(props) {
       <Dark_Mode t1={props.t1} t2={props.t2}></Dark_Mode>
       <LanguageSelector l1={props.l1} l2={props.l2} ></LanguageSelector>
 
+      <ListItem sx={{mt:1}} button onClick={() => handleLogout()} component={Link} to="/profile">
+            <ListItemIcon>
+            <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText primary={languageTags.logout} />
+      </ListItem>
+
     </Box>
     </div>
   );
+
+  function handleLogout() {
+
+    //fetch post to logout
+    fetch('http://localhost:5000/logout', {
+      method: 'POST',
+      credentials: "include",
+    }).then(response => {
+      if(response.status === 200) {
+        window.location.href = "/";
+      }
+    });
+
+  }
 
   return (
     <div>

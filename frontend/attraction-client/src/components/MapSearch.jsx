@@ -53,7 +53,11 @@ function MapSearch (props) {
                                                         museumsText: "Museums",
                                                         palacesText: "Palaces",
                                                         mallsText: "Malls",
-                                                        filterText: "Filter"
+                                                        filterText: "Filter",
+                                                        light: "Light",
+                                                        dark: "Dark",
+                                                        satellite: "Satellite",
+                                                        tooltip3D: "Enables 3D Mode on the map. Zoom in and use CTRL + LEFT MOUSE BUTTON to see the results."
     });
     
     //reacts only to language change
@@ -74,7 +78,11 @@ function MapSearch (props) {
                             museumsText: "Museen",
                             palacesText: "Paläste",
                             mallsText: "Einkaufszentren",
-                            filterText: "Filter"
+                            filterText: "Filter",
+                            light: "Hell",
+                            dark: "Dunkel",
+                            satellite: "Satellit",
+                            tooltip3D: "Aktiviert 3D-Modus auf der Karte. Zoomen Sie hinein und verwenden Sie STRG + LINKE MAUSTASTE, um Ergebnisse zu sehen."
             });
 
         }else if(props.l1 == "it"){
@@ -92,7 +100,11 @@ function MapSearch (props) {
                             museumsText: "Musei",
                             palacesText: "Palazzi",
                             mallsText: "Centri commerciali",
-                            filterText: "Filtro"
+                            filterText: "Filtro",
+                            light: "Luce",
+                            dark: "Scuro",
+                            satellite: "Satellite",
+                            tooltip3D: "Attiva la modalità 3D sulla mappa. Zoomare in e usare CTRL + TASTO SINISTRO del mouse per vedere i risultati."
             });
 
         }else{
@@ -110,7 +122,11 @@ function MapSearch (props) {
                             museumsText: "Museums",
                             palacesText: "Palaces",
                             mallsText: "Malls",
-                            filterText: "Filter"
+                            filterText: "Filter",
+                            light: "Light",
+                            dark: "Dark",
+                            satellite: "Satellite",
+                            tooltip3D: "Enables 3D Mode on the map. Zoom in and use CTRL + LEFT MOUSE BUTTON to see the results."
             });
 
         }
@@ -222,7 +238,7 @@ function MapSearch (props) {
 
         if(coords != null){
             setSelectedCityCoords(coords);
-            flyToLocation(coords, radiusValue, true)
+            flyToLocation(coords, radiusValue, true, props.showErrorSnack)
         }
         
     }
@@ -231,7 +247,7 @@ function MapSearch (props) {
         setRadiusValue(value);
         setRadiusForPointerSearch(value, props.showErrorSnack)
         if(selectedCityCoords.length !== 0){
-            flyToLocation(selectedCityCoords, value, false);
+            flyToLocation(selectedCityCoords, value, false, props.showErrorSnack);
         }
     }
 
@@ -301,7 +317,7 @@ function MapSearch (props) {
                     <Chip className="attributeChipsOfSearchbar" icon={<LayersIcon fontSize="small" />} label={"Dark"} variant={props.themeMap === "dark" ? "filled" : "outlined"} onClick={() => props.setThemeMap("dark")}></Chip>
                     <Chip className="attributeChipsOfSearchbar" icon={<LayersIcon fontSize="small" />} label={"Satellite"} variant={props.themeMap === "satellite" ? "filled" : "outlined"} onClick={() => props.setThemeMap("satellite")}></Chip>
                     
-                    <Tooltip placement="top" disableFocusListener enterTouchDelay={420}  title={"Enables 3D Mode on the map. Zoom in and use CTRL + LEFT MOUSE to see the results."} TransitionComponent={Zoom} arrow>
+                    <Tooltip placement="top" disableFocusListener enterTouchDelay={420}  title={languageTags.tooltip3D} TransitionComponent={Zoom} arrow>
                         <FormControlLabel
                             sx={{display: 'block',}}
                             control={
@@ -313,7 +329,7 @@ function MapSearch (props) {
                                 color="primary"
                                 />
                             }
-                            label="Enable 3D"
+                            label="3D"
                             />
                     </Tooltip>
                     </div>

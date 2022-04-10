@@ -22,6 +22,10 @@ import MapSearch from "./MapSearch";
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
+import redMarker from './locationRed.png';
+import blueMarker from './locationBlue.png';
+import friendMarker from './friendAvatar.png';
+import arrowImage from './arrow.png';
 
 let map = null;
 let countUserPoints = 0;
@@ -155,8 +159,7 @@ export function setFilter(newFilter){
             }
         });
 
-        let url = 'https://i.imgur.com/2y57KdU.png';
-        map.loadImage(url, function(err, image2) {
+        map.loadImage(arrowImage, function(err, image2) {
             if(!map.hasImage('arrow')){
           if (err) {
             console.error('err image', err);
@@ -171,13 +174,13 @@ export function setFilter(newFilter){
             "icon-allow-overlap" : true,
             "text-allow-overlap": true,
             'source': 'route1',
+            'minzoom': 5,
             'layout': {
               'symbol-placement': 'line',
-              'symbol-spacing': 20,
+              'symbol-spacing': 40,
               'icon-allow-overlap': true,
-              // 'icon-ignore-placement': true,
               'icon-image': 'arrow',
-              'icon-size': 0.9,
+              'icon-size': 0.3,
               'visibility': 'visible'
             }
           });
@@ -286,6 +289,7 @@ function BaseMap (props) {
                                                         gpsNotSupported: "GPS is not supported on your device.",
                                                         ratingSuccessText: "Rating saved successfully",
                                                         noPoisErrorText: "No POIs found in this area! Try to change your radius, filters or search at a new location.",
+                                                        importSavedRoutes: "IMPORT SAVED ROUTES",
                                                     });
 
 
@@ -331,6 +335,7 @@ function BaseMap (props) {
                 gpsNotSupported: "Die GPS Funktion wird für dein Gerät nicht unterstützt.",
                 ratingSuccessText: "Bewertung erfolgreich gespeichert",
                 noPoisErrorText: "Keine Sehenswürdigkeiten in diesem Umkreis gefunden! Versuche deinen Radius oder deine Filter zu verändern oder probiere es mit einer neuen Suche.",
+                importSavedRoutes: "GESPEICHERTE ROUTEN IMPORTIEREN",
             });
             setRatingErrorText("Fehler beim Bewerten der POI.");
 
@@ -360,6 +365,7 @@ function BaseMap (props) {
                 gpsNotSupported: "Il GPS non è supportato sul tuo dispositivo.",
                 ratingSuccessText: "Voto salvato con successo",
                 noPoisErrorText: "Nessun POI trovato in questa zona! Prova a regolare il raggio o i filtri o cerca una nuova posizione.",
+                importSavedRoutes: "IMPORTA I PERCORSI SALVATI",
             });
             setRatingErrorText("Errore durante il voto della segnaletica.");
         } else {
@@ -388,6 +394,7 @@ function BaseMap (props) {
                 gpsNotSupported: "GPS is not supported on your device.",
                 ratingSuccessText: "Rating saved successfully",
                 noPoisErrorText: "No POIs found in this area! Try to adjust your radius or filters or search at a new location.",
+                importSavedRoutes: "IMPORT SAVED ROUTES",
             });
             setRatingErrorText("Error while rating the POI.");
         }
@@ -545,7 +552,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         zoom: zoom,
         maxPitch: 85,
         center: center,
-        minZoom: 1,
+        minZoom: 2,
     });
     map.addControl(new mapboxgl.ScaleControl({ position: 'bottom-left' }));
     geolocate = new mapboxgl.GeolocateControl({
@@ -709,13 +716,14 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                         'id': 'arrow-layer',
                         'type': 'symbol',
                         'source': 'route1',
+                        'minzoom': 5,
                         'layout': {
                         'symbol-placement': 'line',
-                        'symbol-spacing': 20,
+                        'symbol-spacing': 40,
                         "icon-allow-overlap" : true,
                         "text-allow-overlap": true,
                         'icon-image': 'arrow',
-                        'icon-size': 0.9,
+                        'icon-size': 0.3,
                         'visibility': 'visible'
                         }
                     });
@@ -762,6 +770,19 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
 
     delay(1200).then(() => {
         getFriendsLocation();
+
+        // add a sky layer that will show when the map is highly pitched
+        if (!map.getLayer("sky")) {
+            map.addLayer({
+                'id': 'sky',
+                'type': 'sky',
+                'paint': {
+                    'sky-type': 'atmosphere',
+                    'sky-atmosphere-sun': [0.0, 0.0],
+                    'sky-atmosphere-sun-intensity': 20
+                }
+            });
+        }
     });
 
 }
@@ -923,7 +944,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 map.setPitch(0)
                 return;
         } } catch(e){return;}
-
+       
         if(map.getStyle()["name"] !== "Mapbox Satellite"){
             const layers = map.getStyle().layers;
             const labelLayerId = layers.find(
@@ -939,7 +960,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             'source-layer': 'building',
             'filter': ['==', 'extrude', 'true'],
             'type': 'fill-extrusion',
-            'minzoom': 10,
+            'minzoom': 9,
             'paint': {
             'fill-extrusion-color': '#aaa',
             
@@ -980,18 +1001,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         // add the DEM source as a terrain layer with exaggerated height
         map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.2 });
 
-        // add a sky layer that will show when the map is highly pitched
-        if (!map.getLayer("sky")) {
-            map.addLayer({
-                'id': 'sky',
-                'type': 'sky',
-                'paint': {
-                    'sky-type': 'atmosphere',
-                    'sky-atmosphere-sun': [0.0, 0.0],
-                    'sky-atmosphere-sun-intensity': 20
-                }
-            });
-        }
+        
         
         
         map.setPitch(80);
@@ -1264,8 +1274,9 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         return(
             <div>
                 <Card sx={{mt:1.5, ml:1, mr:1}} >
-                            <Button style={{minWidth:"100%", minHeight: "50px"}} variant="contained" onClick={() => setClickedImportRouteButton(true)}>IMPORT SAVED ROUTES<ImportExportIcon/></Button>
-                        {clickedImportRouteButton ?  <ShowOldRoutes/> : null } 
+                            <Button style={{minWidth:"100%", minHeight: "50px"}} variant="contained" onClick={() => setClickedImportRouteButton(true)}>{languageTags.importSavedRoutes}<ImportExportIcon/></Button>
+                        {clickedImportRouteButton ?  <ShowOldRoutes/> : null } import fetchFakeData from './fetchFakeData';
+
                 </Card>
                       
                 <Card sx={{mt:3, mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={7}><Typography variant='h6' fontWeight={500} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.errorNoRoute}</Typography>
@@ -1426,8 +1437,7 @@ async function getLocationData(lon, lat, radius, filters, setShowNoPoisFoundErro
         credentials: 'include',
     }).then(res => res.json())
     .then(res => data = res);
-
-    if(data.length === 0) { // no pois found
+    if(data.length === 0 || data.length == undefined) { // no pois found
         setShowNoPoisFoundErrorSnackbar(true);
     }
 
@@ -1435,7 +1445,7 @@ async function getLocationData(lon, lat, radius, filters, setShowNoPoisFoundErro
 }
 
 export async function flyToLocation (coords, radius, newCoordinates = false, setShowNoPoisFoundErrorSnackbar){
-
+    setShowNoPoisFoundErrorSnackbar(false);
     let locationData = new FormData();
 
     if(newCoordinates){
@@ -1491,30 +1501,46 @@ export async function changedFilter(coords = false, setShowNoPoisFoundErrorSnack
     //on filterchange call api only every 1 second 
     //(otherwise there would betoo many requests to the api if someone spams filter buttons)
     timerID = setTimeout(async () => {
-
+        setShowNoPoisFoundErrorSnackbar(false)
         if(!coords){
             if(lastCoords.length === 0)
                 return;
             else
                 coords = lastCoords;
         }
-        
+        let search = false;
+        //go through filter object
+        for (var key of Object.keys(filter)) {
+            if(filter[key] !== false){
+                search = true;
+            }
+        }
+        if(search === false){
+            setShowNoPoisFoundErrorSnackbar(true);
+            //empty geojson
+            map.getSource("attraction-points-data").setData({type: "FeatureCollection", features: []});
+            currentGlobalResults = {type: "FeatureCollection", features: []};
+            return;
+        }
+
         const results = await getLocationData(coords[0], coords[1], lastRadius, filter, setShowNoPoisFoundErrorSnackbar);
         currentGlobalResults = results;
-    
         map.getSource("attraction-points-data").setData(results);
+
     }, 900)
 
 }
 
 function addAllLayersToMap(map){
-    map.loadImage('https://i.imgur.com/cYaWaTU.png',
+
+    map.loadImage(redMarker,
     function (error, image) {
         if (error) throw error;
         map.addImage('marker-red', image);
     });
 
-    map.loadImage('https://i.imgur.com/Ve1mOzk.png', 
+
+    map.loadImage(blueMarker, 
     function(error, image) {
         if(error) throw error;
         map.addImage('marker-blue', image);
@@ -1563,7 +1589,7 @@ function addAllLayersToMap(map){
         }
     });
 
-    map.loadImage('https://img.icons8.com/dusk/344/circled-user-male-skin-type-6.png',
+    map.loadImage(friendMarker,
         function (error, image) {
             if (error) throw error;
             map.addImage('friends-marker', image);
@@ -1587,7 +1613,7 @@ function addAllLayersToMap(map){
                 "icon-padding": 0,
                 "icon-allow-overlap" : true,
                 "text-allow-overlap": true,
-                "icon-size": 0.1,
+                "icon-size": 0.3,
                 'text-field': ['get', 'title'],
                 'text-font': [
                 'Open Sans Semibold',

@@ -97,7 +97,7 @@ export default function SwipeableTemporaryDrawer(props) {
     <div>
     <Box id="sidebarBox"
       role="presentation"
-      
+      style={{height:"100vh"}}
       onKeyDown={toggleDrawer(anchor, false)}
     >
       
@@ -151,7 +151,7 @@ export default function SwipeableTemporaryDrawer(props) {
       <Dark_Mode t1={props.t1} t2={props.t2}></Dark_Mode>
       <LanguageSelector l1={props.l1} l2={props.l2} ></LanguageSelector>
 
-      <ListItem sx={{mt:1}} button onClick={() => handleLogout()} component={Link} to="/profile">
+      <ListItem style={{bottom:"8px", position:"absolute"}} button onClick={() => handleLogout()} component={Link} to="/profile">
             <ListItemIcon>
             <LogoutIcon />
             </ListItemIcon>

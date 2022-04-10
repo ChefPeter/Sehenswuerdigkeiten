@@ -1,7 +1,6 @@
 import React from "react";
 import { Snackbar, Alert, Fade } from "@mui/material";
 
-
 function SuccessSnackbar (props){
 
     return (

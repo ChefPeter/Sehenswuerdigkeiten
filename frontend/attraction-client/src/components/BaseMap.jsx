@@ -46,8 +46,9 @@ let coordsForGpsSearch = [];
 let lastSentCoordinates = [];
 let currentLineCoords = [];
 let saveRouteName = "";
+let markersWithNumbersGeoJson = null;
 
-    export function setFilter(newFilter){
+export function setFilter(newFilter){
         filter = newFilter;
     }
 
@@ -86,7 +87,11 @@ let saveRouteName = "";
             }
             return;
         }
-        setShowLoadingCircleRoute(true) 
+        setShowLoadingCircleRoute(true);
+        if(map.getSource("route-points-data")){
+            map.removeLayer("route-points-layer");
+            map.removeSource("route-points-data");
+        }
         let formData = new FormData();
         let route, sortedIDs, weather, sortedCoords;
 
@@ -177,7 +182,6 @@ let saveRouteName = "";
             }
           });
         });
-        setShowLoadingCircleRoute(false)
      
         //get coordinates of data
         let coords = [];
@@ -194,7 +198,7 @@ let saveRouteName = "";
             }
         }
         //markersWitrhNumbers to geojson
-        let markersWithNumbersGeoJson = {
+        markersWithNumbersGeoJson = {
             "type": "FeatureCollection",
             "features": markersWithNumbers
         };
@@ -203,6 +207,7 @@ let saveRouteName = "";
             map.removeLayer("selected-attraction-points-layer");
             map.removeSource("selected-attraction-points-data");
         }
+        
         //layer with points and data as points
         map.addSource('route-points-data', {
             'type': 'geojson',
@@ -228,13 +233,13 @@ let saveRouteName = "";
                 'text-anchor': 'top',
             },
             paint: {
-                "text-color": "#000000",
-                "text-halo-color": "#fff",
+                "text-color": "#313638",
+                "text-halo-color": "#f7fff7",
                 "text-halo-width": 4
             }
     });
-
-    }
+    setShowLoadingCircleRoute(false);
+}
 
 function BaseMap (props) {
     
@@ -675,6 +680,8 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                         'id': 'layer1',
                         'type': 'line',
                         'source': 'route1',
+                        "icon-allow-overlap" : true,
+                        "text-allow-overlap": true,
                         'filter': ['==', '$type', 'LineString'],
                         'layout': {
                             'line-join': 'round',
@@ -709,13 +716,47 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                         'layout': {
                         'symbol-placement': 'line',
                         'symbol-spacing': 20,
-                        'icon-allow-overlap': true,
-                        // 'icon-ignore-placement': true,
+                        "icon-allow-overlap" : true,
+                        "text-allow-overlap": true,
                         'icon-image': 'arrow',
                         'icon-size': 0.9,
                         'visibility': 'visible'
                         }
                     });
+
+                    if(markersWithNumbersGeoJson !== null){
+                        //layer with points and data as points
+                        map.addSource('route-points-data', {
+                            'type': 'geojson',
+                            'data': markersWithNumbersGeoJson,
+                            tolerance: 0
+                        });
+                        map.addLayer({
+                            id: "route-points-layer",
+                            source: "route-points-data",
+                            type: "symbol",
+                            layout: {
+                                "icon-image": "marker-blue",
+                                "icon-padding": 0,
+                                "icon-allow-overlap" : true,
+                                "text-allow-overlap": true,
+                                "icon-size": 0.8,
+                                'text-field': ['get', 'title'],
+                                'text-font': [
+                                'Open Sans Semibold',
+                                'Arial Unicode MS Bold'
+                                ],
+                                'text-offset': [0, 1.25],
+                                'text-anchor': 'top',
+                            },
+                            paint: {
+                                "text-color": "#313638",
+                                "text-halo-color": "#fff",
+                                "text-halo-width": 4
+                            }
+                    });
+                    }
+
                     });
                 }
             }catch (e){}
@@ -1499,7 +1540,8 @@ function addAllLayersToMap(map){
         layout: {
             "icon-image": "marker-red",
             "icon-padding": 0,
-            "icon-allow-overlap": true,
+            "icon-allow-overlap" : true,
+            "text-allow-overlap": true,
             "icon-size": 0.8
         }
     });
@@ -1519,7 +1561,8 @@ function addAllLayersToMap(map){
         layout: {
             'icon-image': 'marker-blue',
             "icon-padding": 0,
-            "icon-allow-overlap": true,
+            "icon-allow-overlap" : true,
+            "text-allow-overlap": true,
             "icon-size": 0.8
         }
     });
@@ -1559,7 +1602,7 @@ function addAllLayersToMap(map){
                
             },
             paint: {
-                "text-color": "#000000",
+                "text-color": "#313638",
                 "text-halo-color": "#fff",
                 "text-halo-width": 4
             }

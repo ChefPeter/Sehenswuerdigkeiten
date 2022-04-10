@@ -87,10 +87,15 @@ async function getBestRoute(request, res) {
     //zwischen lat lon , zwischen zwei ; 25
     for(let count = 0; count < coords.length; count += 25)
     {
-        let rout = await getDataFromURL(getRouteURL(request.body.vehicle, coords.slice(count, count + 25).join(";"), "en"));
-        route.coords = route.coords.concat(rout.routes[0].geometry.coordinates);
-        route.duration += rout.routes[0].duration;
-        route.distance += rout.routes[0].distance;
+        try {
+            let rout = await getDataFromURL(getRouteURL(request.body.vehicle, coords.slice(count, count + 25).join(";"), "en"));
+            route.coords = route.coords.concat(rout.routes[0].geometry.coordinates);
+            route.duration += rout.routes[0].duration;
+            route.distance += rout.routes[0].distance;
+        } catch (e) {
+            //return an error...
+            console.log(e);
+        }
     }
 
     let weather = await getDataFromURL(getWeatherURL(p[0].geometry.coordinates[1], p[0].geometry.coordinates[0]));

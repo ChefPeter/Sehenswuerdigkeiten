@@ -10,7 +10,7 @@ const httpsAgent = new https.Agent({
 
 describe("Backend test cases with mocha chai assertion library", function() {
     it("Check if server is available", async function() {
-        const res = await fetch("https://10.10.30.18:8443/debug", {
+        const res = await fetch("https://10.10.30.18:8444/debug", {
             method: "GET",
             agent: httpsAgent
         });
@@ -18,7 +18,7 @@ describe("Backend test cases with mocha chai assertion library", function() {
         assert.equal(status, 200, "Der Server ist nicht erreichbar!");
     });
     it("Check if login protection works", async function() {
-        const res = await fetch("https://10.10.30.18:8443/", {
+        const res = await fetch("https://10.10.30.18:8444/", {
             method: "GET",
             agent: httpsAgent
         });
@@ -29,7 +29,7 @@ describe("Backend test cases with mocha chai assertion library", function() {
         const formData = new FormData();
         formData.append("username", "zLuki");
         formData.append("password", "Kennwort0");
-        const res = await fetch("https://10.10.30.18:8443/login", {
+        const res = await fetch("https://10.10.30.18:8444/login", {
             method: "POST",
             credentials: "include",
             body: formData,

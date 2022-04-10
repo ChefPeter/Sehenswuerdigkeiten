@@ -1,5 +1,5 @@
 export async function checkCurrentlyLoggedIn(){
-    await fetch("https://10.10.30.18:8443/logged-in", {
+    await fetch("https://10.10.30.18:8444/logged-in", {
       method: "GET",
       credentials: "include"
     })
@@ -14,7 +14,7 @@ export async function checkCurrentlyLoggedIn(){
 }
 
 export function autoLogin(){
-    fetch("https://10.10.30.18:8443/logged-in", {
+    fetch("https://10.10.30.18:8444/logged-in", {
       method: "GET",
       credentials: "include"
     })

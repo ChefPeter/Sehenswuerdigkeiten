@@ -75,7 +75,7 @@ app.use(bodyParser.json());
 const corsConfig = {
     credentials: true,
     //origin: true,
-    origin: "https:10.10.30.18:3000"
+    origin: "https:10.10.30.18:8443"
 };
 app.use(cors(corsConfig));
 
@@ -141,7 +141,7 @@ app.get("/debug", (req, res) => {
     res.sendStatus(200);
 });
 
-app.listen(5000, () => console.log("Server running on https://10.10.30.18:8443"));
+//app.listen(5000, () => console.log("Server running on https://10.10.30.18:8444"));
 
 
 const httpsServer = https.createServer({
@@ -149,6 +149,6 @@ const httpsServer = https.createServer({
     cert: fs.readFileSync("server.crt", "utf-8")
 }, app);
 
-httpsServer.listen(8443);
+httpsServer.listen(8444);
 
-app.listen(5000, () => console.log("Server running on http://10.10.30.18:5000"));
+//app.listen(5000, () => console.log("Server running on http://10.10.30.18:5000"));

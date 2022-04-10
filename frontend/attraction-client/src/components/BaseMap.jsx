@@ -102,7 +102,7 @@ export function setFilter(newFilter){
         formData.append('points', JSON.stringify(data));
         formData.append('vehicle', directionMode);
         formData.append('returnToStart', returnToStart);
-        await fetch('https://10.10.30.18:8443/route', {
+        await fetch('https://10.10.30.18:8444/route', {
             method: 'post',
             body: formData,
             credentials: 'include',
@@ -428,7 +428,7 @@ useEffect(() => {
         
         
         //fetch get request
-        fetch("https://10.10.30.18:8443/route-names", {
+        fetch("https://10.10.30.18:8444/route-names", {
             method: "GET",
             credentials: "include"
         }).then(res => res.json()).then(data => setRouteNames(data));
@@ -445,7 +445,7 @@ useEffect(() => {
                     let formData = new FormData();
                     formData.append('latitude', lastPositionByMapboxGeolocate[1]);
                     formData.append('longtitude', lastPositionByMapboxGeolocate[0]);
-                    fetch("https://10.10.30.18:8443/add-position", {
+                    fetch("https://10.10.30.18:8444/add-position", {
                         method: "post",
                         body: formData,
                         credentials: 'include'
@@ -475,7 +475,7 @@ useEffect(() => {
             formData.append('latitude', null);
             formData.append('longtitude', null);
 
-            fetch("https://10.10.30.18:8443/add-position", {
+            fetch("https://10.10.30.18:8444/add-position", {
                 method: "post",
                 body: formData,
                 credentials: 'include'
@@ -486,7 +486,7 @@ useEffect(() => {
 
 async function getFriendsLocation(){
 
-    const positions = await fetch("https://10.10.30.18:8443/all-positions", {
+    const positions = await fetch("https://10.10.30.18:8444/all-positions", {
         method: "get",
         credentials: 'include'
     });
@@ -615,7 +615,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             setObj(e.features[0]);
             setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
             //get request with fetch
-            fetch("https://10.10.30.18:8443/rating?"+new URLSearchParams({sight_id: e["features"][0]["properties"]["wikidata"]}), {
+            fetch("https://10.10.30.18:8444/rating?"+new URLSearchParams({sight_id: e["features"][0]["properties"]["wikidata"]}), {
                 method: "get",
                 credentials: 'include'
             }).then(res => res.json()).then(data => {
@@ -1015,7 +1015,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
        
         setDisableHandleRandomLocationButton(true);
         setOpenRouteDrawer(false);
-        const resultRandomLocation = await fetch("https://10.10.30.18:8443/get-random-location", {
+        const resultRandomLocation = await fetch("https://10.10.30.18:8444/get-random-location", {
             method: "get",
             credentials:"include"
         })
@@ -1050,7 +1050,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         setCurrentSortedPointsRouteOutput(testRoute);
 
         let ids=[],names=[],wikidata=[],coordinates=[];
-        await fetch("https://10.10.30.18:8443/route?"+new URLSearchParams({route_name: nameRoute}), {
+        await fetch("https://10.10.30.18:8444/route?"+new URLSearchParams({route_name: nameRoute}), {
             method: "get",
             credentials:"include"
         }).then(res => res.json()).then(res => {
@@ -1115,7 +1115,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         formData.append("coordinates", JSON.stringify(coordinates));
 
         //post
-        fetch("https://10.10.30.18:8443/add-route", {
+        fetch("https://10.10.30.18:8444/add-route", {
             method: "post",
             body: formData,
             credentials:"include"
@@ -1336,14 +1336,14 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             let formdata = new FormData();
             formdata.append("rating", newRating);
             formdata.append("sight_id", obj["properties"]["wikidata"]);
-            fetch(`https://10.10.30.18:8443/add-rating`, {
+            fetch(`https://10.10.30.18:8444/add-rating`, {
                 method: "POST",
                 credentials: "include",
                 body: formdata
             }).then(res =>  {
                 if(res.status === 200){
                     setShowRatingSuccessSnackbar(true);
-                    fetch("https://10.10.30.18:8443/rating?"+new URLSearchParams({sight_id: obj["properties"]["wikidata"]}), {
+                    fetch("https://10.10.30.18:8444/rating?"+new URLSearchParams({sight_id: obj["properties"]["wikidata"]}), {
                     method: "get",
                     credentials: 'include'
                     }).then(res => res.json()).then(data => {
@@ -1431,7 +1431,7 @@ async function getLocationData(lon, lat, radius, filters, setShowNoPoisFoundErro
     locationData.append('lon', lon);
     locationData.append('filters', JSON.stringify(filters));
 
-    await fetch('https://10.10.30.18:8443/sights', {
+    await fetch('https://10.10.30.18:8444/sights', {
         method: 'post',
         body: locationData,
         credentials: 'include',

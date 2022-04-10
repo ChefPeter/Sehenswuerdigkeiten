@@ -63,7 +63,7 @@ const GroupSettings = (props) => {
       setSearchTextTag("Search a member");
    }
 
-    fetch("https://10.10.30.18:8443/group-members?"+new URLSearchParams({group_id: searchParams.get("group_id")}), {
+    fetch("https://10.10.30.18:8444/group-members?"+new URLSearchParams({group_id: searchParams.get("group_id")}), {
      method: "GET",
      credentials: "include"
     })
@@ -86,7 +86,7 @@ const GroupSettings = (props) => {
     formData.append("username", searchFriendInput);
     formData.append("group_id", searchParams.get("group_id"));
 
-    fetch("https://10.10.30.18:8443/add-to-group", {
+    fetch("https://10.10.30.18:8444/add-to-group", {
       method: "POST",
       body: formData,
       credentials: "include"

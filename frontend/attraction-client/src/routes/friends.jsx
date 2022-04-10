@@ -67,7 +67,7 @@ function Friends(props) {
 
       setLoggedIn(checkCurrentlyLoggedIn());
 
-      const resultFriends = await fetch("https://10.10.30.18:8443/friends", {
+      const resultFriends = await fetch("https://10.10.30.18:8444/friends", {
         method: "get",
         credentials: 'include'
       })
@@ -78,7 +78,7 @@ function Friends(props) {
       let profilePictures = [];
       for(let i = 0; i<friends.length; i++){
 
-        const fileProfilePicture = await fetch("https://10.10.30.18:8443/profile-picture?"+new URLSearchParams({friend: friends[i]}), {
+        const fileProfilePicture = await fetch("https://10.10.30.18:8444/profile-picture?"+new URLSearchParams({friend: friends[i]}), {
           method: "get",
           credentials: 'include'
         });
@@ -101,7 +101,7 @@ function Friends(props) {
       
       for(let i = 0; i<friends.length; i++){
 
-        const resultDescription = await fetch("https://10.10.30.18:8443/description?"+new URLSearchParams({username:friends[i]}).toString(), {
+        const resultDescription = await fetch("https://10.10.30.18:8444/description?"+new URLSearchParams({username:friends[i]}).toString(), {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
@@ -118,7 +118,7 @@ function Friends(props) {
       }
       
       //fetch friend requests
-      const resultFriendRequests = await fetch("https://10.10.30.18:8443/pending-friends", {
+      const resultFriendRequests = await fetch("https://10.10.30.18:8444/pending-friends", {
         method: "get",
         credentials: 'include'
       });
@@ -217,7 +217,7 @@ function handleAddFriend(setOpenSuccessSnack, setOpenErrorSnack, setSuccessMessa
   let formData = new FormData();
   formData.append('friend', searchFriendInput);
 
-  fetch("https://10.10.30.18:8443/add-friend", {
+  fetch("https://10.10.30.18:8444/add-friend", {
       method: "post",
       body: formData,
       credentials: 'include'

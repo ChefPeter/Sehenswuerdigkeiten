@@ -56,7 +56,7 @@ function Groups(props) {
     let formData = new FormData();
     formData.append("groupname", createGroupInput);
 
-    fetch("https://10.10.30.18:8443/create-group", {
+    fetch("https://10.10.30.18:8444/create-group", {
       method: "POST",
       credentials: "include",
       body: formData
@@ -83,7 +83,7 @@ function Groups(props) {
 
     setLoggedIn(checkCurrentlyLoggedIn());
 
-    fetch("https://10.10.30.18:8443/groups", {
+    fetch("https://10.10.30.18:8444/groups", {
       method: "GET",
       credentials: "include"
     }).then(res => res.json())

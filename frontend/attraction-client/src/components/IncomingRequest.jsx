@@ -33,7 +33,7 @@ function accepted(name){
     let formData = new FormData();
     formData.append('friend', name);
   
-    fetch("https://10.10.30.18:8443/add-friend", {
+    fetch("https://10.10.30.18:8444/add-friend", {
         method: "post",
         body: formData,
         credentials: 'include'
@@ -55,7 +55,7 @@ function rejected(name){
     let formData = new FormData();
     formData.append('friend', name);
   
-    fetch("https://10.10.30.18:8443/reject-friend", {
+    fetch("https://10.10.30.18:8444/reject-friend", {
         method: "post",
         body: formData,
         credentials: 'include'

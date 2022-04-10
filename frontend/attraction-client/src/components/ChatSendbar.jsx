@@ -23,7 +23,7 @@ function ChatSendbar (props) {
             formData.append('recipient', props.name);
             formData.append('content', message);
 
-            fetch("https://10.10.30.18:8443/send-message", {
+            fetch("https://10.10.30.18:8444/send-message", {
                 method: "post",
                 body: formData,
                 credentials: 'include'
@@ -32,7 +32,7 @@ function ChatSendbar (props) {
             formData.append('group_id', props.groupID);
             formData.append('content', message);
 
-            fetch("https://10.10.30.18:8443/send-group-message", {
+            fetch("https://10.10.30.18:8444/send-group-message", {
                 method: "post",
                 body: formData,
                 credentials: 'include'
@@ -87,7 +87,7 @@ function ChatSendbar (props) {
             formData.append('file', document.getElementById("pictureUpload").files[0]);
             formData.append('recipient', props.name);
 
-            fetch("https://10.10.30.18:8443/send-message", {
+            fetch("https://10.10.30.18:8444/send-message", {
                 method: "post",
                 body: formData,
                 credentials: 'include'
@@ -96,7 +96,7 @@ function ChatSendbar (props) {
             formData.append('file', document.getElementById("pictureUpload").files[0]);
             formData.append('group_id', props.groupID);
 
-            fetch("https://10.10.30.18:8443/send-group-message", {
+            fetch("https://10.10.30.18:8444/send-group-message", {
                 method: "post",
                 body: formData,
                 credentials: 'include'
@@ -110,7 +110,7 @@ function ChatSendbar (props) {
             formData.append('file', audio);
             formData.append('recipient', props.name);
 
-            fetch("https://10.10.30.18:8443/send-message", {
+            fetch("https://10.10.30.18:8444/send-message", {
                 method: "post",
                 body: formData,
                 credentials: 'include'
@@ -119,7 +119,7 @@ function ChatSendbar (props) {
             formData.append('file', audio);
             formData.append('group_id', props.groupID);
 
-            fetch("https://10.10.30.18:8443/send-group-message", {
+            fetch("https://10.10.30.18:8444/send-group-message", {
                 method: "post",
                 body: formData,
                 credentials: 'include'

@@ -190,24 +190,20 @@ export function setFilter(newFilter){
         }
 
         let markersWithNumbers = [];
-        //positionsFriends.push({type:"Feature",geometry:{type:"Point",coordinates:[locationOfFriends[i]["longtitude"],locationOfFriends[i]["latitude"]]},properties:{id:"name"+i,name:locationOfFriends[i]["username"],title:locationOfFriends[i]["username"]}});
-
-        for(let i = 0; i<coords.length; i++){
+        for(let i = 0; i<sortedCoords.length; i++){
             if(coords[i][0] !== null || coords[i][1] !== null){
-                markersWithNumbers.push({type:"Feature",geometry:{type:"Point", coordinates: [coords[i][0],coords[i][1]]} , properties:{id:"coord"+i,title:i+1}});
+                markersWithNumbers.push({type:"Feature",geometry:{type:"Point", coordinates: [sortedCoords[i][0],sortedCoords[i][1]]} , properties:{id:"coord"+i,title:i+1}});
             }
+        }
+        if(map.getSource("selected-attractions-points-data")){
+            map.removeLayer("selected-attraction-points-layer");
+            map.removeSource("selected-attraction-points-data");
         }
         //markersWitrhNumbers to geojson
         markersWithNumbersGeoJson = {
             "type": "FeatureCollection",
             "features": markersWithNumbers
         };
-
-        if(map.getSource("selected-attractions-points-data")){
-            map.removeLayer("selected-attraction-points-layer");
-            map.removeSource("selected-attraction-points-data");
-        }
-        console.log(markersWithNumbersGeoJson);
         //layer with points and data as points
         map.addSource('route-points-data', {
             'type': 'geojson',

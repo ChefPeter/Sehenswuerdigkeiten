@@ -193,9 +193,15 @@ export function setFilter(newFilter){
         }
 
         let markersWithNumbers = [];
-        for(let i = 0; i<sortedCoords.length; i++){
-            if(coords[i][0] !== null || coords[i][1] !== null){
-                markersWithNumbers.push({type:"Feature",geometry:{type:"Point", coordinates: [sortedCoords[i][0],sortedCoords[i][1]]} , properties:{id:"coord"+i,title:i+1}});
+        let l = 0;
+        if(returnToStart)
+            l = 1;
+        for(let i = 0; i<sortedCoords.length-l; i++){
+            if(sortedCoords[i][0] !== null || sortedCoords[i][1] !== null){
+                if(l === 1 && i === 0)
+                    markersWithNumbers.push({type:"Feature",geometry:{type:"Point", coordinates: [sortedCoords[i][0],sortedCoords[i][1]]} , properties:{id:"coord"+i,title:1 + " & " + sortedCoords.length}});
+                else 
+                    markersWithNumbers.push({type:"Feature",geometry:{type:"Point", coordinates: [sortedCoords[i][0],sortedCoords[i][1]]} , properties:{id:"coord"+i,title:i+1}});
             }
         }
         if(map.getSource("selected-attractions-points-data")){
@@ -290,6 +296,7 @@ function BaseMap (props) {
                                                         ratingSuccessText: "Rating saved successfully",
                                                         noPoisErrorText: "No POIs found in this area! Try to change your radius, filters or search at a new location.",
                                                         importSavedRoutes: "IMPORT SAVED ROUTES",
+                                                        nameCurrentRouteText: "Name to save current route"
                                                     });
 
 
@@ -336,6 +343,7 @@ function BaseMap (props) {
                 ratingSuccessText: "Bewertung erfolgreich gespeichert",
                 noPoisErrorText: "Keine Sehenswürdigkeiten in diesem Umkreis gefunden! Versuche deinen Radius oder deine Filter zu verändern oder probiere es mit einer neuen Suche.",
                 importSavedRoutes: "GESPEICHERTE ROUTEN IMPORTIEREN",
+                nameCurrentRouteText: "Name um die Route zu speichern"
             });
             setRatingErrorText("Fehler beim Bewerten der POI.");
 
@@ -366,6 +374,7 @@ function BaseMap (props) {
                 ratingSuccessText: "Voto salvato con successo",
                 noPoisErrorText: "Nessun POI trovato in questa zona! Prova a regolare il raggio o i filtri o cerca una nuova posizione.",
                 importSavedRoutes: "IMPORTA I PERCORSI SALVATI",
+                nameCurrentRouteText: "Nome per salvare il percorso"
             });
             setRatingErrorText("Errore durante il voto della segnaletica.");
         } else {
@@ -395,6 +404,7 @@ function BaseMap (props) {
                 ratingSuccessText: "Rating saved successfully",
                 noPoisErrorText: "No POIs found in this area! Try to adjust your radius or filters or search at a new location.",
                 importSavedRoutes: "IMPORT SAVED ROUTES",
+                nameCurrentRouteText: "Name to save current route"
             });
             setRatingErrorText("Error while rating the POI.");
         }
@@ -566,6 +576,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     map.on("load", () => {
         map.addControl(geolocate);
         addAllLayersToMap(map);
+	map.resize();
     });
     map.doubleClickZoom.disable();    
     // change cursor to pointer when user hovers over a clickable feature
@@ -580,6 +591,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
 
                 const feature = e.features[0];
                 // create popup node
+               
                 setImage("");
                 try{
                     imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
@@ -612,6 +624,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     // add popup when user clicks a point
     map.on("click", "attraction-points-layer", e => {
         if (e.features.length) {
+            getImage(e["features"][0]["properties"]["wikidata"]);
             setObj(e.features[0]);
             setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
             //get request with fetch
@@ -790,7 +803,15 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     const sleep = (milliseconds) => {
         return new Promise(resolve => setTimeout(resolve, milliseconds))
     }
-
+    async function getImage(wikidata){
+        setImage("");
+        try{
+            imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
+            if(imageSrc != undefined)
+                setImage(imageSrc);
+        }catch(e){}
+        setShowLoadingInsteadPicture(false);  
+    }
     function pointIsInRoute(id){
         if (testRoute.some(item => item["properties"]["id"]===id)) 
             return true;
@@ -1159,7 +1180,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                             <OutlinedInput
                                 id="outlined-adornment-weight"
                                 fullWidth
-                                placeholder={"Name to save current route"}
+                                placeholder={languageTags.nameCurrentRouteText}
                                 inputProps={{ maxLength: 299, 'aria-label': 'weight'}}
                                 onChange={handleSaveRouteNameChange}
                                 endAdornment={<Button onClick={() => saveCurrentRouteToDatabase(testRoute, saveRouteName)}><SaveIcon/></Button>}
@@ -1222,7 +1243,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     { didCalculateRoute ?
                         <div>
                             <div style={{ display:"flex", alignItems:"center"}}>
-                                <img style={{height:"50px", marginLeft:"5px"}} src={`http://openweathermap.org/img/wn/${weatherData.icon}.png`} alt='weather' ></img>
+                                <img style={{height:"50px", marginLeft:"5px"}} src={`https://openweathermap.org/img/wn/${weatherData.icon}.png`} alt='weather' ></img>
                                 <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{Math.round(weatherData.temp - 273.15) + "°C"}</strong></Typography>
                             </div>
                             <Card sx={{ mb:3, ml:1, mr:1, pt:1, pb:0.5}} style={{borderRadius:"8px"}} elevation={4}>
@@ -1275,7 +1296,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             <div>
                 <Card sx={{mt:1.5, ml:1, mr:1}} >
                             <Button style={{minWidth:"100%", minHeight: "50px"}} variant="contained" onClick={() => setClickedImportRouteButton(true)}>{languageTags.importSavedRoutes}<ImportExportIcon/></Button>
-                        {clickedImportRouteButton ?  <ShowOldRoutes/> : null } import fetchFakeData from './fetchFakeData';
+                        {clickedImportRouteButton ?  <ShowOldRoutes/> : null }
 
                 </Card>
                       

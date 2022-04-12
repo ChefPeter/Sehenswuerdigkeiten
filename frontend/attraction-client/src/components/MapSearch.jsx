@@ -325,7 +325,7 @@ function MapSearch (props) {
                                 sx={{ml:2}}
                                 checked={props.enabled3D}
                                 onChange={() => props.enable3D()}
-                                name="switchEnableReturnToStartpoint"
+                                name="switch3DMode"
                                 color="primary"
                                 />
                             }

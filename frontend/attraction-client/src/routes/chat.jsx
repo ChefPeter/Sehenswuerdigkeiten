@@ -187,17 +187,19 @@ const Chat = (props) => {
           {loggedIn ? 
             <div>
             <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
-            <Card style={{width:"100vw", borderRadius:"0px"}}>
+            <Card style={{width:"100%", borderRadius:"0px", minHeight:"60vh", marginLeft:"0px", marginRight:"0px"}}>
               <Card elevation={4} sx={{
+                      maxWidth: "100%",
                       marginTop: 8.5, 
-                      marginLeft: 1, 
-                      marginRight: 1, 
                       paddingTop: 1,
+                      marginLeft: 1, 
                       paddingBottom: 1,
                       paddingRight: 1,
-                      paddingLeft: 1}}>{writingTag}<strong>{name}</strong></Card>
+                      paddingLeft: 1}}>
+                    {writingTag}<strong>{name}</strong></Card>
             
                   <Card elevation={4} sx={{
+                    maxWidth: "100%",
                       marginTop: 1.5, 
                       marginLeft: 1, 
                       marginRight: 1, 
@@ -226,7 +228,6 @@ const Chat = (props) => {
 
                       
                   </Card>
-
                     <Card elevation={4} sx={{
                       marginBottom: 2,
                       marginTop: 1, 

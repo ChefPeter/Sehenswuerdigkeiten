@@ -41,7 +41,7 @@ async function checkCredentials(params) {
         const salt = await query(
             `SELECT salt FROM users WHERE username='${params.username}'`
         );
-        if (!salt[0].salt) return "Benutzername oder Passwort ist falsch!";
+        if (!salt[0]?.salt) return "Benutzername oder Passwort ist falsch!";
         const result = await query(
             `SELECT approved FROM users
                 WHERE username='${params.username}' AND 

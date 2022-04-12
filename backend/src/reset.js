@@ -80,7 +80,7 @@ async function changePassword(params) {
         const salt = await query(
             `SELECT salt FROM users WHERE email='${params.email}'`
         );
-        if (!salt[0].salt) return "Fehler mit der Datenbank!";
+        if (!salt[0]?.salt) return "Fehler mit der Datenbank!";
         const result = await query(
             `UPDATE users SET
                 password='${crypto.createHash("sha256").update(salt[0].salt+params["new-password"]).digest("hex")}',

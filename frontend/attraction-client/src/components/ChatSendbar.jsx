@@ -2,15 +2,14 @@ import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import SendIcon from '@mui/icons-material/Send';
 import StopIcon from '@mui/icons-material/Stop';
-import { Button, Container, TextField } from "@mui/material";
+import { Button, Container, TextField, Box } from "@mui/material";
 import React, { useState } from "react";
 
-//let message = "";
 
 function ChatSendbar (props) {
 
-    const [hideButton, setHideButton] = useState(true);
     const [message, setMessage] = useState("");
+    const [currentlyRecordingAudio, setCurrentlyRecordingAudio] = useState(false);
 
     const checkMessageInput = (event) => {
         //message = event.target.value;
@@ -18,6 +17,9 @@ function ChatSendbar (props) {
     };
 
     const sendMessage = (event) => {
+        if(message.length === 0){
+            return;
+        }
         let formData = new FormData();
         if (!props.isGroup) {
             formData.append('recipient', props.name);
@@ -42,7 +44,7 @@ function ChatSendbar (props) {
     }
 
     const recordAudio = (event) => {
-
+        setCurrentlyRecordingAudio(true);
         //setHideButton(!hideButton);
         const stopButton = document.getElementById("stop");
 
@@ -56,6 +58,7 @@ function ChatSendbar (props) {
             });
 
             mediaRecorder.addEventListener('stop', function() {
+                setCurrentlyRecordingAudio(false);
                 let blob = new Blob(recordedChunks);
                 let file = new File(recordedChunks, "file.mp3", {
                     type: "audio/mp3"
@@ -132,27 +135,28 @@ function ChatSendbar (props) {
         
             <TextField
                 inputProps={{ maxLength: 9999 }}
-                style={{width:"60%"}}
+                fullWidth
                 id="chatMessageInput"
                 type="text"
                 label={props.labelField}
                 value={message}
                 onChange={checkMessageInput}
+                onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      sendMessage();
+                      e.preventDefault();
+                }}}
                 InputProps={{endAdornment: <Button onClick={sendMessage}><SendIcon/></Button> }}
             />
             <input onChange={sendPicture} hidden type="file" id="pictureUpload" accept="image/*;capture=camera" />
             <input onChange={sendAudio} hidden id="audioUpload" />
-
-            {hideButton ? 
-                <Button onClick={recordAudio} style={{width:"5%"}}><KeyboardVoiceIcon fontSize="large"></KeyboardVoiceIcon></Button>
-            : null}
-
-            {hideButton ?
-                <Button id="stop"><StopIcon fontSize="large"></StopIcon></Button>
-            : null}
-
-            <Button onClick={() => document.getElementById("pictureUpload").click()} style={{width:"5%"}}><InsertPhotoIcon fontSize="large"></InsertPhotoIcon></Button>
             
+            <Box style={{width:"100%"}} >
+       
+                <Button onClick={currentlyRecordingAudio ? null : recordAudio} id={!currentlyRecordingAudio ? "stop" : null} style={{width:"5%"}}> {currentlyRecordingAudio ?  <KeyboardVoiceIcon fontSize="large" color="error"/> :  <KeyboardVoiceIcon fontSize="large" />} </Button>
+           
+                <Button  onClick={() => document.getElementById("pictureUpload").click()} style={{width:"5%"}}><InsertPhotoIcon fontSize="large"></InsertPhotoIcon></Button>
+            </Box>
         </Container>
     );
 

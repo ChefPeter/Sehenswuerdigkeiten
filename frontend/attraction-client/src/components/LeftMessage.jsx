@@ -5,7 +5,10 @@ import "./styles/leftmessagestyle.css";
 
 function LeftMessage (props) {
 
-    const [file, setFile] = useState("");
+    const [file, setFile] = useState({
+        file: "",
+        type: ""
+    });
 
     useEffect(async() => {
         if (props.path) {
@@ -15,7 +18,10 @@ function LeftMessage (props) {
             });
             if (result.status === 200) {
                 const blob = await result.blob();
-                setFile(URL.createObjectURL(blob));
+                setFile({
+                    file: URL.createObjectURL(blob),
+                    type: blob.type
+                });  
             }
         }
     }, []);
@@ -24,8 +30,9 @@ function LeftMessage (props) {
     const formattedTime = t;
 
     return (
-        <Container  sx={{
-            marginRight: 32, 
+        <Container  
+            style={{width:"75%", marginLeft:"0px", wordWrap: 'break-word'}}
+            sx={{
             backgroundColor: 'primary.dark',
             borderBottomRightRadius: 17,
             borderTopRightRadius: 17,
@@ -38,12 +45,12 @@ function LeftMessage (props) {
             paddingTop: 1.5,
 
            }}>
-        { props.path ? 
-            <object data={file}></object>
-            :
-            <p style={{color:"black"}}>{props.message}</p>
+        {  props.path ? 
+                file.type.includes("image") ? <img style={{maxWidth: "50%"}} src={file.file}></img> : <object data={file.file}></object>
+                :
+                <p style={{color:"black"}}>{props.message}</p>
         }
-        <Card sx={{backgroundColor: "primary.light", color:"black", width: "19ch" }}>{formattedTime}</Card>
+        <Card sx={{backgroundColor: "primary.light", color:"black", width: "19ch" , fontSize:"0.7em"}}>{formattedTime}</Card>
         </Container>
     );
 

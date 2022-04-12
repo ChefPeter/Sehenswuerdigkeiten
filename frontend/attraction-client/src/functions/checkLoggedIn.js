@@ -10,7 +10,10 @@ export async function checkCurrentlyLoggedIn(){
             window.location.href="/login";
             return false;
         }
-   });
+    }).catch(err => {
+            window.location.href="/login";
+            return false;
+    });
 }
 
 export function autoLogin(){

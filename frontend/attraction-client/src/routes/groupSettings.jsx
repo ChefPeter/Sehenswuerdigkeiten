@@ -54,13 +54,13 @@ const GroupSettings = (props) => {
   useEffect(async () => {
     if(props.l1 == "de") {
       setTitle("Gruppe: ");
-      setSearchTextTag("Suche ein Mitglied");
+      setSearchTextTag("Füge einen Freund hinzu");
     } else if(props.l1 == "it") {
       setTitle("Gruppo: ");
-      setSearchTextTag("Cerca un membro")
+      setSearchTextTag("Aggiungi un amico")
     } else {
       setTitle("Group: ");
-      setSearchTextTag("Search a member");
+      setSearchTextTag("Add a friend");
    }
 
     fetch("https://10.10.30.18:8444/group-members?"+new URLSearchParams({group_id: searchParams.get("group_id")}), {

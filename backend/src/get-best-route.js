@@ -71,6 +71,9 @@ async function getBestRoute(request, res) {
 
     let sortedIDs = [];
     let sortedCoords = coords;
+    if(request.body.returnToStart != "false")
+        sortedCoords.pop(); //last element is starting point
+
     for(let i = 0; i<l; i++){
         for(let x = 0; x<l; x++){
             if(coords[i][0] === p[x].geometry.coordinates[0] && coords[i][1] === p[x].geometry.coordinates[1]){
@@ -81,8 +84,9 @@ async function getBestRoute(request, res) {
 
     if(request.body.returnToStart != "false"){
         sortedIDs.push(sortedIDs[0]);
+        coords.push(coords[0]);
     }
-        
+
     //zwischen lat lon , zwischen zwei ; 25
     for(let count = 0; count < coords.length; count += 25)
     {
@@ -106,9 +110,6 @@ async function getBestRoute(request, res) {
       route.duration += rout.routes[0].duration;
       route.distance += rout.routes[0].distance;
     }*
-    
-    
-
     
     //res.status(200).send(tsp(matrix).map(e => p[e]));
 

@@ -74,10 +74,11 @@ app.use(bodyParser.json());
 // Middleware für cors bei requests
 const corsConfig = {
     credentials: true,
-    //origin: true,
-    origin: "https:10.10.30.18:8443"
+    origin: (o, c) => c(null, true),
+    //origin: "*"
 };
 app.use(cors(corsConfig));
+//app.use(cors());
 
 // Funktionen, um Antworten zu schicken
 const sendResponse = (error, res) => error ? res.status(400).send(error) : res.status(200).send();

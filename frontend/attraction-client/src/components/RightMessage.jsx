@@ -1,11 +1,12 @@
 import { Card, Container } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import "./styles/rightmessagestyle.css";
 
 function RightMessage (props) {
 
-    const [file, setFile] = useState("");
-
+    const [file, setFile] = useState({
+        file: "",
+        type: ""
+    });
     useEffect(async() => {
         if (props.path) {
             const result = await fetch("https://10.10.30.18:8444/file?"+new URLSearchParams({file: props.path}).toString(), {
@@ -14,7 +15,10 @@ function RightMessage (props) {
             });
             if (result.status === 200) {
                 const blob = await result.blob();
-                setFile(URL.createObjectURL(blob));
+                setFile({
+                    file: URL.createObjectURL(blob),
+                    type: blob.type
+                }); 
             }
         }
     }, []);
@@ -24,8 +28,7 @@ function RightMessage (props) {
 
     return (
 
-        <Container  sx={{
-            marginLeft: 32, 
+        <Container style={{width: "75%", marginLeft: "25%", wordWrap: 'break-word'}} sx={{
             backgroundColor: 'primary.light',
             borderBottomRightRadius: 25,
             borderTopRightRadius: 5,
@@ -36,17 +39,15 @@ function RightMessage (props) {
             paddingRight: 1,
             paddingBottom: 1.5,
             paddingTop: 1.5,
-            
-            
            }}>
         {
             props.path ? 
-                <object data={file}></object>
+                file.type.includes("image") ? <img style={{maxWidth: "50%"}} src={file.file}></img> : <object data={file.file}></object>
                 :
                 <p style={{color:"black"}}>{props.message}</p>
         }
         
-        <Card sx={{backgroundColor: "primary.dark", color:"black", width: "19ch"}}>{formattedTime}</Card>
+        <Card sx={{backgroundColor: "primary.dark", color:"black", width: "19ch", fontSize:"0.7em"}}>{formattedTime}</Card>
         </Container>
 
     );

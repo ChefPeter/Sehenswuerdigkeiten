@@ -151,7 +151,7 @@ function ChatSendbar (props) {
             <input onChange={sendPicture} hidden type="file" id="pictureUpload" accept="image/*;capture=camera" />
             <input onChange={sendAudio} hidden id="audioUpload" />
             
-            <Box style={{width:"100%"}} >
+            <Box style={{width:"100%", marginTop:"5px"}} >
        
                 <Button onClick={currentlyRecordingAudio ? null : recordAudio} id={!currentlyRecordingAudio ? "stop" : null} style={{width:"5%"}}> {currentlyRecordingAudio ?  <KeyboardVoiceIcon fontSize="large" color="error"/> :  <KeyboardVoiceIcon fontSize="large" />} </Button>
            

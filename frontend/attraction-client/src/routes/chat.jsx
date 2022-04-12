@@ -148,8 +148,13 @@ const Chat = (props) => {
         })
         .then(res => res.json())
         .then(res => {
-          setMessages(res);
-        }), 500);
+          setMessages(oldRes => {
+            if (oldRes.length !== res.length) {
+              setTimeout(() => scroll(), 50);
+            }
+            return res;
+          });
+        }), 250);
       }
       else {
         intervalID = setInterval( () => fetch("https://10.10.30.18:8444/conversation?"+new URLSearchParams({friend: friend}).toString(), {
@@ -158,14 +163,20 @@ const Chat = (props) => {
         })
         .then(res => res.json())
         .then(res => {
-          setMessages(res);
-        }), 500);
+          setMessages(oldRes => {
+            if (oldRes.length !== res.length) {
+              setTimeout(() => scroll(), 50);
+            }
+            return res;
+          });
+        }), 250);
       }
       return (() => clearInterval(intervalID));
     }
-
+  
     useEffect(func, []);
 
+  
     const[writingTag, setWritingTag] = useState(" You are writing with: ");
     const[textfieldTag, setTextfieldTag] = useState("Type a message");
     useEffect(() => {
@@ -181,15 +192,19 @@ const Chat = (props) => {
       }
     }, [props.l1])
 
-    
+    function scroll () {
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
     return (
         <ThemeProvider theme={createTheme(props.t1 === "dark" ? dark : light)}>
           {loggedIn ? 
             <div>
-            <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
-            <Card style={{width:"100%", borderRadius:"0px", minHeight:"60vh", marginLeft:"0px", marginRight:"0px"}}>
-              <Card elevation={4} sx={{
-                      maxWidth: "100%",
+              <Card  style={{position: "fixed", minHeight:"120px", minWidth:"100%", marginTop:"0px"}}>
+                <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2}/>
+                <Card  style={{width:"100%"}}
+                    elevation={4} sx={{
+                      maxWidth: "98%",
                       marginTop: 8.5, 
                       paddingTop: 1,
                       marginLeft: 1, 
@@ -197,9 +212,14 @@ const Chat = (props) => {
                       paddingRight: 1,
                       paddingLeft: 1}}>
                     {writingTag}<strong>{name}</strong></Card>
+                </Card>
+            <Card style={{width:"100%", borderRadius:"0px", minHeight:"60vh", marginLeft:"0px", marginRight:"0px"}}>
+             
             
-                  <Card elevation={4} sx={{
-                    maxWidth: "100%",
+                  <Card id="cardOfMessages" elevation={4} 
+                    style={{marginBottom: "160px", marginTop:"125px"}}
+                    sx={{
+                      maxWidth: "100%",
                       marginTop: 1.5, 
                       marginLeft: 1, 
                       marginRight: 1, 
@@ -228,16 +248,17 @@ const Chat = (props) => {
 
                       
                   </Card>
-                    <Card elevation={4} sx={{
-                      marginBottom: 2,
+                    <Card elevation={4}  style={{position: "fixed", bottom:"0", width:"calc(100% - 16px)", height:"125px"}} sx={{
+                      marginBottom: 0,
                       marginTop: 1, 
-                      marginLeft: 1, 
-                      marginRight: 1, 
+                      marginRight:3,
+                      marginLeft:1,
                       paddingTop: 2,
-                      paddingBottom: 2,
+                      paddingBottom: 1,
                       paddingRight: 1,
                       paddingLeft: 1}}>
-                  <ChatSendbar name={friend} labelField={textfieldTag} isGroup={groupID} groupID={groupID}></ChatSendbar>
+                       
+                  <ChatSendbar  name={friend} labelField={textfieldTag} isGroup={groupID} groupID={groupID}></ChatSendbar>
                   </Card>
                 </Card>
               </div>

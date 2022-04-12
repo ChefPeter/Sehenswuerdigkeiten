@@ -1,4 +1,5 @@
 const mysql = require("mysql2");
+const { allowedNodeEnvironmentFlags } = require("process");
 const util = require("util");
 
 async function getConversation(request) {
@@ -13,7 +14,7 @@ async function getConversation(request) {
             database: process.env.DB_DATABASE
         });
         const query = util.promisify(conn.query).bind(conn);
-        return Array.from(await query(
+        const result = Array.from(await query(
             `SELECT sender, recipient, content, message_timestamp, is_file FROM messages
                 WHERE 
                 ( sender='${request.session.username}' AND recipient='${request.query.friend}' )
@@ -22,6 +23,17 @@ async function getConversation(request) {
                 ORDER BY message_timestamp ASC
                 `
         ));
+        return result.filter(message => {
+            if (!message.is_file) return true;
+            const allowedExtensions = [
+                ".apng", ".avif", ".gif", ".jpg", ".jpeg", ".jfif", ".pjpeg", ".pjp",
+                ".png", ".svg", ".webp", ".bmp", ".ico", ".cur", ".tif", ".tiff",
+                ".mp4", ".mov", ".webm", ".mkv", ".avi", ".wmv", ".mpeg",
+                ".mp3", ".wav", ".flac", ".m4a", ".m4p"
+            ];
+            const extension = message.content.slice(message.content.lastIndexOf("."));
+            return allowedExtensions.includes(extension)
+        });
     } catch(e) {
         console.error(e);
         return null;

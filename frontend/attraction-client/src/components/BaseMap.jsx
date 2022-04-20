@@ -281,7 +281,8 @@ function BaseMap (props) {
     const [currentSortedPointsRouteOutput, setCurrentSortedPointsRouteOutput] = useState([]);
     const [currentNotSortedPointsRouteOutput, setCurrentNotSortedPointsRouteOutput] = useState([]);
     const [currentAddedPoints, setCurrentAddedPoints] = useState([]);
-    const [currentFoundPoints, setCurrentFoundPoints] = useState([]);
+    
+    const [currentlyLookingForPois, setCurrentlyLookingForPois] = useState(true);
  
     const[avgRating, setAvgRating] = useState(0);
     const[howManyReviews, setHowManyReviews] = useState(0);
@@ -721,7 +722,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     map.on("dblclick", (e) => {
         let coords = [e.lngLat.lng, e.lngLat.lat];
         let popupNode  = document.createElement("div");
-        ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar)} >Search here?</Button><Button sx={{mt:2, mb:2}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);
+        ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois)} >Search here?</Button><Button sx={{mt:2, mb:2}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);
         popUpRef.current
             .setLngLat(coords)
             .setDOMContent(popupNode)
@@ -901,7 +902,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         marker.setLngLat(coords).addTo(map);
         globalPopup = marker;
     }
-    function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar) {
+    function handleSearchByMarkerButton(markerCoords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois) {
         if(globalPopup2 !== ""){
             globalPopup2.remove();
             globalPopup2 = "";
@@ -914,7 +915,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         popUpRef.current.remove();
         add_marker(markerCoords);
 
-        flyToLocation(markerCoords, radiusForPointerSearch, false, setShowNoPoisFoundErrorSnackbar)
+        flyToLocation(markerCoords, radiusForPointerSearch, false, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois);
     }
 
     function handleAddClickedByUserPointToRoute(coords){
@@ -1121,7 +1122,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         let randomLocation = (await resultRandomLocation.json());
         setCurrentRandomLocation(randomLocation[2]);
         setShowSuccessSnack(true);
-        flyToLocation ([randomLocation[0], randomLocation[1]], 100, true, setShowNoPoisFoundErrorSnackbar);
+        flyToLocation ([randomLocation[0], randomLocation[1]], 100, true, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois);
         setDisableHandleRandomLocationButton(false);
 
     }
@@ -1229,7 +1230,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             {currentAddedPoints.map((item,i) => {
                 return (
 
-                    <Card  key={item["properties"]["id"]} sx={{mt:1.5, ml:1, mr:1, pt:0.65, pb:0.65}} elevation={3} style={{display:"flex", justifyContent:"space-between", borderRadius:"15px"}}>
+                    <Card  key={item["properties"]["id"]}  sx={{mt:1.5, ml:1, mr:1, pt:0.65, pb:0.65, ':hover': {boxShadow: 5}}} elevation={3} style={{display:"flex", justifyContent:"space-between", borderRadius:"15px"}}>
                        
                        {item["properties"]["id"] === "gpsLocatorId" ? <Box key={i} style={{maxWidth:"80%"}}  sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography> </Box> :  item["properties"]["id"].includes("random") ? <Box key={i} style={{maxWidth:"80%"}} sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box> :  <Box key={i} onClick={() => handlePointListClick(item)} style={{maxWidth:"80%", cursor: "pointer"}}  sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box> }
                        
@@ -1469,11 +1470,12 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         <div>
             <div id="mapContainer" className="map"></div>
             <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
-            <MapSearch l1={props.l1} directionMode={directionMode} setThemeMap={setThemeMap} themeMap={themeMap} enable3D={enable3D} enabled3D={enabled3D} showErrorSnack={setShowNoPoisFoundErrorSnackbar}></MapSearch>
+            <MapSearch l1={props.l1} directionMode={directionMode} setThemeMap={setThemeMap} themeMap={themeMap} enable3D={enable3D} enabled3D={enabled3D} showErrorSnack={setShowNoPoisFoundErrorSnackbar} currentlyLookingForPois={setCurrentlyLookingForPois}></MapSearch>
             
             <div  id="test" style={{position: "fixed",top: "calc(100% - 221px)", left:"calc(100vw - 74px)"}}>
                 <Button style={{width:"60px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => setOpenRouteDrawer(!openRouteDrawer)}><DirectionsIcon fontSize="large" style={{color:"#2979ff"}} /></Button>
-                <Button style={{width:"60px", marginTop:"11px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => setOpenPoiListDrawer(!openPoiListDrawer)}><ListIcon fontSize="large" style={{color:"#2979ff"}} /></Button>
+                {/* ! disable this button if there are no pois and disable it also if user searches for pois at a new places, only is enabled !after! the new pois are found, also make fontcolor grey */ }
+                <Button disabled={currentlyLookingForPois} style={{width:"60px", marginTop:"11px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => setOpenPoiListDrawer(!openPoiListDrawer)}> {currentlyLookingForPois ?  <ListIcon fontSize="large" style={{color:"grey"}} /> :  <ListIcon fontSize="large" style={{color:"#2979ff"}} />} </Button>
                 <Button style={{width:"60px", marginTop:"11px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} disabled={!geolocationSupported} variant="filled"  onClick={() => locationButtonClick()}> {gpsActive ? <GpsFixedIcon style={{color:"#2979ff"}} fontSize="large" /> : <GpsOffIcon style={{color:"grey"}}  fontSize='large'/>}  </Button>
             </div>
     
@@ -1507,7 +1509,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             
                         {currentAddedPoints.length > 0 || currentSortedPointsRouteOutput.length > 1 ? <ShowIfEnoughPoints didCalculateRoute={didCalculateRoute} /> : <ShowIfNotEnoughPoints />}
                     
-                        <Box  sx={{mt:2, ml:1, mr:1}}>
+                        <Box  sx={{mt:2, ml:1, mr:1, mb:4}}>
                             <Button variant="contained" disabled={disableHandleRandomLocationButton} fullWidth onClick={() => handleRandomLocationButton(setShowNoPoisFoundErrorSnackbar)}>{languageTags.exploreRandomLocation} <ShuffleIcon/> </Button>
                         </Box>
                     
@@ -1557,7 +1559,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     );
 };
 
-async function getLocationData(lon, lat, radius, filters, setShowNoPoisFoundErrorSnackbar)
+async function getLocationData(lon, lat, radius, filters, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois)
 {
     let locationData = new FormData();
     let data;
@@ -1574,12 +1576,16 @@ async function getLocationData(lon, lat, radius, filters, setShowNoPoisFoundErro
     .then(res => data = res);
     if(data.length === 0 || data.length == undefined) { // no pois found
         setShowNoPoisFoundErrorSnackbar(true);
+        setCurrentlyLookingForPois(true);
+    }else{
+        setCurrentlyLookingForPois(false);
     }
 
     return {type: "FeatureCollection", features: data};
 }
 
-export async function flyToLocation (coords, radius, newCoordinates = false, setShowNoPoisFoundErrorSnackbar){
+export async function flyToLocation (coords, radius, newCoordinates = false, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois){
+    setCurrentlyLookingForPois(true);
     setShowNoPoisFoundErrorSnackbar(false);
     let locationData = new FormData();
 
@@ -1619,9 +1625,10 @@ export async function flyToLocation (coords, radius, newCoordinates = false, set
     lastRadius = radius;
 
     //const results1 = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius, filterToUse: filter });
-    const results = await getLocationData(coords[0], coords[1], radius, filter, setShowNoPoisFoundErrorSnackbar);
+    const results = await getLocationData(coords[0], coords[1], radius, filter, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois);
     
     currentGlobalResults = results;
+   
     // update "attraction-points-data" source with new data
     // all layers that consume the "attraction-points-data" data source will be updated automatically
     map.getSource("attraction-points-data").setData(results);
@@ -1629,7 +1636,7 @@ export async function flyToLocation (coords, radius, newCoordinates = false, set
 }
 
 //new Request has to be made
-export async function changedFilter(coords = false, setShowNoPoisFoundErrorSnackbar){
+export async function changedFilter(coords = false, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois){
     
     clearTimeout(timerID)
 
@@ -1658,7 +1665,7 @@ export async function changedFilter(coords = false, setShowNoPoisFoundErrorSnack
             return;
         }
 
-        const results = await getLocationData(coords[0], coords[1], lastRadius, filter, setShowNoPoisFoundErrorSnackbar);
+        const results = await getLocationData(coords[0], coords[1], lastRadius, filter, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois);
         currentGlobalResults = results;
         map.getSource("attraction-points-data").setData(results);
 
@@ -1767,10 +1774,10 @@ function addAllLayersToMap(map){
 }
 
 
-export function setRadiusForPointerSearch (newRadius, setShowNoPoisFoundErrorSnackbar){
+export function setRadiusForPointerSearch (newRadius, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois){
     radiusForPointerSearch = newRadius;
     if(searchByMarker)
-        flyToLocation(lastCoords, radiusForPointerSearch, false, setShowNoPoisFoundErrorSnackbar, setShowNoPoisFoundErrorSnackbar)
+        flyToLocation(lastCoords, radiusForPointerSearch, false, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois)
 }
 
 export default BaseMap;

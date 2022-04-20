@@ -238,16 +238,16 @@ function MapSearch (props) {
 
         if(coords != null){
             setSelectedCityCoords(coords);
-            flyToLocation(coords, radiusValue, true, props.showErrorSnack)
+            flyToLocation(coords, radiusValue, true, props.showErrorSnack, props.currentlyLookingForPois);
         }
         
     }
 
     function sliderChange(event, value){
         setRadiusValue(value);
-        setRadiusForPointerSearch(value, props.showErrorSnack)
+        setRadiusForPointerSearch(value, props.showErrorSnack, props.currentlyLookingForPois);
         if(selectedCityCoords.length !== 0){
-            flyToLocation(selectedCityCoords, value, false, props.showErrorSnack);
+            flyToLocation(selectedCityCoords, value, false, props.showErrorSnack, props.currentlyLookingForPois);
         }
     }
 
@@ -365,14 +365,16 @@ function MapSearch (props) {
         let obj = {architecture: s, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setArchitecture(!architecture)
         setFilter(obj);   
-        changedFilter(false, props.showErrorSnack);
+        props.currentlyLookingForPois(true);
+        changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);
     }
     function handleClickCulture(){
         let s = !culture;
         let obj = {architecture: architecture, cultural: s, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setCulture(!culture)
         setFilter(obj);  
-        changedFilter(false, props.showErrorSnack);
+        props.currentlyLookingForPois(true);
+        changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);
     }
 
     function handleClickHistorical(){
@@ -380,56 +382,64 @@ function MapSearch (props) {
         let obj = {architecture: architecture, cultural: culture, historic: s, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setHistorical(!historical)
         setFilter(obj);  
-        changedFilter(false, props.showErrorSnack);
+        props.currentlyLookingForPois(true);
+        changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);
     }
     function handleClickNatural(){
         let s = !natural;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: s, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setNatural(!natural)
         setFilter(obj); 
-        changedFilter(false, props.showErrorSnack);
+        props.currentlyLookingForPois(true);
+        changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);
     }
     function handleClickReligion(){
         let s = !religion;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: s, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setReligion(!religion)
         setFilter(obj); 
-        changedFilter(false, props.showErrorSnack);
+        props.currentlyLookingForPois(true);
+        changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);
     }
     function handleClickTouristFacilities(){
         let s = !touristFacilities;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: s, museums: museums, palaces: palaces, malls: malls, churches: churches}
         setTouristFacilities(!touristFacilities)
         setFilter(obj);  
-        changedFilter(false, props.showErrorSnack);
+        props.currentlyLookingForPois(true);
+        changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);
     }
     function handleClickMuseums(){
         let s = !museums;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: s, palaces: palaces, malls: malls, churches: churches}
         setMuseums(!museums)
         setFilter(obj); 
-        changedFilter(false, props.showErrorSnack);
+        props.currentlyLookingForPois(true);
+        changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);
     }
     function handleClickPalaces(){
         let s = !palaces;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: s, malls: malls, churches: churches}
         setPalaces(!palaces)
         setFilter(obj);  
-        changedFilter(false, props.showErrorSnack);
+        props.currentlyLookingForPois(true);
+        changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);
     }
     function handleClickMalls(){
         let s = !malls;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: s, churches: churches}
         setMalls(!malls)
         setFilter(obj);  
-        changedFilter(false, props.showErrorSnack);
+        props.currentlyLookingForPois(true);
+        changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);
     }
     function handleClickChurch(){
         let s = !churches;
         let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: s}
         setChurches(!churches)
         setFilter(obj);
-        changedFilter(false, props.showErrorSnack);
+        props.currentlyLookingForPois(true);
+        changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);
     }
 
 

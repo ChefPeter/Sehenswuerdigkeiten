@@ -163,15 +163,12 @@ export default function SwipeableTemporaryDrawer(props) {
   );
 
   function handleLogout() {
-
     //fetch post to logout
     fetch('https://10.10.30.18:8444/logout', {
       method: 'POST',
       credentials: "include",
     }).then(response => {
-      if(response.status === 200) {
         window.location.href = "/";
-      }
     });
 
   }

@@ -29,4 +29,5 @@ export function autoLogin(){
             return false;
         }
    });
+   return false;
 }

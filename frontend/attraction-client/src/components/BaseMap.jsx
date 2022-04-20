@@ -1,3 +1,4 @@
+import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,20 +13,20 @@ import RouteIcon from '@mui/icons-material/Route';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
-import { Box, Button, Card, Chip, CircularProgress, Drawer, FormControlLabel, OutlinedInput, Rating, Switch, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Card, Chip, CircularProgress, Checkbox, Drawer, FormControlLabel, OutlinedInput, Rating, Switch, Tooltip, Typography, FormGroup } from "@mui/material";
 import Zoom from '@mui/material/Zoom';
-import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
+import arrowImage from './arrow.png';
 import ErrorSnackbar from './ErrorSnackbar';
+import friendMarker from './friendAvatar.png';
+import blueMarker from './locationBlue.png';
+import redMarker from './locationRed.png';
 import MapSearch from "./MapSearch";
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
-import redMarker from './locationRed.png';
-import blueMarker from './locationBlue.png';
-import friendMarker from './friendAvatar.png';
-import arrowImage from './arrow.png';
+import ListIcon from '@mui/icons-material/List';
 
 let map = null;
 let countUserPoints = 0;
@@ -37,7 +38,7 @@ let searchByMarker = false;
 let lastCoords = [];
 let lastRadius = 1;
 let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, tourist_facilities: true, museums: true, palaces: true, malls: true, churches: true};
-let currentGlobalResults = [];
+let currentGlobalResults = {type: "FeatureCollection", features: []};
 let timerID;
 let locationTimerID;
 let globalPopup = "", globalPopup2 = "";
@@ -47,6 +48,7 @@ let returnToStart = false;
 let startAtGps = false;
 let userEnabledMapboxLocation = false;
 let coordsForGpsSearch = [];
+let timeInHours = false;
 let lastSentCoordinates = [];
 let currentLineCoords = [];
 let saveRouteName = "";
@@ -54,196 +56,210 @@ let markersWithNumbersGeoJson = null;
 
 export function setFilter(newFilter){
         filter = newFilter;
+}
+
+async function getDataFromURL(url)
+{
+    let result = await fetch(url);
+    let answer = null;
+    if(result.ok)
+    answer = await result.json();
+    return answer;
+}
+
+
+export async function postRoute(data, directionMode, setDidCalculateRoute, setCurrentRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData, setLanguageTags)
+{   
+    if(data.length < 1){
+        return;
     }
 
-    async function getDataFromURL(url)
-    {
-        let result = await fetch(url);
-        let answer = null;
-        if(result.ok)
-        answer = await result.json();
-        return answer;
+    if(data[0]["properties"]["id"] === "gpsLocatorId")
+            data.shift();
+
+    if(startAtGps){//addpoint of gps to data
+        data.unshift(JSON.parse('{"geometry":{"type":"Point","coordinates":['+lastPositionByMapboxGeolocate+']},"type":"Feature","properties":{"id":"gpsLocatorId","name":"Your location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"attraction-points-layer","type":"symbol","source":"attraction-points-data","layout":{"icon-image":"marker-red","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.08},"paint":{}},"source":"attraction-points-data","state":{}}'));
     }
 
-
-    export async function postRoute(data, directionMode, setDidCalculateRoute, setCurrentRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData)
-    {   
-        if(data.length < 1){
-            return;
-        }
-
-        if(data[0]["properties"]["id"] === "gpsLocatorId")
-                data.shift();
-
-        if(startAtGps){//addpoint of gps to data
-            data.unshift(JSON.parse('{"geometry":{"type":"Point","coordinates":['+lastPositionByMapboxGeolocate+']},"type":"Feature","properties":{"id":"gpsLocatorId","name":"Your location","wikidata":"nodata","kinds":"nokinds"},"layer":{"id":"attraction-points-layer","type":"symbol","source":"attraction-points-data","layout":{"icon-image":"marker-red","icon-padding":0,"icon-allow-overlap":true,"icon-size":0.08},"paint":{}},"source":"attraction-points-data","state":{}}'));
-        }
-
-        if(data.length < 2){
-            if (map.getSource('route1')) {
-                map.removeLayer("arrow-layer");
-                map.removeLayer("layer1");
-                map.removeSource('route1');
-            }
-            if(map.getSource("route-points-data")){
-                map.removeLayer("route-points-layer");
-                map.removeSource("route-points-data");
-            }
-            return;
-        }
-        setShowLoadingCircleRoute(true);
-        if(map.getSource("route-points-data")){
-            map.removeLayer("route-points-layer");
-            map.removeSource("route-points-data");
-        }
-        let formData = new FormData();
-        let route, sortedIDs, weather, sortedCoords;
-
-        formData.append('points', JSON.stringify(data));
-        formData.append('vehicle', directionMode);
-        formData.append('returnToStart', returnToStart);
-        await fetch('https://10.10.30.18:8444/route', {
-            method: 'post',
-            body: formData,
-            credentials: 'include',
-        }).then(res => res.json())
-            .then(res => {route = res.route; sortedIDs = res.sortedIDs; sortedCoords = res.sortedCoords; weather = res.weather});
+    if(data.length < 2){
         if (map.getSource('route1')) {
             map.removeLayer("arrow-layer");
             map.removeLayer("layer1");
             map.removeSource('route1');
         }
-        
-        setWeatherData({ icon: weather.weather[0].icon, temp: weather.main.temp });
-        setDidCalculateRoute(true);
-        setCurrentNotSortedPointsRouteOutput(data);
-        setCurrentRouteOutput(sortedIDs)
-        setCurrentDurationInMinutes(Math.round(route.duration / 60));
-        setCurrentKilometers(Math.round(route.distance / 1000 * 10) / 10);
-        currentLineCoords = route.coords;
-        map.addSource('route1', {
-            'type': 'geojson',
-            'data': {
-                'type': 'Feature',
-                'properties': {},
-                'geometry': {
-                    'type': 'LineString',
-                    'coordinates': route.coords
-                }
-            }
-        });
-        map.addLayer({
-            'id': 'layer1',
-            'type': 'line',
-            "icon-allow-overlap" : true,
-            "text-allow-overlap": true,
-            'source': 'route1',
-            'filter': ['==', '$type', 'LineString'],
-            'layout': {
-                'line-join': 'round',
-                'line-cap': 'round'
-            },
-            'paint': {
-                'line-color': '#3cb2d0',
-                'line-width': {
-                    'base': 0.5,
-                    'stops': [
-                      [1, 0.5],
-                      [3, 2],
-                      [4, 2.5],
-                      [8, 3],
-                      [15, 6],
-                      [22, 8]
-                    ]
-                  }
-            }
-        });
+        if(map.getSource("route-points-data")){
+            map.removeLayer("route-points-layer");
+            map.removeSource("route-points-data");
+        }
+        return;
+    }
+    setShowLoadingCircleRoute(true);
+    if(map.getSource("route-points-data")){
+        map.removeLayer("route-points-layer");
+        map.removeSource("route-points-data");
+    }
+    let formData = new FormData();
+    let route, sortedIDs, weather, sortedCoords;
 
-        map.loadImage(arrowImage, function(err, image2) {
-            if(!map.hasImage('arrow')){
-          if (err) {
-            console.error('err image', err);
-            return;
-          }
-          map.addImage('arrow', image2);
-        }
+    formData.append('points', JSON.stringify(data));
+    formData.append('vehicle', directionMode);
+    formData.append('returnToStart', returnToStart);
+    await fetch('https://10.10.30.18:8444/route', {
+        method: 'post',
+        body: formData,
+        credentials: 'include',
+    }).then(res => res.json())
+        .then(res => {route = res.route; sortedIDs = res.sortedIDs; sortedCoords = res.sortedCoords; weather = res.weather});
+    if (map.getSource('route1')) {
+        map.removeLayer("arrow-layer");
+        map.removeLayer("layer1");
+        map.removeSource('route1');
+    }
+    
+    setWeatherData({ icon: weather.weather[0].icon, temp: weather.main.temp });
+    setDidCalculateRoute(true);
+    setCurrentNotSortedPointsRouteOutput(data);
+    setCurrentRouteOutput(sortedIDs)
+    setCurrentDurationInMinutes(Math.round(route.duration / 60));
+    timeInHours = false;
+    if(Math.round(route.duration / 60) > 59){
+        setCurrentDurationInMinutes(convertMinsToHrsMins(Math.round(route.duration / 60)));
+        timeInHours = true;
+    }
 
-          map.addLayer({
-            'id': 'arrow-layer',
-            'type': 'symbol',
-            "icon-allow-overlap" : true,
-            "text-allow-overlap": true,
-            'source': 'route1',
-            'minzoom': 5,
-            'layout': {
-              'symbol-placement': 'line',
-              'symbol-spacing': 40,
-              'icon-allow-overlap': true,
-              'icon-image': 'arrow',
-              'icon-size': 0.3,
-              'visibility': 'visible'
-            }
-          });
-        });
-     
-        //get coordinates of data
-        let coords = [];
-        for(let i = 0; i < data.length; i++){
-            coords.push(data[i]["geometry"]["coordinates"]);
-        }
-
-        let markersWithNumbers = [];
-        let l = 0;
-        if(returnToStart)
-            l = 1;
-        for(let i = 0; i<sortedCoords.length-l; i++){
-            if(sortedCoords[i][0] !== null || sortedCoords[i][1] !== null){
-                if(l === 1 && i === 0)
-                    markersWithNumbers.push({type:"Feature",geometry:{type:"Point", coordinates: [sortedCoords[i][0],sortedCoords[i][1]]} , properties:{id:"coord"+i,title:1 + " & " + sortedCoords.length}});
-                else 
-                    markersWithNumbers.push({type:"Feature",geometry:{type:"Point", coordinates: [sortedCoords[i][0],sortedCoords[i][1]]} , properties:{id:"coord"+i,title:i+1}});
+    setCurrentKilometers(Math.round(route.distance / 1000 * 10) / 10);
+    currentLineCoords = route.coords;
+    map.addSource('route1', {
+        'type': 'geojson',
+        'data': {
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+                'type': 'LineString',
+                'coordinates': route.coords
             }
         }
-        if(map.getSource("selected-attractions-points-data")){
-            map.removeLayer("selected-attraction-points-layer");
-            map.removeSource("selected-attraction-points-data");
-        }
-        //markersWitrhNumbers to geojson
-        markersWithNumbersGeoJson = {
-            "type": "FeatureCollection",
-            "features": markersWithNumbers
-        };
-        //layer with points and data as points
-        map.addSource('route-points-data', {
-            'type': 'geojson',
-            'data': markersWithNumbersGeoJson,
-            tolerance: 0
-        });
-        map.addLayer({
-            id: "route-points-layer",
-            source: "route-points-data",
-            type: "symbol",
-            layout: {
-                "icon-image": "marker-blue",
-                "icon-padding": 0,
-                "icon-allow-overlap" : true,
-                "text-allow-overlap": true,
-                "icon-size": 0.8,
-                'text-field': ['get', 'title'],
-                'text-font': [
-                'Open Sans Semibold',
-                'Arial Unicode MS Bold'
-                ],
-                'text-offset': [0, 1.25],
-                'text-anchor': 'top',
-            },
-            paint: {
-                "text-color": "#313638",
-                "text-halo-color": "#f7fff7",
-                "text-halo-width": 4
-            }
     });
-    setShowLoadingCircleRoute(false);
+    map.addLayer({
+        'id': 'layer1',
+        'type': 'line',
+        "icon-allow-overlap" : true,
+        "text-allow-overlap": true,
+        'source': 'route1',
+        'filter': ['==', '$type', 'LineString'],
+        'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+        },
+        'paint': {
+            'line-color': '#3cb2d0',
+            'line-width': {
+                'base': 0.5,
+                'stops': [
+                    [1, 0.5],
+                    [3, 2],
+                    [4, 2.5],
+                    [8, 3],
+                    [15, 6],
+                    [22, 8]
+                ]
+                }
+        }
+    });
+
+    map.loadImage(arrowImage, function(err, image2) {
+        if(!map.hasImage('arrow')){
+        if (err) {
+        console.error('err image', err);
+        return;
+        }
+        map.addImage('arrow', image2);
+    }
+
+        map.addLayer({
+        'id': 'arrow-layer',
+        'type': 'symbol',
+        "icon-allow-overlap" : true,
+        "text-allow-overlap": true,
+        'source': 'route1',
+        'minzoom': 5,
+        'layout': {
+            'symbol-placement': 'line',
+            'symbol-spacing': 40,
+            'icon-allow-overlap': true,
+            'icon-image': 'arrow',
+            'icon-size': 0.3,
+            'visibility': 'visible'
+        }
+        });
+    });
+    
+    //get coordinates of data
+    let coords = [];
+    for(let i = 0; i < data.length; i++){
+        coords.push(data[i]["geometry"]["coordinates"]);
+    }
+
+    let markersWithNumbers = [];
+    let l = 0;
+    if(returnToStart)
+        l = 1;
+    for(let i = 0; i<sortedCoords.length-l; i++){
+        if(sortedCoords[i][0] !== null || sortedCoords[i][1] !== null){
+            if(l === 1 && i === 0)
+                markersWithNumbers.push({type:"Feature",geometry:{type:"Point", coordinates: [sortedCoords[i][0],sortedCoords[i][1]]} , properties:{id:"coord"+i,title:1 + " & " + sortedCoords.length}});
+            else 
+                markersWithNumbers.push({type:"Feature",geometry:{type:"Point", coordinates: [sortedCoords[i][0],sortedCoords[i][1]]} , properties:{id:"coord"+i,title:i+1}});
+        }
+    }
+    if(map.getSource("selected-attractions-points-data")){
+        map.removeLayer("selected-attraction-points-layer");
+        map.removeSource("selected-attraction-points-data");
+    }
+    //markersWitrhNumbers to geojson
+    markersWithNumbersGeoJson = {
+        "type": "FeatureCollection",
+        "features": markersWithNumbers
+    };
+    //layer with points and data as points
+    map.addSource('route-points-data', {
+        'type': 'geojson',
+        'data': markersWithNumbersGeoJson,
+        tolerance: 0
+    });
+    map.addLayer({
+        id: "route-points-layer",
+        source: "route-points-data",
+        type: "symbol",
+        layout: {
+            "icon-image": "marker-blue",
+            "icon-padding": 0,
+            "icon-allow-overlap" : true,
+            "text-allow-overlap": true,
+            "icon-size": 0.8,
+            'text-field': ['get', 'title'],
+            'text-font': [
+            'Open Sans Semibold',
+            'Arial Unicode MS Bold'
+            ],
+            'text-offset': [0, 1.25],
+            'text-anchor': 'top',
+        },
+        paint: {
+            "text-color": "#313638",
+            "text-halo-color": "#f7fff7",
+            "text-halo-width": 4
+        }
+});
+setShowLoadingCircleRoute(false);
+}
+
+const convertMinsToHrsMins = (mins) => {
+    let h = Math.floor(mins / 60);
+    let m = mins % 60;
+    h = h < 10 ? '0' + h : h; // (or alternatively) h = String(h).padStart(2, '0')
+    m = m < 10 ? '0' + m : m; // (or alternatively) m = String(m).padStart(2, '0')
+    return `${h}:${m}`;
 }
 
 function BaseMap (props) {
@@ -265,7 +281,8 @@ function BaseMap (props) {
     const [currentSortedPointsRouteOutput, setCurrentSortedPointsRouteOutput] = useState([]);
     const [currentNotSortedPointsRouteOutput, setCurrentNotSortedPointsRouteOutput] = useState([]);
     const [currentAddedPoints, setCurrentAddedPoints] = useState([]);
-
+    const [currentFoundPoints, setCurrentFoundPoints] = useState([]);
+ 
     const[avgRating, setAvgRating] = useState(0);
     const[howManyReviews, setHowManyReviews] = useState(0);
 
@@ -296,7 +313,8 @@ function BaseMap (props) {
                                                         ratingSuccessText: "Rating saved successfully",
                                                         noPoisErrorText: "No POIs found in this area! Try to change your radius, filters or search at a new location.",
                                                         importSavedRoutes: "IMPORT SAVED ROUTES",
-                                                        nameCurrentRouteText: "Name to save current route"
+                                                        nameCurrentRouteText: "Name to save current route",
+                                                        poiListHeading: "Choose POIs that you want to visit"
                                                     });
 
 
@@ -328,7 +346,7 @@ function BaseMap (props) {
                 errorNoRouteDescription: "Wenn du keine Punkte sehen kann, probiere es mit einer neuen Suche mit angepasstem Radius und Filtern auf der Karte. Solltest du dann immer noch nichts sehen sind in diesem Bereich keine Sehenswürdigkeiten verfügbar!",
                 deleteHoleRouteButton: "KOMPLETTE ROUTE LÖSCHEN!",
                 yourPoints: "Aktuelle Punkte",
-                currentRoute: "Current Route",
+                currentRoute: "Aktuelle Route",
                 minutes: "Minuten",
                 calculateBestRouteButton: "OPTIMALE ROUTE BERECHNEN",
                 exploreRandomLocation: "ZUFÄLLIG ERKUNDEN",
@@ -343,9 +361,19 @@ function BaseMap (props) {
                 ratingSuccessText: "Bewertung erfolgreich gespeichert",
                 noPoisErrorText: "Keine Sehenswürdigkeiten in diesem Umkreis gefunden! Versuche deinen Radius oder deine Filter zu verändern oder probiere es mit einer neuen Suche.",
                 importSavedRoutes: "GESPEICHERTE ROUTEN IMPORTIEREN",
-                nameCurrentRouteText: "Name um die Route zu speichern"
+                nameCurrentRouteText: "Name um die Route zu speichern",
+                poiListHeading: "Wähle Sehenswürdigkeiten die du besuchen möchtest!"
             });
             setRatingErrorText("Fehler beim Bewerten der POI.");
+            if(map !== null){
+                map.getStyle().layers.forEach(function(thisLayer){
+                    if(thisLayer.id.includes("state") || thisLayer.id.includes("country") || thisLayer.id.includes("admin") ){
+                        if(thisLayer.type == 'symbol'){
+                             map.setLayoutProperty(thisLayer.id, 'text-field', ['get','name_de']);
+                        }
+                    }
+                });
+            }
 
         }else if(props.l1 === "it"){
 
@@ -374,9 +402,21 @@ function BaseMap (props) {
                 ratingSuccessText: "Voto salvato con successo",
                 noPoisErrorText: "Nessun POI trovato in questa zona! Prova a regolare il raggio o i filtri o cerca una nuova posizione.",
                 importSavedRoutes: "IMPORTA I PERCORSI SALVATI",
-                nameCurrentRouteText: "Nome per salvare il percorso"
+                nameCurrentRouteText: "Nome per salvare il percorso",
+                poiListHeading: "Scegli i POI che vuoi visitare"
             });
             setRatingErrorText("Errore durante il voto della segnaletica.");
+
+            if(map !== null){
+                map.getStyle().layers.forEach(function(thisLayer){
+                    if(thisLayer.id.includes("state") || thisLayer.id.includes("country") || thisLayer.id.includes("admin") ){
+                        if(thisLayer.type == 'symbol'){
+                            map.setLayoutProperty(thisLayer.id, 'text-field', ['get','name_it']);
+                        }
+                    }
+                });
+            }
+
         } else {
 
             setLanguageTags({  
@@ -404,9 +444,21 @@ function BaseMap (props) {
                 ratingSuccessText: "Rating saved successfully",
                 noPoisErrorText: "No POIs found in this area! Try to adjust your radius or filters or search at a new location.",
                 importSavedRoutes: "IMPORT SAVED ROUTES",
-                nameCurrentRouteText: "Name to save current route"
+                nameCurrentRouteText: "Name to save current route",
+                poiListHeading: "Choose POIs that you want to visit"
             });
             setRatingErrorText("Error while rating the POI.");
+
+            if(map !== null){
+                map.getStyle().layers.forEach(function(thisLayer){
+                    if(thisLayer.id.includes("state") || thisLayer.id.includes("country") || thisLayer.id.includes("admin") ){
+                            if(thisLayer.type == 'symbol'){
+                                map.setLayoutProperty(thisLayer.id, 'text-field', ['get','name_en']);
+                        }
+                    }
+                });
+            }
+
         }
 
     },[props.l1]);
@@ -418,6 +470,7 @@ function BaseMap (props) {
     let imageSrc = "";
 
     const [open, setOpen] = useState(false);
+    const [openPoiListDrawer, setOpenPoiListDrawer] = useState(false);
     const [image, setImage] = useState("");
     const[showLoadingInsteadPicture, setShowLoadingInsteadPicture] = useState(true);
 
@@ -576,8 +629,25 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     map.on("load", () => {
         map.addControl(geolocate);
         addAllLayersToMap(map);
-	map.resize();
+	    map.resize();
+        
+        delay(800).then(() => {
+            map.getStyle().layers.forEach(function(thisLayer){
+                if(thisLayer.id.includes("state") || thisLayer.id.includes("country") || thisLayer.id.includes("admin") ){
+                    if(thisLayer.type == 'symbol'){
+                        if(props.l1==="de")
+                            map.setLayoutProperty(thisLayer.id, 'text-field', ['get','name_de']);
+                        else if(props.l1 === "it")
+                            map.setLayoutProperty(thisLayer.id, 'text-field', ['get','name_it']);
+                        else
+                            map.setLayoutProperty(thisLayer.id, 'text-field', ['get','name_en']);
+                    }
+                }
+            });
+        });
+
     });
+    
     map.doubleClickZoom.disable();    
     // change cursor to pointer when user hovers over a clickable feature
     map.on("mouseenter", "attraction-points-layer", async e => {
@@ -661,19 +731,25 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     
     delay(100).then(async () => {
         try{
+            while(map.getSource("selected-attraction-points-data") == undefined)
+                await sleep(50);
+            map.getSource('selected-attraction-points-data').setData(selectedSights);
+
             if(currentGlobalResults["features"].length > 0){
                 //could take some time till layer exists
-                while(map.getSource("attraction-points-data") == undefined){
-                    await sleep(100);
-                }
+                while(map.getSource("attraction-points-data") == undefined)
+                    await sleep(80);
                 map.getSource("attraction-points-data").setData(currentGlobalResults);
+                
             }
 
             if(lastCoords.length !== 0){
                 let marker2 = new mapboxgl.Marker();
                 // setMarkerCoords(coords)
-                marker2.setLngLat(lastCoords).addTo(map);
-                globalPopup2 = marker2;
+                if(lastCoords[0] !== 11.65598 && lastCoords[1] !== 46.71503){
+                    marker2.setLngLat(lastCoords).addTo(map);
+                    globalPopup2 = marker2;
+                }
             }
             
         } catch (e){};
@@ -718,27 +794,32 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                             }
                         }
                     });
-                    var url = 'https://i.imgur.com/2y57KdU.png';
-                    map.loadImage(url, function(err, image2) {
-                    if (err) {
-                        console.error('err image', err);
-                        return;
-                    }try{
-                    map.addImage('arrow', image2);}catch(e){}
-                    map.addLayer({
-                        'id': 'arrow-layer',
-                        'type': 'symbol',
-                        'source': 'route1',
-                        'minzoom': 5,
-                        'layout': {
-                        'symbol-placement': 'line',
-                        'symbol-spacing': 40,
-                        "icon-allow-overlap" : true,
-                        "text-allow-overlap": true,
-                        'icon-image': 'arrow',
-                        'icon-size': 0.3,
-                        'visibility': 'visible'
+
+                    map.loadImage(arrowImage, function(err, image2) {
+                        if(!map.hasImage('arrow')){
+                            if (err) {
+                                console.error('err image', err);
+                                return;
+                            }
+                            map.addImage('arrow', image2);
                         }
+
+                        map.addLayer({
+                            'id': 'arrow-layer',
+                            'type': 'symbol',
+                            "icon-allow-overlap" : true,
+                            "text-allow-overlap": true,
+                            'source': 'route1',
+                            'minzoom': 5,
+                            'layout': {
+                            'symbol-placement': 'line',
+                            'symbol-spacing': 40,
+                            'icon-allow-overlap': true,
+                            'icon-image': 'arrow',
+                            'icon-size': 0.3,
+                            'visibility': 'visible'
+                            }
+                        });
                     });
 
                     if(markersWithNumbersGeoJson !== null){
@@ -773,8 +854,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                             }
                     });
                     }
-
-                    });
                 }
             }catch (e){}
         });
@@ -797,7 +876,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             });
         }
     });
-
+    
 }
 
     const sleep = (milliseconds) => {
@@ -923,21 +1002,22 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         countUserPoints++;
         let objLocal = '{"geometry":{"type":"Point","coordinates":['+coords[0]+','+coords[1]+']},"type":"Feature","properties":{"id":"randomPoint'+countUserPoints+'","name":"Random Point '+countUserPoints+'","wikidata":"nodata"}}';
         testRoute.push(JSON.parse(objLocal));
+        selectedSights.features.push(JSON.parse(objLocal));
         setCurrentAddedPoints(testRoute);
+        map.getSource('selected-attraction-points-data').setData(selectedSights);
     }
     //remove
     const handleRemoveItem = (key) => {
-        removePointFromRoute(key)
-       /* testRoute = currentAddedPoints.filter(item => item["properties"]["id"] !== key);*/
+        removePointFromRoute(key);
         setCurrentAddedPoints(currentAddedPoints.filter(item => item["properties"]["id"] !== key));
     };
 
     function deleteHoleRoute(){
         currentLineCoords = [];
-        setCurrentAddedPoints([])
+        setCurrentAddedPoints([]);
         testRoute = [];
         selectedSights.features = [];
-        setDidCalculateRoute(false)
+        setDidCalculateRoute(false);
         setCurrentSortedPointsRouteOutput([]);
         setCurrentNotSortedPointsRouteOutput([]);
         map.getSource('selected-attraction-points-data').setData(selectedSights);
@@ -950,6 +1030,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             map.removeLayer('route-points-layer');
             map.removeSource('route-points-data');
         }
+        countUserPoints = 0;
     }
 
     function enable3D(){
@@ -1020,11 +1101,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             'maxzoom': 14
         });
         // add the DEM source as a terrain layer with exaggerated height
-        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.2 });
-
-        
-        
-        
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.2 });    
         map.setPitch(80);
     }
 
@@ -1043,7 +1120,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             
         let randomLocation = (await resultRandomLocation.json());
         setCurrentRandomLocation(randomLocation[2]);
-        setShowSuccessSnack(true)
+        setShowSuccessSnack(true);
         flyToLocation ([randomLocation[0], randomLocation[1]], 100, true, setShowNoPoisFoundErrorSnackbar);
         setDisableHandleRandomLocationButton(false);
 
@@ -1110,7 +1187,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             speed: 1.5,
             essential: true // this animation is considered essential with respect to prefers-reduced-motion
         });
-        postRoute(testRoute, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData);
+        postRoute(testRoute, directionMode, setDidCalculateRoute, setCurrentSortedPointsRouteOutput, setCurrentDurationInMinutes, setCurrentKilometers, setCurrentNotSortedPointsRouteOutput, setShowLoadingCircleRoute, setWeatherData, setLanguageTags);
         setOpenRouteDrawer(false);
     }
 
@@ -1154,7 +1231,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
 
                     <Card  key={item["properties"]["id"]} sx={{mt:1.5, ml:1, mr:1, pt:0.65, pb:0.65}} elevation={3} style={{display:"flex", justifyContent:"space-between", borderRadius:"15px"}}>
                        
-                       {item["properties"]["id"] === "gpsLocatorId" ? <Box key={i} style={{maxWidth:"80%"}}  sx={{mt:1, mb:1}}>  <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography> </Box> : <Box key={i} onClick={() => handlePointListClick(item)} style={{maxWidth:"80%"}}  sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box> }
+                       {item["properties"]["id"] === "gpsLocatorId" ? <Box key={i} style={{maxWidth:"80%"}}  sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography> </Box> :  item["properties"]["id"].includes("random") ? <Box key={i} style={{maxWidth:"80%"}} sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box> :  <Box key={i} onClick={() => handlePointListClick(item)} style={{maxWidth:"80%", cursor: "pointer"}}  sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box> }
                        
                         <Button style={{minHeight: "42px", minWidth:"50px", maxHeight:"42px", margin:"auto", marginLeft:"15px", marginRight:"10px",  borderRadius:"15px"}} 
                             key={item["properties"]["id"]} color="error" variant="contained"
@@ -1247,7 +1324,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                                 <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{Math.round(weatherData.temp - 273.15) + "°C"}</strong></Typography>
                             </div>
                             <Card sx={{ mb:3, ml:1, mr:1, pt:1, pb:0.5}} style={{borderRadius:"8px"}} elevation={4}>
-                                <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{languageTags.currentRoute}:</strong> {currentDurationInMinutes} {languageTags.minutes}, {currentKilometers} km, {returnToStart ?  currentSortedPointsRouteOutput.length-1 : currentSortedPointsRouteOutput.length} POIs</Typography>
+                                <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{languageTags.currentRoute}:</strong> {currentDurationInMinutes} {timeInHours ? " h": languageTags.minutes}, {currentKilometers} km, {returnToStart ?  currentSortedPointsRouteOutput.length-1 : currentSortedPointsRouteOutput.length} POIs</Typography>
                                 <SortedRouteNames></SortedRouteNames>
                             </Card>
                         </div>
@@ -1297,7 +1374,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 <Card sx={{mt:1.5, ml:1, mr:1}} >
                             <Button style={{minWidth:"100%", minHeight: "50px"}} variant="contained" onClick={() => setClickedImportRouteButton(true)}>{languageTags.importSavedRoutes}<ImportExportIcon/></Button>
                         {clickedImportRouteButton ?  <ShowOldRoutes/> : null }
-
                 </Card>
                       
                 <Card sx={{mt:3, mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={7}><Typography variant='h6' fontWeight={500} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.errorNoRoute}</Typography>
@@ -1350,6 +1426,16 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         }, 350);
        
       }
+      function closeBottomPoiListDrawer(){
+        setOpenPoiListDrawer(false);
+      }
+      function  handleCheckBoxChange(value, item){
+        if(value){
+            addPointToRouteButtonClicked(item);
+        }else{
+            removePointFromRoute(item["properties"]["id"]);
+        }
+      }
 
         async function ratingChange(newRating, obj){
             setShowRatingErrorSnackbar(false);
@@ -1385,10 +1471,10 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             <div id="navi" style={{ marginLeft: "3.625em", minWidth:"30vw", maxWidth:"2.625em"}}>
             <MapSearch l1={props.l1} directionMode={directionMode} setThemeMap={setThemeMap} themeMap={themeMap} enable3D={enable3D} enabled3D={enabled3D} showErrorSnack={setShowNoPoisFoundErrorSnackbar}></MapSearch>
             
-            <div  id="test" style={{position: "fixed",top: "calc(100% - 150px)", left:"calc(100vw - 75px)"}}>
-            
+            <div  id="test" style={{position: "fixed",top: "calc(100% - 221px)", left:"calc(100vw - 74px)"}}>
                 <Button style={{width:"60px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => setOpenRouteDrawer(!openRouteDrawer)}><DirectionsIcon fontSize="large" style={{color:"#2979ff"}} /></Button>
-                <Button style={{width:"60px",marginTop:"15px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} disabled={!geolocationSupported} variant="filled"  onClick={() => locationButtonClick()}> {gpsActive ? <GpsFixedIcon style={{color:"#2979ff"}} fontSize="large" /> : <GpsOffIcon style={{color:"grey"}}  fontSize='large'/>}  </Button>
+                <Button style={{width:"60px", marginTop:"11px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => setOpenPoiListDrawer(!openPoiListDrawer)}><ListIcon fontSize="large" style={{color:"#2979ff"}} /></Button>
+                <Button style={{width:"60px", marginTop:"11px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} disabled={!geolocationSupported} variant="filled"  onClick={() => locationButtonClick()}> {gpsActive ? <GpsFixedIcon style={{color:"#2979ff"}} fontSize="large" /> : <GpsOffIcon style={{color:"grey"}}  fontSize='large'/>}  </Button>
             </div>
     
         </div>
@@ -1409,7 +1495,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                         </div>
                         </div>
                     </div>
-
             </Drawer>
         
             <Drawer 
@@ -1427,8 +1512,37 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                         </Box>
                     
                     </div>
-            
             </Drawer>
+
+            { 
+                <Drawer 
+                    anchor='bottom'
+                    transitionDuration	= {280}
+                    open={openPoiListDrawer}
+                    onClose={() => closeBottomPoiListDrawer()}>
+                        <div style={{maxHeight:"67vh", minHeight:"67vh", paddingTop: "12px", paddingBottom: "30px", paddingLeft: "30px"}}>
+                            <Typography variant='h5' fontWeight={450} >{languageTags.poiListHeading}</Typography>
+                           {/* <Button variant="contained">Add All points to route</Button>
+                            <Button variant="contained" color="error">Remove all points from route</Button> */ } 
+                            {
+                                <FormGroup sx={{pt: 1.5}}>
+                                    { 
+                                        currentGlobalResults["features"].map((item,i) => {
+                                                return (
+                                                    pointIsInRoute(currentGlobalResults["features"][i]["properties"]["id"]) ? 
+                                                        <FormControlLabel control={<Checkbox defaultChecked onChange={(e) => handleCheckBoxChange(e.target.checked, item)} />} label={(i+1) + ". " + currentGlobalResults["features"][i]["properties"]["name"]} />
+                                                    : 
+                                                        <FormControlLabel control={<Checkbox onChange={(e) => handleCheckBoxChange(e.target.checked, item)}/>} label={(i+1) + ". " + currentGlobalResults["features"][i]["properties"]["name"]} />
+                                                );
+                                            })
+                                    } 
+                                </FormGroup>
+                            }
+                        </div>
+                </Drawer>
+                
+             }
+
 
             <SuccessSnackbar openSuccessSnack={showSuccessSnack} successMessage={languageTags.flyTo + currentRandomLocation} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>
             <ErrorSnackbar openErrorSnack={unableToRetrieveLocation} errorMessage={languageTags.unableToRetrieveLocation} handleClose={handleGpsErrorsnack}></ErrorSnackbar>

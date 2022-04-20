@@ -137,7 +137,7 @@ function MapSearch (props) {
 
         setSelectedCityCoords([]);
 
-        clearTimeout(timerID)
+        clearTimeout(timerID);
 
         let jsonRes = "";
         let language = props.l1;

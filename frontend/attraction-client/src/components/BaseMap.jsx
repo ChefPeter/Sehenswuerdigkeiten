@@ -13,7 +13,7 @@ import RouteIcon from '@mui/icons-material/Route';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
-import { Box, Button, Card, Chip, CircularProgress, Checkbox, Drawer, FormControlLabel, OutlinedInput, Rating, Switch, Tooltip, Typography, FormGroup } from "@mui/material";
+import { Box, Button, Card, Chip, CircularProgress, TextField, Checkbox, Drawer, FormControlLabel, OutlinedInput, Rating, Switch, Tooltip, Typography, FormGroup } from "@mui/material";
 import Zoom from '@mui/material/Zoom';
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
@@ -284,6 +284,9 @@ function BaseMap (props) {
     
     const [currentlyLookingForPois, setCurrentlyLookingForPois] = useState(true);
  
+    const [filteredPoiList, setFilteredPoiList] = useState({"type": "FeatureCollection", "features": []});
+    const [filterPoiListText, setFilterPoiListText] = useState("");
+   
     const[avgRating, setAvgRating] = useState(0);
     const[howManyReviews, setHowManyReviews] = useState(0);
 
@@ -315,7 +318,9 @@ function BaseMap (props) {
                                                         noPoisErrorText: "No POIs found in this area! Try to change your radius, filters or search at a new location.",
                                                         importSavedRoutes: "IMPORT SAVED ROUTES",
                                                         nameCurrentRouteText: "Name to save current route",
-                                                        poiListHeading: "Choose POIs that you want to visit"
+                                                        poiListHeading: "Choose POIs that you want to visit",
+                                                        searchPoiText: "Search",
+                                                        noPoiInListFound: "No Pois found. Change your searchtext."
                                                     });
 
 
@@ -363,7 +368,9 @@ function BaseMap (props) {
                 noPoisErrorText: "Keine Sehenswürdigkeiten in diesem Umkreis gefunden! Versuche deinen Radius oder deine Filter zu verändern oder probiere es mit einer neuen Suche.",
                 importSavedRoutes: "GESPEICHERTE ROUTEN IMPORTIEREN",
                 nameCurrentRouteText: "Name um die Route zu speichern",
-                poiListHeading: "Wähle Sehenswürdigkeiten die du besuchen möchtest!"
+                poiListHeading: "Wähle Sehenswürdigkeiten die du besuchen möchtest!",
+                searchPoiText: "Suche",
+                noPoiInListFound: "Keine Sehenswürdigkeiten gefunden. Ändere deinen Suchtext."
             });
             setRatingErrorText("Fehler beim Bewerten der POI.");
             if(map !== null){
@@ -404,7 +411,9 @@ function BaseMap (props) {
                 noPoisErrorText: "Nessun POI trovato in questa zona! Prova a regolare il raggio o i filtri o cerca una nuova posizione.",
                 importSavedRoutes: "IMPORTA I PERCORSI SALVATI",
                 nameCurrentRouteText: "Nome per salvare il percorso",
-                poiListHeading: "Scegli i POI che vuoi visitare"
+                poiListHeading: "Scegli i POI che vuoi visitare",
+                searchPoiText: "Search",
+                noPoiInListFound: "No Pois found. Change your searchtext."
             });
             setRatingErrorText("Errore durante il voto della segnaletica.");
 
@@ -446,7 +455,9 @@ function BaseMap (props) {
                 noPoisErrorText: "No POIs found in this area! Try to adjust your radius or filters or search at a new location.",
                 importSavedRoutes: "IMPORT SAVED ROUTES",
                 nameCurrentRouteText: "Name to save current route",
-                poiListHeading: "Choose POIs that you want to visit"
+                poiListHeading: "Choose POIs that you want to visit",
+                searchPoiText: "Cerca",
+                noPoiInListFound: "Nessun Pois trovato. Cambia il tuo testo di ricerca."
             });
             setRatingErrorText("Error while rating the POI.");
 
@@ -463,6 +474,19 @@ function BaseMap (props) {
         }
 
     },[props.l1]);
+    let timerPoiText = null;
+    useEffect(() => {
+        clearTimeout(timerPoiText);
+        if(currentGlobalResults["features"].length === 0)
+            return;
+        try{
+            timerPoiText = setTimeout(() => {
+                let ft = currentGlobalResults["features"].filter(item => item["properties"]["name"].toLowerCase().replaceAll(" ", "").includes(filterPoiListText.toLowerCase().replaceAll(" ", "")));
+                setFilteredPoiList({"type": "FeatureCollection", "features": ft})
+            }, 100);
+        }catch(e){}
+    }, [filterPoiListText]);
+
 
     useEffect(()=> {
         newMap(themeMap, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen);
@@ -1429,12 +1453,14 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
       }
       function closeBottomPoiListDrawer(){
         setOpenPoiListDrawer(false);
+        delay(350).then(() =>  setFilterPoiListText(""));
       }
       function  handleCheckBoxChange(value, item){
         if(value){
             addPointToRouteButtonClicked(item);
         }else{
             removePointFromRoute(item["properties"]["id"]);
+            delay(350).then(() =>  setFilterPoiListText(""));
         }
       }
 
@@ -1465,6 +1491,17 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             }); 
         }
 
+        function openPoiList(setOpenPoiListDrawer, value){
+
+             if(value){
+                setFilteredPoiList(currentGlobalResults);
+                setOpenPoiListDrawer(true);
+             }else{ 
+                 setOpenPoiListDrawer(false);
+             }
+
+        }
+
     return (
 
         <div>
@@ -1475,7 +1512,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             <div  id="test" style={{position: "fixed",top: "calc(100% - 221px)", left:"calc(100vw - 74px)"}}>
                 <Button style={{width:"60px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => setOpenRouteDrawer(!openRouteDrawer)}><DirectionsIcon fontSize="large" style={{color:"#2979ff"}} /></Button>
                 {/* ! disable this button if there are no pois and disable it also if user searches for pois at a new places, only is enabled !after! the new pois are found, also make fontcolor grey */ }
-                <Button disabled={currentlyLookingForPois} style={{width:"60px", marginTop:"11px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => setOpenPoiListDrawer(!openPoiListDrawer)}> {currentlyLookingForPois ?  <ListIcon fontSize="large" style={{color:"grey"}} /> :  <ListIcon fontSize="large" style={{color:"#2979ff"}} />} </Button>
+                <Button disabled={currentlyLookingForPois} style={{width:"60px", marginTop:"11px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => openPoiList(setOpenPoiListDrawer, !openPoiListDrawer)}> {currentlyLookingForPois ?  <ListIcon fontSize="large" style={{color:"grey"}} /> :  <ListIcon fontSize="large" style={{color:"#2979ff"}} />} </Button>
                 <Button style={{width:"60px", marginTop:"11px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} disabled={!geolocationSupported} variant="filled"  onClick={() => locationButtonClick()}> {gpsActive ? <GpsFixedIcon style={{color:"#2979ff"}} fontSize="large" /> : <GpsOffIcon style={{color:"grey"}}  fontSize='large'/>}  </Button>
             </div>
     
@@ -1524,19 +1561,34 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     onClose={() => closeBottomPoiListDrawer()}>
                         <div style={{maxHeight:"67vh", minHeight:"67vh", paddingTop: "12px", paddingBottom: "30px", paddingLeft: "30px"}}>
                             <Typography variant='h5' fontWeight={450} >{languageTags.poiListHeading}</Typography>
+                            
+                            <TextField
+                                id="searchBarPois"
+                                type="text"
+                                label={languageTags.searchPoiText}
+                                variant="filled"
+                                value={filterPoiListText}
+                                style={{minWidth:"60vw", marginTop:"12px"}}
+                                onChange={(e) => setFilterPoiListText(e.target.value)}
+                            />
+                           
                            {/* <Button variant="contained">Add All points to route</Button>
                             <Button variant="contained" color="error">Remove all points from route</Button> */ } 
-                            {
+
+                            {   
                                 <FormGroup sx={{pt: 1.5}}>
                                     { 
-                                        currentGlobalResults["features"].map((item,i) => {
-                                                return (
-                                                    pointIsInRoute(currentGlobalResults["features"][i]["properties"]["id"]) ? 
-                                                        <FormControlLabel control={<Checkbox defaultChecked onChange={(e) => handleCheckBoxChange(e.target.checked, item)} />} label={(i+1) + ". " + currentGlobalResults["features"][i]["properties"]["name"]} />
-                                                    : 
-                                                        <FormControlLabel control={<Checkbox onChange={(e) => handleCheckBoxChange(e.target.checked, item)}/>} label={(i+1) + ". " + currentGlobalResults["features"][i]["properties"]["name"]} />
-                                                );
-                                            })
+                                        filteredPoiList["features"].length > 0 ? 
+                                            filteredPoiList["features"].map((item,i) => {
+                                                    return (
+                                                        pointIsInRoute(filteredPoiList["features"][i]["properties"]["id"]) ? 
+                                                            <FormControlLabel control={<Checkbox defaultChecked onChange={(e) => handleCheckBoxChange(e.target.checked, item)} />} label={(i+1) + ". " + filteredPoiList["features"][i]["properties"]["name"]} />
+                                                        : 
+                                                            <FormControlLabel control={<Checkbox onChange={(e) => handleCheckBoxChange(e.target.checked, item)}/>} label={(i+1) + ". " + filteredPoiList["features"][i]["properties"]["name"]} />
+                                                    );
+                                                })
+                                            :
+                                            <Typography variant='h6' fontWeight={450} sx={{color:"red"}}>{languageTags.noPoiInListFound}</Typography>
                                     } 
                                 </FormGroup>
                             }

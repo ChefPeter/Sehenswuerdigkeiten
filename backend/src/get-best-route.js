@@ -42,7 +42,7 @@ async function getBestRoute(request, res) {
         }
     }
 ]*/
-
+    console.log("ROUTE");
     // Adjazenzmatrix aufbauen
     const p = JSON.parse(request.body.points);
     const l = p.length;
@@ -60,7 +60,6 @@ async function getBestRoute(request, res) {
             matrix[x][i] = distance;
         }
     }
-
     let coords=null;
     try{
         coords = tsp(matrix).map(e => p[e].geometry.coordinates);
@@ -73,7 +72,6 @@ async function getBestRoute(request, res) {
     let sortedCoords = coords;
     if(request.body.returnToStart != "false")
         sortedCoords.pop(); //last element is starting point
-
     for(let i = 0; i<l; i++){
         for(let x = 0; x<l; x++){
             if(coords[i][0] === p[x].geometry.coordinates[0] && coords[i][1] === p[x].geometry.coordinates[1]){
@@ -81,12 +79,11 @@ async function getBestRoute(request, res) {
             }
         }
     }
-
     if(request.body.returnToStart != "false"){
         sortedIDs.push(sortedIDs[0]);
         coords.push(coords[0]);
     }
-
+    let weather = await getDataFromURL(getWeatherURL(p[0].geometry.coordinates[1], p[0].geometry.coordinates[0]));
     //zwischen lat lon , zwischen zwei ; 25
     for(let count = 0; count < coords.length; count += 25)
     {
@@ -97,10 +94,12 @@ async function getBestRoute(request, res) {
             route.distance += rout.routes[0].distance;
         } catch (e) {
             //return an error...
-            console.log(e);
+            res.status(201).send(JSON.stringify({route: route, sortedIDs: sortedIDs, sortedCoords: sortedCoords, weather: weather}));
+            console.log("error at route");
+            return;
         }
     }
-    let weather = await getDataFromURL(getWeatherURL(p[0].geometry.coordinates[1], p[0].geometry.coordinates[0]));
+    
     res.status(200).send(JSON.stringify({route: route, sortedIDs: sortedIDs, sortedCoords: sortedCoords, weather: weather}));
 
     /*for(let count = 1; count < coords.length; count++)

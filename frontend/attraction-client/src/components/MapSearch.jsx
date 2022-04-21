@@ -302,6 +302,7 @@ function MapSearch (props) {
                             step={1}
                             min={0.5}
                             max={100}
+                            value={radiusValue}
                             valueLabelDisplay="auto"
                             onChangeCommitted={sliderChange}
                             size="small">

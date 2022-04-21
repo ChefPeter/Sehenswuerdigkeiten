@@ -2,6 +2,7 @@ import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-load
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import DirectionsIcon from '@mui/icons-material/Directions';
 import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
 import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
@@ -13,7 +14,7 @@ import RouteIcon from '@mui/icons-material/Route';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
-import { Box, Button, Card, Chip, CircularProgress, TextField, Checkbox, Drawer, FormControlLabel, OutlinedInput, Rating, Switch, Tooltip, Typography, FormGroup } from "@mui/material";
+import { Box, Button, Card, InputAdornment, Dialog, DialogContent, DialogActions, DialogContentText, DialogTitle, Chip, CircularProgress, TextField, Checkbox, Drawer, FormControlLabel, OutlinedInput, Rating, Switch, Tooltip, Typography, FormGroup } from "@mui/material";
 import Zoom from '@mui/material/Zoom';
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
@@ -23,6 +24,7 @@ import friendMarker from './friendAvatar.png';
 import blueMarker from './locationBlue.png';
 import redMarker from './locationRed.png';
 import MapSearch from "./MapSearch";
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
@@ -109,7 +111,12 @@ export async function postRoute(data, directionMode, setDidCalculateRoute, setCu
         body: formData,
         credentials: 'include',
     }).then(res => res.json())
-        .then(res => {route = res.route; sortedIDs = res.sortedIDs; sortedCoords = res.sortedCoords; weather = res.weather});
+        .then(res => {route = res.route; sortedIDs = res.sortedIDs; sortedCoords = res.sortedCoords; weather = res.weather})
+        .catch(err => {
+            setShowLoadingCircleRoute(false);
+            return;
+    });
+
     if (map.getSource('route1')) {
         map.removeLayer("arrow-layer");
         map.removeLayer("layer1");
@@ -319,8 +326,16 @@ function BaseMap (props) {
                                                         importSavedRoutes: "IMPORT SAVED ROUTES",
                                                         nameCurrentRouteText: "Name to save current route",
                                                         poiListHeading: "Choose POIs that you want to visit",
-                                                        searchPoiText: "Search",
-                                                        noPoiInListFound: "No Pois found. Change your searchtext."
+                                                        searchPoiText: "Filter",
+                                                        noPoiInListFound: "No Pois found. Change your searchtext.",
+                                                        poiListAddAllPointsButton: "Add all points",
+                                                        poiListRemoveAllPointsButton: "Remove all points",
+                                                        areYouSafe: "Are you sure?",
+                                                        dialogText1: "All added items in the list will be removed!",
+                                                        dialogText2: "Your entire route will be deleted!",
+                                                        dialogCancel: "Cancel",
+                                                        dialogApprovePoints: "Delete Points",
+                                                        dialogApproveRoute: "Delete Route"
                                                     });
 
 
@@ -369,8 +384,16 @@ function BaseMap (props) {
                 importSavedRoutes: "GESPEICHERTE ROUTEN IMPORTIEREN",
                 nameCurrentRouteText: "Name um die Route zu speichern",
                 poiListHeading: "Wähle Sehenswürdigkeiten die du besuchen möchtest!",
-                searchPoiText: "Suche",
-                noPoiInListFound: "Keine Sehenswürdigkeiten gefunden. Ändere deinen Suchtext."
+                searchPoiText: "Filter",
+                noPoiInListFound: "Keine Sehenswürdigkeiten gefunden. Ändere deinen Suchtext.",
+                poiListAddAllPointsButton: "Alle Punkte hinzufügen",
+                poiListRemoveAllPointsButton: "Alle Punkte löschen",
+                areYouSafe: "Bist du dir sicher?",
+                dialogText1: "Alle hinzugefügten Punkte in der Liste werden entfernt.",
+                dialogText2: "Deine komplette Route wird gelöscht!",
+                dialogCancel: "Abbrechen",
+                dialogApprovePoints: "Punkte löschen",
+                dialogApproveRoute: "Route löschen"
             });
             setRatingErrorText("Fehler beim Bewerten der POI.");
             if(map !== null){
@@ -412,8 +435,16 @@ function BaseMap (props) {
                 importSavedRoutes: "IMPORTA I PERCORSI SALVATI",
                 nameCurrentRouteText: "Nome per salvare il percorso",
                 poiListHeading: "Scegli i POI che vuoi visitare",
-                searchPoiText: "Search",
-                noPoiInListFound: "No Pois found. Change your searchtext."
+                searchPoiText: "Filtro",
+                noPoiInListFound: "Nessun Pois trovato. Cambia il tuo testo di ricerca.",
+                poiListAddAllPointsButton: "Aggiungi tutti i punti",
+                poiListRemoveAllPointsButton: "Rimuovere tutti i punti",
+                areYouSafe: "Sei sicuro?",
+                dialogText1: "Tutti gli elementi aggiunti nella lista vengono rimossi.",
+                dialogText2: "Il tuo intero percorso sarà cancellato!",
+                dialogCancel: "Cancella",
+                dialogApprovePoints: "Cancellare i punti",
+                dialogApproveRoute: "Cancellare il percorso"
             });
             setRatingErrorText("Errore durante il voto della segnaletica.");
 
@@ -456,8 +487,16 @@ function BaseMap (props) {
                 importSavedRoutes: "IMPORT SAVED ROUTES",
                 nameCurrentRouteText: "Name to save current route",
                 poiListHeading: "Choose POIs that you want to visit",
-                searchPoiText: "Cerca",
-                noPoiInListFound: "Nessun Pois trovato. Cambia il tuo testo di ricerca."
+                searchPoiText: "Filtrare",
+                noPoiInListFound: "Nessun Pois trovato. Cambia il tuo testo di ricerca.",
+                poiListAddAllPointsButton: "Add all points",
+                poiListRemoveAllPointsButton: "Remove all points",
+                areYouSafe: "Are you sure?",
+                dialogText1: "All added items in the list will be removed!",
+                dialogText2: "Your entire route will be deleted!",
+                dialogCancel: "Cancel",
+                dialogApprovePoints: "Delete Points",
+                dialogApproveRoute: "Delete Route"
             });
             setRatingErrorText("Error while rating the POI.");
 
@@ -482,7 +521,7 @@ function BaseMap (props) {
         try{
             timerPoiText = setTimeout(() => {
                 let ft = currentGlobalResults["features"].filter(item => item["properties"]["name"].toLowerCase().replaceAll(" ", "").includes(filterPoiListText.toLowerCase().replaceAll(" ", "")));
-                setFilteredPoiList({"type": "FeatureCollection", "features": ft})
+                setFilteredPoiList({"type": "FeatureCollection", "features": ft});
             }, 100);
         }catch(e){}
     }, [filterPoiListText]);
@@ -507,6 +546,10 @@ function BaseMap (props) {
     const [obj, setObj] = useState({properties: {name: 'test'}});
     const [markerCoords, setMarkerCoords] = useState([]);
     const [clickedFriends, setClickedFriends] = useState(false);
+    const [checkedInPoiList, setCheckedInPoiList] = useState({});
+
+    const [openPoiListDialog, setOpenPoiListDialog] = useState(false);
+    const [openDeleteHoleRouteDialog, setOpenDeleteHoleRouteDialog] = useState(false);
 
 useEffect(() => {
         
@@ -738,7 +781,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         setClickedFriends(true);
         if (e.features.length) {
             setObj(e.features[0]);
-            setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["wikidata"]));
+            setShowAddButton(!pointIsInRoute(e["features"][0]["properties"]["id"]));
             setOpen(true);
         }
     });
@@ -1038,6 +1081,13 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         setCurrentAddedPoints(currentAddedPoints.filter(item => item["properties"]["id"] !== key));
     };
 
+    function deleteHoleRouteClicked(){
+        setOpenDeleteHoleRouteDialog(true);
+    }
+    function handleDeleteHoleRouteDialogClose(){
+        setOpenDeleteHoleRouteDialog(false);
+    }
+
     function deleteHoleRoute(){
         currentLineCoords = [];
         setCurrentAddedPoints([]);
@@ -1057,8 +1107,9 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             map.removeSource('route-points-data');
         }
         countUserPoints = 0;
+        setOpenDeleteHoleRouteDialog(false);
     }
-
+    
     function enable3D(){
         setEnabled3D(!enabled3D);
 
@@ -1361,7 +1412,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     <PointList></PointList>
                         
                     <Box  sx={{mt:5, ml:1, mr:1, mb: 1}}>
-                        <Button color="error" fullWidth variant="contained" onClick={() => deleteHoleRoute()}><DeleteIcon />{languageTags.deleteHoleRouteButton}</Button>
+                        <Button color="error" fullWidth variant="contained" onClick={() => deleteHoleRouteClicked()}><DeleteIcon />{languageTags.deleteHoleRouteButton}</Button>
                     </Box>  
                 </div>
             );
@@ -1452,20 +1503,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         }, 350);
        
       }
-      function closeBottomPoiListDrawer(){
-        setOpenPoiListDrawer(false);
-        delay(350).then(() => {               
-            setFilteredPoiList({"type": "FeatureCollection", "features": []});
-            setFilterPoiListText("");
-        });
-      }
-      function  handleCheckBoxChange(value, item){
-        if(value){
-            addPointToRouteButtonClicked(item);
-        }else{
-            removePointFromRoute(item["properties"]["id"]);
-        }
-      }
+      
 
         async function ratingChange(newRating, obj){
             setShowRatingErrorSnackbar(false);
@@ -1497,6 +1535,14 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         function openPoiList(setOpenPoiListDrawer, value){
 
              if(value){
+                for(let i = 0; i<currentGlobalResults["features"].length; i++){
+
+                }
+                let check = {};
+                currentGlobalResults["features"].map((item) => {
+                    check[item["properties"]["id"]] = pointIsInRoute(item["properties"]["id"]);
+                });
+                setCheckedInPoiList(check);
                 setFilteredPoiList(currentGlobalResults);
                 setOpenPoiListDrawer(true);
              }else{ 
@@ -1506,8 +1552,62 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     setFilterPoiListText("");
                 });
              }
-
         }
+        function closeBottomPoiListDrawer(){
+            setOpenPoiListDrawer(false);
+            delay(350).then(() => {               
+                setFilteredPoiList({"type": "FeatureCollection", "features": []});
+                setFilterPoiListText("");
+            });
+          }
+          function  handleCheckBoxChange(value, item){
+            let c = checkedInPoiList;
+            if(value){
+                addPointToRouteButtonClicked(item);
+                setCheckedInPoiList({
+                    ...c,
+                    [item["properties"]["id"]]: true
+                });
+            }else{
+                removePointFromRoute(item["properties"]["id"]);
+                setCheckedInPoiList({
+                    ...c,
+                    [item["properties"]["id"]]: false
+                });
+            }
+          }
+        function addAllListedPoints(filteredPoiList){
+            let check = checkedInPoiList
+            filteredPoiList["features"].map((item) => {
+                addPointToRouteButtonClicked(item);
+                check[item["properties"]["id"]] = true;
+            });
+            setCheckedInPoiList({...check});
+        }
+        function removeAllListedPoints(filteredPoiList){
+            const keys = Object.keys(checkedInPoiList);
+            for(let i = 0; i<keys.length; i++){
+                if(checkedInPoiList[keys[i]]){
+                    setOpenPoiListDialog(true);
+                    break;
+                }
+            }    
+        }
+
+        function handleClosePoiListDialog(){
+            setOpenPoiListDialog(false);
+        }
+
+        function closePoiDialogAndDeletePoints(){
+            setOpenPoiListDialog(false);
+            let check = checkedInPoiList;
+            filteredPoiList["features"].map((item) => {
+                removePointFromRoute(item["properties"]["id"]);
+                check[item["properties"]["id"]] = false;
+            });
+            setCheckedInPoiList({...check});
+        }
+
 
     return (
 
@@ -1566,32 +1666,39 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     transitionDuration	= {280}
                     open={openPoiListDrawer}
                     onClose={() => closeBottomPoiListDrawer()}>
-                        <div style={{maxHeight:"67vh", minHeight:"67vh", paddingTop: "12px", paddingBottom: "30px", paddingLeft: "30px"}}>
-                            <Typography variant='h5' fontWeight={450} >{languageTags.poiListHeading}</Typography>
-                            
-                            <TextField
-                                id="searchBarPois"
-                                type="text"
-                                label={languageTags.searchPoiText}
-                                variant="filled"
-                                value={filterPoiListText}
-                                style={{minWidth:"60vw", marginTop:"12px"}}
-                                onChange={(e) => setFilterPoiListText(e.target.value)}
-                            />
-                           
-                           {/* <Button variant="contained">Add All points to route</Button>
-                            <Button variant="contained" color="error">Remove all points from route</Button> */ } 
-
+                        <div style={{maxHeight:"67vh", minHeight:"67vh", paddingTop: "12px", paddingBottom: "30px"}}>
+                            <Typography variant='h5' style={{paddingLeft:"30px"}} fontWeight={450} >{languageTags.poiListHeading}</Typography>
+                            <Box style={{width:"60ch", maxWidth:"calc(100vw - 60px)", marginLeft:"30px"}}>
+                                <TextField
+                                    id="searchBarPois"
+                                    type="text"
+                                    fullWidth
+                                    label={languageTags.searchPoiText}
+                                    value={filterPoiListText}
+                                    style={{marginTop:"14px"}}
+                                    onChange={(e) => setFilterPoiListText(e.target.value)}
+                                    InputProps={{
+                                        startAdornment: (
+                                        <InputAdornment position="start">
+                                            <FilterAltIcon />
+                                        </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                                {filteredPoiList["features"].length > 0 ? 
+                                    <Box sx={{mt:1.6}} style={{display:"flex", flexDirection:"column"}}>
+                                        <Button variant="contained" fullWidth onClick={() => addAllListedPoints(filteredPoiList)}> {languageTags.poiListAddAllPointsButton} <AddLocationAltIcon /> </Button>
+                                        <Button variant="contained" fullWidth sx={{mt:1.6}} color="error" onClick={() => removeAllListedPoints(filteredPoiList)}> {languageTags.poiListRemoveAllPointsButton} <DeleteIcon /> </Button>
+                                    </Box>
+                                : null    }
+                            </Box>
                             {   
-                                <FormGroup sx={{pt: 1.5}}>
+                                <FormGroup style={{paddingLeft:"30px"}} sx={{pt: 1.6}}>
                                     { 
                                         filteredPoiList["features"].length > 0 ? 
                                             filteredPoiList["features"].map((item,i) => {
                                                     return (
-                                                        pointIsInRoute(filteredPoiList["features"][i]["properties"]["id"]) ? 
-                                                            <FormControlLabel control={<Checkbox defaultChecked onChange={(e) => handleCheckBoxChange(e.target.checked, item)} />} label={(i+1) + ". " + filteredPoiList["features"][i]["properties"]["name"]} />
-                                                        : 
-                                                            <FormControlLabel control={<Checkbox onChange={(e) => handleCheckBoxChange(e.target.checked, item)}/>} label={(i+1) + ". " + filteredPoiList["features"][i]["properties"]["name"]} />
+                                                            <FormControlLabel key={item["properties"]["id"]} control={<Checkbox checked={checkedInPoiList[item["properties"]["id"]]} onChange={(e) => handleCheckBoxChange(e.target.checked, item)} />} label={(i+1) + ". " + filteredPoiList["features"][i]["properties"]["name"]} />
                                                     );
                                                 })
                                             :
@@ -1603,6 +1710,34 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 </Drawer>
                 
              }
+
+            <Dialog
+                open={openPoiListDialog}
+                onClose={handleClosePoiListDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">{languageTags.areYouSafe}</DialogTitle>
+                <DialogContent><DialogContentText id="alert-dialog-description">{languageTags.dialogText1}</DialogContentText></DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClosePoiListDialog}>{languageTags.dialogCancel}</Button>
+                    <Button color="error" onClick={closePoiDialogAndDeletePoints}>{languageTags.dialogApprovePoints}</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog
+                open={openDeleteHoleRouteDialog}
+                onClose={handleDeleteHoleRouteDialogClose}
+                aria-labelledby="alert-dialog-title2"
+                aria-describedby="alert-dialog-description2">
+                <DialogTitle id="alert-dialog-title2">{languageTags.areYouSafe}</DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-description2">{languageTags.dialogText2}</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDeleteHoleRouteDialogClose}>{languageTags.dialogCancel}</Button>
+                    <Button color="error" onClick={deleteHoleRoute}>{languageTags.dialogApproveRoute}</Button>
+                </DialogActions>
+            </Dialog>
 
 
             <SuccessSnackbar openSuccessSnack={showSuccessSnack} successMessage={languageTags.flyTo + currentRandomLocation} handleClose={handleCloseSuccessSnackbar}></SuccessSnackbar>

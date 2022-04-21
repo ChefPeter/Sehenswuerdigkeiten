@@ -12,7 +12,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import Drawer from '@mui/material/Drawer';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
@@ -196,14 +196,14 @@ export default function SwipeableTemporaryDrawer(props) {
         
         <React.Fragment key="left">
          
-          <SwipeableDrawer
+          <Drawer
             anchor="left"
             open={state["left"]}
             onClose={toggleDrawer("left", false)}
             onOpen={toggleDrawer("left", true)}
           >
             {list("left")}
-          </SwipeableDrawer>
+          </Drawer>
         </React.Fragment>
       }
     </div>

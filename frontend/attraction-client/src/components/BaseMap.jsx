@@ -757,15 +757,16 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     delay(100).then(async () => {
         try{
             while(map.getSource("selected-attraction-points-data") == undefined)
-                await sleep(50);
+                await sleep(80);
             map.getSource('selected-attraction-points-data').setData(selectedSights);
 
             if(currentGlobalResults["features"].length > 0){
                 //could take some time till layer exists
                 while(map.getSource("attraction-points-data") == undefined)
                     await sleep(80);
-                map.getSource("attraction-points-data").setData(currentGlobalResults);
-                
+                delay(50).then(() => {
+                    map.getSource("attraction-points-data").setData(currentGlobalResults);
+                });
             }
 
             if(lastCoords.length !== 0){
@@ -1453,14 +1454,16 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
       }
       function closeBottomPoiListDrawer(){
         setOpenPoiListDrawer(false);
-        delay(350).then(() =>  setFilterPoiListText(""));
+        delay(350).then(() => {               
+            setFilteredPoiList({"type": "FeatureCollection", "features": []});
+            setFilterPoiListText("");
+        });
       }
       function  handleCheckBoxChange(value, item){
         if(value){
             addPointToRouteButtonClicked(item);
         }else{
             removePointFromRoute(item["properties"]["id"]);
-            delay(350).then(() =>  setFilterPoiListText(""));
         }
       }
 
@@ -1498,6 +1501,10 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 setOpenPoiListDrawer(true);
              }else{ 
                  setOpenPoiListDrawer(false);
+                 delay(350).then(() => {               
+                    setFilteredPoiList({"type": "FeatureCollection", "features": []});
+                    setFilterPoiListText("");
+                });
              }
 
         }

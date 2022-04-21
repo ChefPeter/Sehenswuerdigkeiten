@@ -176,16 +176,14 @@ function Friends(props) {
                 />
 
                   { friendRequests.length > 0 ?
-                  <Typography >
+                  <Typography style={{ marginLeft: "0.625em", marginTop:"10px"}}  variant='h5' fontWeight={450} >
                     {incomingRequestTag}
                   </Typography>
                 : null }
 
               </div>
-
               
               {friendRequests.map(e => <IncomingRequest name={e} ></IncomingRequest>)}
-
 
               <div id="freunde" >
               

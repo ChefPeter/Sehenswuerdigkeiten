@@ -39,7 +39,7 @@ let radiusForPointerSearch = 1;
 let searchByMarker = false;
 let lastCoords = [];
 let lastRadius = 1;
-let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, tourist_facilities: true, museums: true, palaces: true, malls: true, churches: true};
+let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, tourist_facilities: true, museums: true, palaces: true, malls: true, churches: true, monuments_and_memorials: true};
 let currentGlobalResults = {type: "FeatureCollection", features: []};
 let timerID;
 let locationTimerID;
@@ -219,6 +219,7 @@ export async function postRoute(data, directionMode, setDidCalculateRoute, setCu
                 markersWithNumbers.push({type:"Feature",geometry:{type:"Point", coordinates: [sortedCoords[i][0],sortedCoords[i][1]]} , properties:{id:"coord"+i,title:i+1}});
         }
     }
+    
     if(map.getSource("selected-attractions-points-data")){
         map.removeLayer("selected-attraction-points-layer");
         map.removeSource("selected-attraction-points-data");
@@ -258,14 +259,25 @@ export async function postRoute(data, directionMode, setDidCalculateRoute, setCu
             "text-halo-width": 4
         }
 });
-setShowLoadingCircleRoute(false);
+    setShowLoadingCircleRoute(false);
+
+    //focus 1st point
+    map.flyTo({
+            center: [
+                sortedCoords[0][0], sortedCoords[0][1]
+            ],
+            zoom: 15.5,
+            speed: 1,
+            essential: true // this animation is considered essential with respect to prefers-reduced-motion
+    });
+    
 }
 
 const convertMinsToHrsMins = (mins) => {
     let h = Math.floor(mins / 60);
     let m = mins % 60;
-    h = h < 10 ? '0' + h : h; // (or alternatively) h = String(h).padStart(2, '0')
-    m = m < 10 ? '0' + m : m; // (or alternatively) m = String(m).padStart(2, '0')
+    h = h < 10 ? '0' + h : h;
+    m = m < 10 ? '0' + m : m;
     return `${h}:${m}`;
 }
 
@@ -562,7 +574,9 @@ useEffect(() => {
         fetch("https://10.10.30.18:8444/route-names", {
             method: "GET",
             credentials: "include"
-        }).then(res => res.json()).then(data => setRouteNames(data));
+        })
+        .then(res => res.json())
+        .then(data => setRouteNames(data));
         
         let interval1;
         geolocate.on('geolocate', function(e) {
@@ -789,7 +803,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     map.on("dblclick", (e) => {
         let coords = [e.lngLat.lng, e.lngLat.lat];
         let popupNode  = document.createElement("div");
-        ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois)} >Search here?</Button><Button sx={{mt:2, mb:2}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);
+        ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois)} >Search here?</Button><Button sx={{mt:2}} variant="contained" fullWidth onClick={() => handleStartPointClickedByUserPoint(coords)} >startpoint</Button><Button sx={{mt:2, mb:2}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);
         popUpRef.current
             .setLngLat(coords)
             .setDOMContent(popupNode)
@@ -991,6 +1005,10 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         popUpRef.current.remove();
         addClickedByUserPointToRoute(coords);
     }
+    function handleStartPointClickedByUserPoint(coords){
+        popUpRef.current.remove();
+        addClickedByUserPointToRoute(coords, true);
+    }
 
     function locationButtonClick(){
 
@@ -1002,8 +1020,8 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         if(userEnabledMapboxLocation){
             function success(position) {
                 lastPositionByMapboxGeolocate = [position.coords.longitude,position.coords.latitude];
-                setUnableToRetrieveLocation(false)
-                setGpsActive(true)
+                setUnableToRetrieveLocation(false);
+                setGpsActive(true);
             }
             function error() {
                 setGpsActive(false);
@@ -1067,11 +1085,17 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         setCurrentAddedPoints(testRoute);
     }
 
-    function addClickedByUserPointToRoute(coords){
+    function addClickedByUserPointToRoute(coords, asStartPoint = false){
         countUserPoints++;
         let objLocal = '{"geometry":{"type":"Point","coordinates":['+coords[0]+','+coords[1]+']},"type":"Feature","properties":{"id":"randomPoint'+countUserPoints+'","name":"Random Point '+countUserPoints+'","wikidata":"nodata"}}';
-        testRoute.push(JSON.parse(objLocal));
-        selectedSights.features.push(JSON.parse(objLocal));
+        
+        if(asStartPoint){
+            testRoute.unshift(JSON.parse(objLocal));
+            selectedSights.features.unshift(JSON.parse(objLocal));
+        }else{
+            testRoute.push(JSON.parse(objLocal));
+            selectedSights.features.push(JSON.parse(objLocal));
+        }
         setCurrentAddedPoints(testRoute);
         map.getSource('selected-attraction-points-data').setData(selectedSights);
     }
@@ -1193,7 +1217,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         const resultRandomLocation = await fetch("https://10.10.30.18:8444/get-random-location", {
             method: "get",
             credentials:"include"
-        })
+        });
             
         let randomLocation = (await resultRandomLocation.json());
         setCurrentRandomLocation(randomLocation[2]);
@@ -1236,7 +1260,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 coordinates.push([obj["longtitude"], obj["latitude"]]);
             });
         }).catch(e => {console.log(e)});
-
+        
         for(let i = 0; i < ids.length; i++){
             let obj = {
                 "type": "Feature",
@@ -1272,7 +1296,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         if(name === ""){
             return;
         }
-
+      
         let ids= [], names = [], wikidata = [], coordinates = [];
         //for each loop on data
         data.map(item => {
@@ -1281,6 +1305,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             wikidata.push(item.properties.wikidata);
             coordinates.push(item.geometry.coordinates);
         });
+        
         //create formdata
         let formData = new FormData();
         formData.append("route_name", name);
@@ -1761,19 +1786,27 @@ async function getLocationData(lon, lat, radius, filters, setShowNoPoisFoundErro
     locationData.append('lat', lat);
     locationData.append('lon', lon);
     locationData.append('filters', JSON.stringify(filters));
-
     await fetch('https://10.10.30.18:8444/sights', {
         method: 'post',
         body: locationData,
         credentials: 'include',
     }).then(res => res.json())
-    .then(res => data = res);
+      .then(res => data = res);
+    
+    if(data.length !== 0 || data.length != undefined) {
+        if(!filters.museums)
+            data = data.filter(item => !item.properties.kinds.includes("museums"));
+        if(!filters.monuments_and_memorials)
+            data = data.filter(item => !item["properties"]["kinds"].includes("monuments_and_memorials"));
+        if(!filters.churches)   
+            data = data.filter(item => !item["properties"]["kinds"].includes("churches"));
+    }
+
     if(data.length === 0 || data.length == undefined) { // no pois found
         setShowNoPoisFoundErrorSnackbar(true);
         setCurrentlyLookingForPois(true);
-    }else{
+    }else
         setCurrentlyLookingForPois(false);
-    }
 
     return {type: "FeatureCollection", features: data};
 }
@@ -1818,7 +1851,6 @@ export async function flyToLocation (coords, radius, newCoordinates = false, set
 
     lastRadius = radius;
 
-    //const results1 = await fetchFakeData({ longitude: coords[0], latitude: coords[1], radius2: radius, filterToUse: filter });
     const results = await getLocationData(coords[0], coords[1], radius, filter, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois);
     
     currentGlobalResults = results;

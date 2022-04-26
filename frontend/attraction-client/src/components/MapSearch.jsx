@@ -17,6 +17,7 @@ import Zoom from '@mui/material/Zoom';
 import React, { useEffect, useState } from "react";
 import { changedFilter, flyToLocation, setFilter, setRadiusForPointerSearch } from "./BaseMap";
 import "./styles/mapsearch.css";
+import BoyIcon from '@mui/icons-material/Boy';
 
 let locationInput = "";
 let timerID;
@@ -25,6 +26,7 @@ function MapSearch (props) {
 
     const [locations, setLocations] = useState([]);
     const [radiusValue, setRadiusValue] = useState(1);
+    const [currentRadiusValue, setCurrentRadiusValue] = useState(1);
     const [selectedCityCoords, setSelectedCityCoords] = useState([]);
     const [showLoading, setShowLoading] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -39,6 +41,7 @@ function MapSearch (props) {
     const [museums, setMuseums] = useState(true);
     const [palaces, setPalaces] = useState(true);
     const [malls, setMalls] = useState(true);
+    const [monuments, setMonuments] = useState(true);
 
     const [languageTags, setLanguageTags] = useState({
                                                         searchText: "Search a city",
@@ -57,7 +60,8 @@ function MapSearch (props) {
                                                         light: "Light",
                                                         dark: "Dark",
                                                         satellite: "Satellite",
-                                                        tooltip3D: "Enables 3D Mode on the map. Zoom in and use CTRL + LEFT MOUSE BUTTON to see the results."
+                                                        tooltip3D: "Enables 3D Mode on the map. Zoom in and use CTRL + LEFT MOUSE BUTTON to see the results.",
+                                                        monumentText: "Monuments"
     });
     
     //reacts only to language change
@@ -82,7 +86,8 @@ function MapSearch (props) {
                             light: "Hell",
                             dark: "Dunkel",
                             satellite: "Satellit",
-                            tooltip3D: "Aktiviert 3D-Modus auf der Karte. Zoomen Sie hinein und verwenden Sie STRG + LINKE MAUSTASTE, um Ergebnisse zu sehen."
+                            tooltip3D: "Aktiviert 3D-Modus auf der Karte. Zoomen Sie hinein und verwenden Sie STRG + LINKE MAUSTASTE, um Ergebnisse zu sehen.",
+                            monumentText: "Monumente"
             });
 
         }else if(props.l1 == "it"){
@@ -104,8 +109,9 @@ function MapSearch (props) {
                             light: "Luce",
                             dark: "Scuro",
                             satellite: "Satellite",
-                            tooltip3D: "Attiva la modalità 3D sulla mappa. Zoomare in e usare CTRL + TASTO SINISTRO del mouse per vedere i risultati."
-            });
+                            tooltip3D: "Attiva la modalità 3D sulla mappa. Zoomare in e usare CTRL + TASTO SINISTRO del mouse per vedere i risultati.",
+                            monumentText: "Monumenti"
+             });
 
         }else{
 
@@ -126,7 +132,8 @@ function MapSearch (props) {
                             light: "Light",
                             dark: "Dark",
                             satellite: "Satellite",
-                            tooltip3D: "Enables 3D Mode on the map. Zoom in and use CTRL + LEFT MOUSE BUTTON to see the results."
+                            tooltip3D: "Enables 3D Mode on the map. Zoom in and use CTRL + LEFT MOUSE BUTTON to see the results.",
+                            monumentText: "Monuments"
             });
 
         }
@@ -182,12 +189,12 @@ function MapSearch (props) {
                 }else{
                     obj = [{name: "", coords: ""}];
                 }
-                setLocations(obj)
-                setShowLoading(false)
+                setLocations(obj);
+                setShowLoading(false);
             }, 500)
 
         }else{
-            setShowLoading(false)
+            setShowLoading(false);
         }
         
         locationInput = event.target.value;
@@ -243,11 +250,11 @@ function MapSearch (props) {
         
     }
 
-    function sliderChange(event, value){
-        setRadiusValue(value);
-        setRadiusForPointerSearch(value, props.showErrorSnack, props.currentlyLookingForPois);
+    function sliderChange(){
+        setRadiusValue(currentRadiusValue);
+        setRadiusForPointerSearch(currentRadiusValue, props.showErrorSnack, props.currentlyLookingForPois);
         if(selectedCityCoords.length !== 0){
-            flyToLocation(selectedCityCoords, value, false, props.showErrorSnack, props.currentlyLookingForPois);
+            flyToLocation(selectedCityCoords, currentRadiusValue, false, props.showErrorSnack, props.currentlyLookingForPois);
         }
     }
 
@@ -302,8 +309,9 @@ function MapSearch (props) {
                             step={1}
                             min={0.5}
                             max={100}
-                            value={radiusValue}
+                            value={currentRadiusValue}
                             valueLabelDisplay="auto"
+                            onChange={(e) => setCurrentRadiusValue(e.target.value)}
                             onChangeCommitted={sliderChange}
                             size="small">
                         </Slider>
@@ -350,6 +358,7 @@ function MapSearch (props) {
                     <Chip className="attributeChipsOfSearchbar" icon={<MuseumIcon fontSize="small" />} variant={museums ? "filled" : "outlined"} label={languageTags.museumsText} onClick={() => handleClickMuseums()} />
                     <Chip className="attributeChipsOfSearchbar" icon={<AccountBalanceIcon fontSize="small" />} variant={palaces ? "filled" : "outlined"} label={languageTags.palacesText} onClick={() => handleClickPalaces()} />
                     <Chip className="attributeChipsOfSearchbar" icon={<LocalMallIcon fontSize="small" />} variant={malls ? "filled" : "outlined"} label={languageTags.mallsText} onClick={() => handleClickMalls()} />
+                    <Chip className="attributeChipsOfSearchbar" icon={<BoyIcon fontSize="small" />} variant={monuments ? "filled" : "outlined"} label={languageTags.monumentText} onClick={() => handleMonumentClick()} />
 
                 </div>
                 </Fade>
@@ -363,7 +372,7 @@ function MapSearch (props) {
     function handleClickArchitecture(){
         //opposite way on purpose
         let s = !architecture;
-        let obj = {architecture: s, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let obj = {architecture: s, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches, monuments_and_memorials: monuments}
         setArchitecture(!architecture)
         setFilter(obj);   
         props.currentlyLookingForPois(true);
@@ -371,7 +380,7 @@ function MapSearch (props) {
     }
     function handleClickCulture(){
         let s = !culture;
-        let obj = {architecture: architecture, cultural: s, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let obj = {architecture: architecture, cultural: s, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches, monuments_and_memorials: monuments}
         setCulture(!culture)
         setFilter(obj);  
         props.currentlyLookingForPois(true);
@@ -380,7 +389,7 @@ function MapSearch (props) {
 
     function handleClickHistorical(){
         let s = !historical;
-        let obj = {architecture: architecture, cultural: culture, historic: s, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let obj = {architecture: architecture, cultural: culture, historic: s, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches, monuments_and_memorials: monuments}
         setHistorical(!historical)
         setFilter(obj);  
         props.currentlyLookingForPois(true);
@@ -388,7 +397,7 @@ function MapSearch (props) {
     }
     function handleClickNatural(){
         let s = !natural;
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: s, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: s, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches, monuments_and_memorials: monuments}
         setNatural(!natural)
         setFilter(obj); 
         props.currentlyLookingForPois(true);
@@ -396,7 +405,7 @@ function MapSearch (props) {
     }
     function handleClickReligion(){
         let s = !religion;
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: s, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: s, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches, monuments_and_memorials: monuments}
         setReligion(!religion)
         setFilter(obj); 
         props.currentlyLookingForPois(true);
@@ -404,7 +413,7 @@ function MapSearch (props) {
     }
     function handleClickTouristFacilities(){
         let s = !touristFacilities;
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: s, museums: museums, palaces: palaces, malls: malls, churches: churches}
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: s, museums: museums, palaces: palaces, malls: malls, churches: churches, monuments_and_memorials: monuments}
         setTouristFacilities(!touristFacilities)
         setFilter(obj);  
         props.currentlyLookingForPois(true);
@@ -412,7 +421,7 @@ function MapSearch (props) {
     }
     function handleClickMuseums(){
         let s = !museums;
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: s, palaces: palaces, malls: malls, churches: churches}
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: s, palaces: palaces, malls: malls, churches: churches, monuments_and_memorials: monuments}
         setMuseums(!museums)
         setFilter(obj); 
         props.currentlyLookingForPois(true);
@@ -420,7 +429,7 @@ function MapSearch (props) {
     }
     function handleClickPalaces(){
         let s = !palaces;
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: s, malls: malls, churches: churches}
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: s, malls: malls, churches: churches, monuments_and_memorials: monuments}
         setPalaces(!palaces)
         setFilter(obj);  
         props.currentlyLookingForPois(true);
@@ -428,7 +437,7 @@ function MapSearch (props) {
     }
     function handleClickMalls(){
         let s = !malls;
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: s, churches: churches}
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: s, churches: churches, monuments_and_memorials: monuments}
         setMalls(!malls)
         setFilter(obj);  
         props.currentlyLookingForPois(true);
@@ -436,8 +445,16 @@ function MapSearch (props) {
     }
     function handleClickChurch(){
         let s = !churches;
-        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: s}
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: s, monuments_and_memorials: monuments}
         setChurches(!churches)
+        setFilter(obj);
+        props.currentlyLookingForPois(true);
+        changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);
+    }
+    function handleMonumentClick() {
+        let s = !monuments;
+        let obj = {architecture: architecture, cultural: culture, historic: historical, natural: natural, religion: religion, tourist_facilities: touristFacilities, museums: museums, palaces: palaces, malls: malls, churches: churches, monuments_and_memorials: s}
+        setMonuments(!monuments)
         setFilter(obj);
         props.currentlyLookingForPois(true);
         changedFilter(false, props.showErrorSnack, props.currentlyLookingForPois);

@@ -35,13 +35,15 @@ async function insertRoute(request) {
             `SELECT COUNT(*) AS c FROM routes 
                 WHERE username='${request.session.username}' AND route_name='${request.body.route_name}'`
         );
-        if (result[0].c > 0) return "Es existiert schun eine Route mit diesem Namen!";
+        if (result[0].c > 0) return "Es existiert schon eine Route mit diesem Namen!";
         const ids = JSON.parse(request.body.ids);
         const names = JSON.parse(request.body.names);
         const wikidata = JSON.parse(request.body.wikidata);
         const coordinates = JSON.parse(request.body.coordinates);
-
+        
         for (let i = 0; i < ids.length; i++) {
+            if(ids[i].includes("randomPoint") || ids[i].includes("gps"))
+                ids[i] = "r"+coordinates[i][0]+";"+coordinates[i][1];
             result = await query(
                 `SELECT COUNT(*) AS c FROM points WHERE point_id='${ids[i]}'`
             );
@@ -58,7 +60,7 @@ async function insertRoute(request) {
                         '${ids[i]}',
                         ${coordinates[i][0]},
                         ${coordinates[i][1]},
-                        '${names[i]}',
+                        '${names[i].replace(/["'`]/g , " ")}',
                         '${wikidata[i]}'
                     )`
                 );

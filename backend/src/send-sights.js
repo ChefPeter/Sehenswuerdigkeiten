@@ -5,12 +5,12 @@ async function sendSights(req, res) {
     
     // Schauen ob Pflichtfelder ausgefüllt sind
     if (!checkMandatoryFields(req.body)) {
-        res.status(400).send("Nicht alle Pflichtfelder sind ausgefüllt!")
+        res.status(400).send("Nicht alle Pflichtfelder sind ausgefüllt!");
         return;
     }
     let points = [];
     let centerCoordinates = req.body;
-    let url = getURL(parseFloat(centerCoordinates.radius)*1000, centerCoordinates.lat, centerCoordinates.lon, JSON.parse(centerCoordinates.filters), 500);
+    let url = getURL(parseFloat(centerCoordinates.radius)*1000, centerCoordinates.lat, centerCoordinates.lon, JSON.parse(centerCoordinates.filters), 500, "3");
     if(url === "") {
         res.status(200).send(JSON.stringify({}));
         return;
@@ -18,7 +18,6 @@ async function sendSights(req, res) {
     
     //FETCHING DATA HERE
     let results = await getDataFromURL(url);
-
     results = results.filter((item, index, self) => index === self.findIndex((x) => (x.wikidata === item.wikidata)));
     
     //insertSight(result.wikidata, result.name.replace(/"/g, '\\"').replace(/'/g, "\\'"), lat, lon);
@@ -99,7 +98,7 @@ async function getDataFromURL(url) {
     return answer;
 }
 
-function getURL(radius, lat, lon, filterLink, limit, fame = "3") {
+function getURL(radius, lat, lon, filterLink, limit, fame) {
     const API_KEY = process.env.TRIPMAP_API_KEY;
     let filters = `kinds=${Object.keys(filterLink).filter(function(x) { return filterLink[x]; }).join(',')}`;
     if(filters.length>8)

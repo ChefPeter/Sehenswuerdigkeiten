@@ -56,6 +56,7 @@ let saveRouteName = "";
 let markersWithNumbersGeoJson = null;
 let timeoutForGpsLoading = null;
 let trackUserLocationEnd = false;
+let routeToDeleteName = "";
 
 export function setFilter(newFilter){
         filter = newFilter;
@@ -351,7 +352,11 @@ function BaseMap (props) {
                                                         dialogText2: "Your entire route will be deleted!",
                                                         dialogCancel: "Cancel",
                                                         dialogApprovePoints: "Delete Points",
-                                                        dialogApproveRoute: "Delete Route"
+                                                        dialogApproveRoute: "Delete Route",
+                                                        removePoiFromMap: "REMOVE FROM MAP",
+                                                        deleteRoute: "Delete Route",
+                                                        deleteRouteDialog1: "Delete route ",
+                                                        deleteRouteDialog2: " permanently?"
                                                     });
 
 
@@ -360,6 +365,8 @@ function BaseMap (props) {
     const [showRatingErrorSnackbar, setShowRatingErrorSnackbar] = useState(false);
     const [showRatingSuccessSnackbar, setShowRatingSuccessSnackbar] = useState(false);
     const [showNoPoisFoundErrorSnackbar, setShowNoPoisFoundErrorSnackbar] = useState(false);
+
+    const[routeToDeleteNameState, setRouteToDeleteNameState] = useState("");
 
     const [gpsActive, setGpsActive] = useState(false);
     const [currentlyLoadingGpsClass, setCurrentlyLoadingGpsClass] = useState(false);
@@ -410,7 +417,11 @@ function BaseMap (props) {
                 dialogText2: "Deine komplette Route wird gelöscht!",
                 dialogCancel: "Abbrechen",
                 dialogApprovePoints: "Punkte löschen",
-                dialogApproveRoute: "Route löschen"
+                dialogApproveRoute: "Route löschen",
+                removePoiFromMap: "VON DER KARTE ENTFERNEN",
+                deleteRoute: "Route löschen",
+                deleteRouteDialog1: "Route ",
+                deleteRouteDialog2: " für immer löschen?"
             });
             setRatingErrorText("Fehler beim Bewerten der POI.");
             if(map !== null){
@@ -461,7 +472,12 @@ function BaseMap (props) {
                 dialogText2: "Il tuo intero percorso sarà cancellato!",
                 dialogCancel: "Cancella",
                 dialogApprovePoints: "Cancellare i punti",
-                dialogApproveRoute: "Cancellare il percorso"
+                dialogApproveRoute: "Cancellare il percorso",
+                removePoiFromMap: "Rimuovi dalla mappa",
+                deleteRoute: "Rimuovere percorso",
+                deleteRouteDialog1: "Rimuovere per sempre il percorso ",
+                deleteRouteDialog2: " ?"
+
             });
             setRatingErrorText("Errore durante il voto della segnaletica.");
 
@@ -513,7 +529,11 @@ function BaseMap (props) {
                 dialogText2: "Your entire route will be deleted!",
                 dialogCancel: "Cancel",
                 dialogApprovePoints: "Delete Points",
-                dialogApproveRoute: "Delete Route"
+                dialogApproveRoute: "Delete Route",
+                removePoiFromMap: "REMOVE FROM MAP",
+                deleteRoute: "Delete Route",
+                deleteRouteDialog1: "Delete route ",
+                deleteRouteDialog2: " permanently?"
             });
             setRatingErrorText("Error while rating the POI.");
 
@@ -567,6 +587,7 @@ function BaseMap (props) {
 
     const [openPoiListDialog, setOpenPoiListDialog] = useState(false);
     const [openDeleteHoleRouteDialog, setOpenDeleteHoleRouteDialog] = useState(false);
+    const [openRemoveRouteFromDatabaseDialog, setOpenRemoveRouteFromDatabaseDialog] = useState(false);
 
 useEffect(() => {
         
@@ -820,7 +841,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     map.on("dblclick", (e) => {
         let coords = [e.lngLat.lng, e.lngLat.lat];
         let popupNode  = document.createElement("div");
-        ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois)} >Search here?</Button><Button sx={{mt:2}} variant="contained" fullWidth onClick={() => handleStartPointClickedByUserPoint(coords)} >startpoint</Button><Button sx={{mt:2, mb:2}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);
+        ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois)} >Search here?</Button><Button sx={{mt:1.5}} variant="contained" fullWidth onClick={() => handleStartPointClickedByUserPoint(coords)} >STARTPOINT</Button><Button sx={{mt:1.5, mb:0.5}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);
         popUpRef.current
             .setLngLat(coords)
             .setDOMContent(popupNode)
@@ -1011,6 +1032,9 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     function handleDeleteHoleRouteDialogClose(){
         setOpenDeleteHoleRouteDialog(false);
     }
+    function handleRemoveRouteFromDatabaseDialogClose(){
+        setOpenRemoveRouteFromDatabaseDialog(false);
+    }
 
     function deleteHoleRoute(){
         currentLineCoords = [];
@@ -1193,6 +1217,18 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         setOpenRouteDrawer(false);
     }
 
+    function removeRouteFromDatabase(name){
+        setRouteToDeleteNameState(name);
+        routeToDeleteName = name;
+        setOpenRemoveRouteFromDatabaseDialog(true);
+    }
+    function removeRouteFromDatabaseSure(){
+        if(routeToDeleteName === "")
+            return;
+        console.log("delete " + routeToDeleteName);
+        setOpenRemoveRouteFromDatabaseDialog(false);
+    }
+
     function saveCurrentRouteToDatabase(data, name){
         if(name === ""){
             return;
@@ -1220,7 +1256,15 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             method: "post",
             body: formData,
             credentials:"include"
-        });
+        }).then(data => {
+            console.log(data)
+            if(data.ok){
+                console.log("gespeichert")
+            }else{
+                console.log("fehler")
+            }
+        })
+        .catch(e => {console.log("error at " + e)});
 
         setRouteNames([...routeNames, {route_name: name}]);
   
@@ -1362,8 +1406,9 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             {routeNames.map((item,i) => {
                 return (
                     <div key={item["route_name"]+i}>
-                        <Card sx={{mt:1, mb:1}}>
-                            <Button style={{backgroundColor:"#939ed5", width:"calc(100% - 10px)", marginLeft:"5px", marginRight:"5px"}} variant="contained" sx={{wordWrap:"break-word", mt:0.6}} onClick={() => selectRouteFromToDatabase(item["route_name"])} >{item["route_name"]}<AltRouteIcon/></Button>
+                        <Card sx={{mt:1, mb:1}} style={{display:"flex", justifyContent:"space-evenly"}}>
+                            <Button style={{backgroundColor:"#939ed5", width:"calc(78% - 5px)", minWidth:"45px", marginLeft:"2px", marginRight:"5px", textTransform:"none"}} variant="contained" sx={{wordWrap:"break-word", mt:0.6}} onClick={() => selectRouteFromToDatabase(item["route_name"])} >{item["route_name"]}<AltRouteIcon/></Button> 
+                            <Button color="error" style={{width:"calc(10% - 5px)", minWidth:"15px" ,marginLeft:"5px", marginRight:"5px"}} variant="contained" sx={{mt:0.6}} onClick={() => removeRouteFromDatabase(item["route_name"])} > <DeleteIcon /> </Button>
                         </Card>
                     </div>
                 );
@@ -1375,8 +1420,8 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         return(
             <div>
                 <Card sx={{mt:1.5, ml:1, mr:1}} >
-                            <Button style={{minWidth:"100%", minHeight: "50px"}} variant="contained" onClick={() => setClickedImportRouteButton(true)}>{languageTags.importSavedRoutes}<ImportExportIcon/></Button>
-                        {clickedImportRouteButton ?  <ShowOldRoutes/> : null }
+                            <Button style={{minWidth:"100%", minHeight: "50px"}} variant="contained" onClick={() => setClickedImportRouteButton(!clickedImportRouteButton)}>{languageTags.importSavedRoutes}<ImportExportIcon/></Button>
+                        {clickedImportRouteButton &&  <ShowOldRoutes/> }
                 </Card>
                       
                 <Card sx={{mt:3, mb:1.5, ml:1, mr:1, pt:0.5, pb:0.5}} style={{border:"solid grey 0.5px", borderRadius:"8px"}} elevation={7}><Typography variant='h6' fontWeight={500} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px"}}>{languageTags.errorNoRoute}</Typography>
@@ -1576,7 +1621,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                             {clickedFriends ? null :  <Box sx={{display: 'flex',alignItems: 'center',}}> <Rating sx={{mb:1}} name="rating-attractions" onChange={(event, newValue) => {ratingChange(newValue, obj)}} value={avgRating} precision={0.5} />  <Box sx={{ ml: 1, mb:1 }}>({howManyReviews})</Box> </Box> }
                             {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"10px"}}></img>}</div>}
                         </div>
-                           {clickedFriends ? null : (!showLoadingInsteadPicture && <Button variant="contained" color="error" style={{marginBottom:"10px"}} onClick={() => removePoiFromMap(obj["properties"]["id"])} startIcon={<DeleteIcon />} >Remove poi from map</Button>)} 
+                           {clickedFriends ? null : (!showLoadingInsteadPicture && <Button variant="contained" color="error" style={{marginBottom:"10px"}} onClick={() => removePoiFromMap(obj["properties"]["id"])} startIcon={<DeleteIcon />} >{languageTags.removePoiFromMap}</Button>)} 
                         </div>                     
                     </div>
             </Drawer>
@@ -1674,6 +1719,20 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 <DialogActions>
                     <Button onClick={handleDeleteHoleRouteDialogClose}>{languageTags.dialogCancel}</Button>
                     <Button color="error" onClick={deleteHoleRoute}>{languageTags.dialogApproveRoute}</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openRemoveRouteFromDatabaseDialog}
+                onClose={handleRemoveRouteFromDatabaseDialogClose}
+                aria-labelledby="alert-dialog-title3"
+                aria-describedby="alert-dialog-description3">
+                <DialogTitle id="alert-dialog-title3">Feature currently under construction!</DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-description3">{languageTags.deleteRouteDialog1 + routeToDeleteNameState + languageTags.deleteRouteDialog2}</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleRemoveRouteFromDatabaseDialogClose}>{languageTags.dialogCancel}</Button>
+                    <Button color="error" onClick={removeRouteFromDatabaseSure}>{languageTags.deleteRoute}</Button>
                 </DialogActions>
             </Dialog>
 

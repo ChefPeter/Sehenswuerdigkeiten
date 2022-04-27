@@ -100,7 +100,7 @@
     }
   }
   .loadingGpsClass {
-    color:rgb(105, 158, 176);
+    color:rgb(75, 210, 255);
     -webkit-animation: rotating 2s linear infinite;
     -moz-animation: rotating 2s linear infinite;
     -ms-animation: rotating 2s linear infinite;

@@ -363,7 +363,8 @@ function BaseMap (props) {
                                                         deleteRouteDialog1: "Delete route ",
                                                         deleteRouteDialog2: " permanently?",
                                                         routeSavedSuccessfullyText: "Route was saved successfully!",
-                                                        routeSavedErrorText: "Error while saving your route. Try again!"
+                                                        routeSavedErrorText: "Error while saving your route. Try again!",
+                                                        noSavedRoutes: "You have no saved routes to import!"
                                                     });
 
 
@@ -430,7 +431,8 @@ function BaseMap (props) {
                 deleteRouteDialog1: "Route ",
                 deleteRouteDialog2: " für immer löschen?",
                 routeSavedSuccessfullyText: "Route wurde gespeichert!",
-                routeSavedErrorText: "Die Route konnte nicht gespeichert werden. Probiere es erneut!"
+                routeSavedErrorText: "Die Route konnte nicht gespeichert werden. Probiere es erneut!",
+                noSavedRoutes: "Du hast keine gespeicherten Routen zum importieren!"
             });
             setRatingErrorText("Fehler beim Bewerten der POI.");
             if(map !== null){
@@ -487,7 +489,8 @@ function BaseMap (props) {
                 deleteRouteDialog1: "Rimuovere per sempre il percorso ",
                 deleteRouteDialog2: " ?",
                 routeSavedSuccessfullyText: "Il percorso è stato salvato con successo!",
-                routeSavedErrorText: "Errore durante il salvataggio del percorso. Riprova!"
+                routeSavedErrorText: "Errore durante il salvataggio del percorso. Riprova!",
+                noSavedRoutes: "Non hai percorsi salvati da importare!"
 
             });
             setRatingErrorText("Errore durante il voto della segnaletica.");
@@ -546,7 +549,8 @@ function BaseMap (props) {
                 deleteRouteDialog1: "Delete route ",
                 deleteRouteDialog2: " permanently?",
                 routeSavedSuccessfullyText: "Route was saved successfully!",
-                routeSavedErrorText: "Error while saving your route. Try again!"
+                routeSavedErrorText: "Error while saving your route. Try again!",
+                noSavedRoutes: "You have no saved routes to import!"
             });
             setRatingErrorText("Error while rating the POI.");
 
@@ -575,7 +579,6 @@ function BaseMap (props) {
             }, 100);
         }catch(e){}
     }, [filterPoiListText]);
-
 
     useEffect(()=> {
         newMap(themeMap, setImage, imageSrc, setShowLoadingInsteadPicture, popUpRef, setObj, setShowAddButton, pointIsInRoute, setOpen);
@@ -1239,10 +1242,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         if(routeToDeleteName === "")
             return;
         setOpenRemoveRouteFromDatabaseDialog(false);
-        //TODO IMPORTANT
-        //Route in Datenbank löschen -> backend dafür erstellen
-        /*
-        console.log("delete " + routeToDeleteName);
         let formData = new FormData();
         formData.append("route_name", routeToDeleteName);
         fetch("https://10.10.30.18:8444/delete-route", {
@@ -1250,10 +1249,20 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             body: formData,
             credentials:"include"
         }).then(data => {
-            console.log(data);
+            if(data.ok){
+                let tempRoutes = [...routeNames];
+                for(let i = 0; i<tempRoutes.length; i++){
+                    if(tempRoutes[i]["route_name"] == routeToDeleteName){
+                        tempRoutes.splice(i, 1);
+                        break;
+                    }
+                }
+                setRouteNames(tempRoutes);
+            }else{
+                console.log("err");
+            }
         })
         .catch(e =>  console.log(e));
-        */
     }
 
     function saveCurrentRouteToDatabase(data, name){
@@ -1431,16 +1440,19 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
 
     const ShowOldRoutes = () => (
         <div>
-            {routeNames.map((item,i) => {
-                return (
-                    <div key={item["route_name"]+i}>
-                        <Card elevation={0} sx={{mt:1.3, mb:1}} style={{display:"flex", justifyContent:"space-evenly"}}>
-                            <Button color="info" style={{ width:"76%", minWidth:"45px", marginLeft:"2px", marginRight:"4px", textTransform:"none"}} variant="contained" sx={{wordWrap:"break-word", mt:0.6}} onClick={() => selectRouteFromToDatabase(item["route_name"])} >{item["route_name"]}<AltRouteIcon/></Button> 
-                            <Button color="error" style={{width:"13%", minWidth:"30px" ,marginLeft:"4px", marginRight:"2px"}} variant="contained" sx={{mt:0.6}} onClick={() => removeRouteFromDatabase(item["route_name"])} > <DeleteIcon /> </Button>
-                        </Card>
-                    </div>
-                );
-            })}
+            { routeNames.length > 0 ? 
+                routeNames.map((item,i) => {
+                    return (
+                        <div key={item["route_name"]+i}>
+                            <Card elevation={0} sx={{mt:1.3, mb:1}} style={{display:"flex", justifyContent:"space-evenly"}}>
+                                <Button color="info" style={{ width:"76%", minWidth:"45px", marginLeft:"2px", marginRight:"4px", textTransform:"none"}} variant="contained" sx={{wordWrap:"break-word", mt:0.6}} onClick={() => selectRouteFromToDatabase(item["route_name"])} >{item["route_name"]}<AltRouteIcon/></Button> 
+                                <Button color="error" style={{width:"13%", minWidth:"30px" ,marginLeft:"4px", marginRight:"2px"}} variant="contained" sx={{mt:0.6}} onClick={() => removeRouteFromDatabase(item["route_name"])} > <DeleteIcon /> </Button>
+                            </Card>
+                        </div>
+                    );
+                })
+            : <Typography variant='h6' fontWeight={410} sx={{mt:2, mb:1.2, pt:0.5, pl:1, pr:1}} style={{margin:"auto", textAlign:"center"}}>{languageTags.noSavedRoutes}</Typography>
+        }
         </div>
     );
 
@@ -1764,7 +1776,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 onClose={handleRemoveRouteFromDatabaseDialogClose}
                 aria-labelledby="alert-dialog-title3"
                 aria-describedby="alert-dialog-description3">
-                <DialogTitle id="alert-dialog-title3">Feature currently under construction!</DialogTitle>
+                <DialogTitle id="alert-dialog-title3">{languageTags.areYouSafe}</DialogTitle>
                 <DialogContent>
                 <DialogContentText id="alert-dialog-description3">{languageTags.deleteRouteDialog1 + routeToDeleteNameState + languageTags.deleteRouteDialog2}</DialogContentText>
                 </DialogContent>

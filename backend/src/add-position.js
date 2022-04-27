@@ -35,10 +35,10 @@ async function insertPosition(request) {
         );
         const result = await query(
             `SELECT sight_id FROM sights 
-            WHERE abs(latitude-${request.body.latitude}) < 0.001 AND abs(longtitude-${request.body.longtitude}) < 0.001`
+            WHERE abs(latitude-${request.body.latitude}) < 0.0027 AND abs(longtitude-${request.body.longtitude}) < 0.0027`
         );
         for (let i = 0; i < result.length; i++) {
-            await query(`INSERT INTO users_sights (username, sight_id) values ('${request.session.username}', '${result[i].sight_id}')`);
+            await query(`INSERT IGNORE INTO users_sights (username, sight_id) values ('${request.session.username}', '${result[i].sight_id}')`);
         }
         return null;
     } catch(e) {

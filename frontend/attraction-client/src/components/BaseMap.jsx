@@ -29,6 +29,7 @@ import Popup from "./Popup";
 import "./styles/BaseMap.css";
 import SuccessSnackbar from './SuccessSnackbar';
 import ListIcon from '@mui/icons-material/List';
+import GpsNotFixedIcon from '@mui/icons-material/GpsNotFixed';
 
 let map = null;
 let countUserPoints = 0;
@@ -42,19 +43,19 @@ let lastRadius = 1;
 let filter = {architecture: true, cultural: true, historic: true, natural: true, religion: true, tourist_facilities: true, museums: true, palaces: true, malls: true, churches: true, monuments_and_memorials: true};
 let currentGlobalResults = {type: "FeatureCollection", features: []};
 let timerID;
-let locationTimerID;
 let globalPopup = "", globalPopup2 = "";
 let geolocate;
 let lastPositionByMapboxGeolocate = [];
 let returnToStart = false;
 let startAtGps = false;
 let userEnabledMapboxLocation = false;
-let coordsForGpsSearch = [];
 let timeInHours = false;
 let lastSentCoordinates = [];
 let currentLineCoords = [];
 let saveRouteName = "";
 let markersWithNumbersGeoJson = null;
+let timeoutForGpsLoading = null;
+let trackUserLocationEnd = false;
 
 export function setFilter(newFilter){
         filter = newFilter;
@@ -300,7 +301,10 @@ function BaseMap (props) {
     const [currentSortedPointsRouteOutput, setCurrentSortedPointsRouteOutput] = useState([]);
     const [currentNotSortedPointsRouteOutput, setCurrentNotSortedPointsRouteOutput] = useState([]);
     const [currentAddedPoints, setCurrentAddedPoints] = useState([]);
-    
+
+    const[disabledGpsButton, setDisabledGpsButton] = useState(true);
+    const[showGpsFixedButton, setShowGpsFixedButton] = useState(true);
+
     const [currentlyLookingForPois, setCurrentlyLookingForPois] = useState(true);
  
     const [filteredPoiList, setFilteredPoiList] = useState({"type": "FeatureCollection", "features": []});
@@ -358,6 +362,7 @@ function BaseMap (props) {
     const [showNoPoisFoundErrorSnackbar, setShowNoPoisFoundErrorSnackbar] = useState(false);
 
     const [gpsActive, setGpsActive] = useState(false);
+    const [currentlyLoadingGpsClass, setCurrentlyLoadingGpsClass] = useState(false);
     const [geolocationSupported, setGeolocationSupported] = useState(true);
     const [unableToRetrieveLocation, setUnableToRetrieveLocation] = useState(false);
 
@@ -579,11 +584,14 @@ useEffect(() => {
         .then(data => setRouteNames(data));
         
         let interval1;
+    
         geolocate.on('geolocate', function(e) {
+
             setGpsActive(true);
+            setCurrentlyLoadingGpsClass(false);
             lastPositionByMapboxGeolocate = [e.coords.longitude, e.coords.latitude];
-           
-            //posts location every 10 secs
+    
+            //posts location every 6 secs
             interval1 =  setInterval(async () => {
                 
                 if((lastPositionByMapboxGeolocate.length === 2) && ((lastSentCoordinates[0] != lastPositionByMapboxGeolocate[0]) || (lastSentCoordinates[1] != lastPositionByMapboxGeolocate[1]))){
@@ -600,7 +608,6 @@ useEffect(() => {
             }, 6000)
 
         });
-
 
         setTimeout(async () => {
             getFriendsLocation();
@@ -705,6 +712,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             enableHighAccuracy: true
         },
         trackUserLocation: true,
+        showAccuracyCircle: true,
         // Draw an arrow next to the location dot to indicate which direction the device is heading.
         showUserHeading: true,
     });
@@ -727,9 +735,18 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 }
             });
         });
-
+        setDisabledGpsButton(false);
     });
-    
+    geolocate.on('trackuserlocationend', () => {
+        setTimeout((() => {
+            if(userEnabledMapboxLocation){
+                trackUserLocationEnd = true;
+                setShowGpsFixedButton(false);
+            }
+        }), 500);
+        
+    });
+
     map.doubleClickZoom.disable();    
     // change cursor to pointer when user hovers over a clickable feature
     map.on("mouseenter", "attraction-points-layer", async e => {
@@ -751,7 +768,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                         setImage(imageSrc);
                 }catch(e){}
                 
-                setShowLoadingInsteadPicture(false);    
+                delay(40).then(() => setShowLoadingInsteadPicture(false)); 
                 const popupNode = document.createElement("div");
 
                 ReactDOM.render(<Popup feature={feature} />, popupNode);
@@ -809,139 +826,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             .setDOMContent(popupNode)
             .addTo(map);
     });
-   
-    
-    delay(100).then(async () => {
-        try{
-            while(map.getSource("selected-attraction-points-data") == undefined)
-                await sleep(80);
-            map.getSource('selected-attraction-points-data').setData(selectedSights);
-
-            if(currentGlobalResults["features"].length > 0){
-                //could take some time till layer exists
-                while(map.getSource("attraction-points-data") == undefined)
-                    await sleep(80);
-                delay(50).then(() => {
-                    map.getSource("attraction-points-data").setData(currentGlobalResults);
-                });
-            }
-
-            if(lastCoords.length !== 0){
-                let marker2 = new mapboxgl.Marker();
-                // setMarkerCoords(coords)
-                if(lastCoords[0] !== 11.65598 && lastCoords[1] !== 46.71503){
-                    marker2.setLngLat(lastCoords).addTo(map);
-                    globalPopup2 = marker2;
-                }
-            }
-            
-        } catch (e){};
-        delay(200).then(() => {
-            try {
-                //route exists -> draw new
-                if(currentLineCoords.length !== 0){
-                    map.addSource('route1', {
-                        'type': 'geojson',
-                        'data': {
-                            'type': 'Feature',
-                            'properties': {},
-                            'geometry': {
-                                'type': 'LineString',
-                                'coordinates': currentLineCoords
-                            }
-                        }
-                    });
-                    map.addLayer({
-                        'id': 'layer1',
-                        'type': 'line',
-                        'source': 'route1',
-                        "icon-allow-overlap" : true,
-                        "text-allow-overlap": true,
-                        'filter': ['==', '$type', 'LineString'],
-                        'layout': {
-                            'line-join': 'round',
-                            'line-cap': 'round'
-                        },
-                        'paint': {
-                            'line-color': '#3cb2d0',
-                            'line-width': {
-                                'base': 0.5,
-                                'stops': [
-                                [1, 0.5],
-                                [3, 2],
-                                [4, 2.5],
-                                [8, 3],
-                                [15, 6],
-                                [22, 8]
-                                ]
-                            }
-                        }
-                    });
-
-                    map.loadImage(arrowImage, function(err, image2) {
-                        if(!map.hasImage('arrow')){
-                            if (err) {
-                                console.error('err image', err);
-                                return;
-                            }
-                            map.addImage('arrow', image2);
-                        }
-
-                        map.addLayer({
-                            'id': 'arrow-layer',
-                            'type': 'symbol',
-                            "icon-allow-overlap" : true,
-                            "text-allow-overlap": true,
-                            'source': 'route1',
-                            'minzoom': 5,
-                            'layout': {
-                            'symbol-placement': 'line',
-                            'symbol-spacing': 40,
-                            'icon-allow-overlap': true,
-                            'icon-image': 'arrow',
-                            'icon-size': 0.3,
-                            'visibility': 'visible'
-                            }
-                        });
-                    });
-
-                    if(markersWithNumbersGeoJson !== null){
-                        //layer with points and data as points
-                        map.addSource('route-points-data', {
-                            'type': 'geojson',
-                            'data': markersWithNumbersGeoJson,
-                            tolerance: 0
-                        });
-                        map.addLayer({
-                            id: "route-points-layer",
-                            source: "route-points-data",
-                            type: "symbol",
-                            layout: {
-                                "icon-image": "marker-blue",
-                                "icon-padding": 0,
-                                "icon-allow-overlap" : true,
-                                "text-allow-overlap": true,
-                                "icon-size": 0.8,
-                                'text-field': ['get', 'title'],
-                                'text-font': [
-                                'Open Sans Semibold',
-                                'Arial Unicode MS Bold'
-                                ],
-                                'text-offset': [0, 1.25],
-                                'text-anchor': 'top',
-                            },
-                            paint: {
-                                "text-color": "#313638",
-                                "text-halo-color": "#fff",
-                                "text-halo-width": 4
-                            }
-                    });
-                    }
-                }
-            }catch (e){}
-        });
-
-    });
 
     delay(1200).then(() => {
         getFriendsLocation();
@@ -962,9 +846,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     
 }
 
-    const sleep = (milliseconds) => {
-        return new Promise(resolve => setTimeout(resolve, milliseconds))
-    }
     async function getImage(wikidata){
         setImage("");
         try{
@@ -972,7 +853,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             if(imageSrc != undefined)
                 setImage(imageSrc);
         }catch(e){}
-        setShowLoadingInsteadPicture(false);  
+        delay(40).then(() => setShowLoadingInsteadPicture(false));
     }
     function pointIsInRoute(id){
         if (testRoute.some(item => item["properties"]["id"]===id)) 
@@ -1011,25 +892,46 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     }
 
     function locationButtonClick(){
-
-        lastPositionByMapboxGeolocate = [];        
-        userEnabledMapboxLocation = !userEnabledMapboxLocation;
-        geolocate._geolocateButton.click();
-
-
+        setDisabledGpsButton(true);
+        setShowGpsFixedButton(true);
+        setTimeout(() => setDisabledGpsButton(false), 500);
+        lastPositionByMapboxGeolocate = [];       
+        geolocate.trigger();
+        if(geolocate["_watchState"] == "OFF"){
+            setGpsActive(false);
+            startAtGps = false;
+            userEnabledMapboxLocation = false;
+        }else if (geolocate["_watchState"] == "WAITING_ACTIVE"){
+            setCurrentlyLoadingGpsClass(true);
+            userEnabledMapboxLocation = true;
+        }else if(geolocate["_watchState"] == "ACTIVE_LOCK"){
+            setCurrentlyLoadingGpsClass(false);
+            userEnabledMapboxLocation = true;
+            setGpsActive(true);
+        }else if(geolocate["_watchState"] == "BACKGROUND"){
+            setCurrentlyLoadingGpsClass(false);
+            userEnabledMapboxLocation = true;
+            setGpsActive(true);
+        }else{
+            setGpsActive(false);
+            userEnabledMapboxLocation = false;
+            setCurrentlyLoadingGpsClass(false);
+        }
+        
         if(userEnabledMapboxLocation){
             function success(position) {
                 lastPositionByMapboxGeolocate = [position.coords.longitude,position.coords.latitude];
                 setUnableToRetrieveLocation(false);
-                setGpsActive(true);
             }
             function error() {
                 setGpsActive(false);
+                setCurrentlyLoadingGpsClass(false);
                 setUnableToRetrieveLocation(true);
                 startAtGps = false;
             }
             if(!navigator.geolocation) {
                 setGpsActive(false);
+                setCurrentlyLoadingGpsClass(false);
                 setGeolocationSupported(false);
                 startAtGps = false;
             } else {
@@ -1037,13 +939,11 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 navigator.geolocation.getCurrentPosition(success, error);
             }
         }
-        delay(1000).then(() => {
-            if(lastPositionByMapboxGeolocate.length !== 0)
-                setGpsActive(true);
-            else
-                setGpsActive(false);
-        });
-        
+        setGpsActive(false);
+        if(trackUserLocationEnd){
+            setGpsActive(true);
+            trackUserLocationEnd = false;
+        }
     }
 
     function delay(time) {return new Promise(resolve => setTimeout(resolve, time));}
@@ -1228,17 +1128,18 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     }
 
     async function handlePointListClick(obj){
-
-        if(!obj["properties"]["id"].includes("randomPoint")){
+        if(!obj["properties"]["id"].includes("randomPoint") || !obj["properties"]["wikidata"]){
             //set image
             try{
                 let newimageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${obj.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
                 setImage(newimageSrc);
-                setShowLoadingInsteadPicture(false);  
+                delay(40).then(() => setShowLoadingInsteadPicture(false));
             }catch(e){}
             setShowAddButton(false);
             setObj(obj);
             setOpen(true);
+        }else{
+            setShowLoadingInsteadPicture(false);
         }
     }
 
@@ -1333,7 +1234,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
 
                     <Card  key={item["properties"]["id"]}  sx={{mt:1.5, ml:1, mr:1, pt:0.65, pb:0.65, ':hover': {boxShadow: 5}}} elevation={3} style={{display:"flex", justifyContent:"space-between", borderRadius:"15px"}}>
                        
-                       {item["properties"]["id"] === "gpsLocatorId" ? <Box key={i} style={{maxWidth:"80%"}}  sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography> </Box> :  item["properties"]["id"].includes("random") ? <Box key={i} style={{maxWidth:"80%"}} sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box> :  <Box key={i} onClick={() => handlePointListClick(item)} style={{maxWidth:"80%", cursor: "pointer"}}  sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box> }
+                       {item["properties"]["id"] === "gpsLocatorId" ? <Box key={i} style={{maxWidth:"80%"}}  sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography> </Box> :  (item["properties"]["id"].includes("random") || !item["properties"]["wikidata"]) ? <Box key={i} style={{maxWidth:"80%"}} sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box> :  <Box key={i} onClick={() => handlePointListClick(item)} style={{maxWidth:"80%", cursor: "pointer"}}  sx={{mt:1, mb:1}}> <Typography style={{margin:"auto", marginLeft:"10px",  overflowWrap:"break-word"}}>{i+1}. {item["properties"]["name"]}</Typography>  </Box> }
                        
                         <Button style={{minHeight: "42px", minWidth:"50px", maxHeight:"42px", margin:"auto", marginLeft:"15px", marginRight:"10px",  borderRadius:"15px"}} 
                             key={item["properties"]["id"]} color="error" variant="contained"
@@ -1525,6 +1426,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         setTimeout(() => {
             setClickedFriends(false);
             setAvgRating(0);
+            setShowLoadingInsteadPicture(true);
         }, 350);
        
       }
@@ -1632,6 +1534,16 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             });
             setCheckedInPoiList({...check});
         }
+        function removePoiFromMap(id){
+            setOpen(false);
+            for(let i = 0; i<currentGlobalResults["features"].length; i++){
+                if(currentGlobalResults["features"][i]["properties"]["id"] === id){
+                    currentGlobalResults["features"].splice(i, 1);
+                    break;
+                }
+            }
+            map.getSource("attraction-points-data").setData(currentGlobalResults);
+        }
 
 
     return (
@@ -1645,7 +1557,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 <Button style={{width:"60px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => setOpenRouteDrawer(!openRouteDrawer)}><DirectionsIcon fontSize="large" style={{color:"#2979ff"}} /></Button>
                 {/* ! disable this button if there are no pois and disable it also if user searches for pois at a new places, only is enabled !after! the new pois are found, also make fontcolor grey */ }
                 <Button disabled={currentlyLookingForPois} style={{width:"60px", marginTop:"11px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} variant="filled" onClick={() => openPoiList(setOpenPoiListDrawer, !openPoiListDrawer)}> {currentlyLookingForPois ?  <ListIcon fontSize="large" style={{color:"grey"}} /> :  <ListIcon fontSize="large" style={{color:"#2979ff"}} />} </Button>
-                <Button style={{width:"60px", marginTop:"11px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} disabled={!geolocationSupported} variant="filled"  onClick={() => locationButtonClick()}> {gpsActive ? <GpsFixedIcon style={{color:"#2979ff"}} fontSize="large" /> : <GpsOffIcon style={{color:"grey"}}  fontSize='large'/>}  </Button>
+                <Button  style={{width:"60px", marginTop:"11px", height:"60px", backgroundColor:"white", borderRadius:"42%"}} disabled={!geolocationSupported || disabledGpsButton} variant="filled"  onClick={() => locationButtonClick()}> {unableToRetrieveLocation ? <GpsOffIcon color="error" fontSize="large" /> : (gpsActive ? (showGpsFixedButton ? <GpsFixedIcon style={{color:"#2979ff"}} fontSize="large" /> : <GpsNotFixedIcon style={{color:"#2979ff"}} fontSize="large" />) : <GpsOffIcon className={currentlyLoadingGpsClass ? 'loadingGpsClass' : 'notLoadingGpsClass'} fontSize='large'/>)}  </Button>
             </div>
     
         </div>
@@ -1655,16 +1567,17 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 open={open}
                 onClose={() => closeBottomDrawer()}>
                     <div style={{maxHeight:"60vh", minHeight:"200px"}}>
-                        <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", display:"flex", alignItems:"center", justifyContent:"center"}}>
+                        <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", marginBottom:"10px", display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column"}}>
                         <div>
-                            <div> 
+                            <div style={{display:"flex", flexDirection:"column"}}> 
                                 {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{languageTags.addButton}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{languageTags.removeButton}</Button>}
                                 <h2 id="nameField" style={{marginBottom:"1px"}}>{obj.properties.name}</h2>
                             </div>
                             {clickedFriends ? null :  <Box sx={{display: 'flex',alignItems: 'center',}}> <Rating sx={{mb:1}} name="rating-attractions" onChange={(event, newValue) => {ratingChange(newValue, obj)}} value={avgRating} precision={0.5} />  <Box sx={{ ml: 1, mb:1 }}>({howManyReviews})</Box> </Box> }
-                        {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"20px"}}></img>}</div>}
+                            {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"10px"}}></img>}</div>}
                         </div>
-                        </div>
+                           {clickedFriends ? null : (!showLoadingInsteadPicture && <Button variant="contained" color="error" style={{marginBottom:"10px"}} onClick={() => removePoiFromMap(obj["properties"]["id"])} startIcon={<DeleteIcon />} >Remove poi from map</Button>)} 
+                        </div>                     
                     </div>
             </Drawer>
         
@@ -1959,7 +1872,6 @@ function addAllLayersToMap(map){
 
     map.loadImage(friendMarker,
         function (error, image) {
-            if (error) throw error;
             map.addImage('friends-marker', image);
         }
     );
@@ -1976,8 +1888,7 @@ function addAllLayersToMap(map){
             source: "friends-points-data",
             type: "symbol",
             layout: {
-                // full list of icons here: https://labs.mapbox.com/maki-icons
-                "icon-image": "friends-marker", // this will put little croissants on our map
+                "icon-image": "friends-marker", 
                 "icon-padding": 0,
                 "icon-allow-overlap" : true,
                 "text-allow-overlap": true,

@@ -11,14 +11,18 @@ async function sendSights(req, res) {
     let points = [];
     let centerCoordinates = req.body;
     let url = getURL(parseFloat(centerCoordinates.radius)*1000, centerCoordinates.lat, centerCoordinates.lon, JSON.parse(centerCoordinates.filters), 500, "3");
+    
     if(url === "") {
         res.status(200).send(JSON.stringify({}));
         return;
     }
     
     //FETCHING DATA HERE
+    console.log(url);
     let results = await getDataFromURL(url);
-    results = results.filter((item, index, self) => index === self.findIndex((x) => (x.wikidata === item.wikidata)));
+    try{
+        results = results.filter((item, index, self) => index === self.findIndex((x) => (x.wikidata === item.wikidata)));
+    }catch(e){}
     
     //insertSight(result.wikidata, result.name.replace(/"/g, '\\"').replace(/'/g, "\\'"), lat, lon);
     insertSights(results);
@@ -81,7 +85,6 @@ function checkMandatoryFields(params) {
         if (params[field]) {
             return true;
         } else {
-            console.log(field);
             return false;
         }
     });
@@ -98,11 +101,11 @@ async function getDataFromURL(url) {
     return answer;
 }
 
-function getURL(radius, lat, lon, filterLink, limit, fame) {
+function getURL(radius, lat, lon, filterLink, limit, fame = "3") {
     const API_KEY = process.env.TRIPMAP_API_KEY;
     let filters = `kinds=${Object.keys(filterLink).filter(function(x) { return filterLink[x]; }).join(',')}`;
     if(filters.length>8)
-        return `https://api.opentripmap.com/0.1/en/places/radius?radius=${radius}&lon=${lon}&lat=${lat}&rate=${fame}&${filters}&format=json&limit=${limit}&apikey=${API_KEY}`
+        return `https://api.opentripmap.com/0.1/en/places/radius?radius=${radius}&lon=${lon}&lat=${lat}&rate=3&${filters}&format=json&limit=${limit}&apikey=${API_KEY}`;
     return "";
 }
 

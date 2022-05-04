@@ -67,7 +67,7 @@ async function getDataFromURL(url)
     let result = await fetch(url);
     let answer = null;
     if(result.ok)
-    answer = await result.json();
+        answer = await result.json();
     return answer;
 }
 
@@ -864,6 +864,139 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
             .addTo(map);
     });
 
+    
+    delay(100).then(async () => {
+        try{
+            while(map.getSource("selected-attraction-points-data") == undefined)
+                await sleep(80);
+            map.getSource('selected-attraction-points-data').setData(selectedSights);
+
+            if(currentGlobalResults["features"].length > 0){
+                //could take some time till layer exists
+                while(map.getSource("attraction-points-data") == undefined)
+                    await sleep(80);
+                delay(50).then(() => {
+                    map.getSource("attraction-points-data").setData(currentGlobalResults);
+                });
+            }
+
+            if(lastCoords.length !== 0){
+                let marker2 = new mapboxgl.Marker();
+                // setMarkerCoords(coords)
+                if(lastCoords[0] !== 11.65598 && lastCoords[1] !== 46.71503){
+                    marker2.setLngLat(lastCoords).addTo(map);
+                    globalPopup2 = marker2;
+                }
+            }
+            
+        } catch (e){};
+        delay(200).then(() => {
+            try {
+                //route exists -> draw new
+                if(currentLineCoords.length !== 0){
+                    map.addSource('route1', {
+                        'type': 'geojson',
+                        'data': {
+                            'type': 'Feature',
+                            'properties': {},
+                            'geometry': {
+                                'type': 'LineString',
+                                'coordinates': currentLineCoords
+                            }
+                        }
+                    });
+                    map.addLayer({
+                        'id': 'layer1',
+                        'type': 'line',
+                        'source': 'route1',
+                        "icon-allow-overlap" : true,
+                        "text-allow-overlap": true,
+                        'filter': ['==', '$type', 'LineString'],
+                        'layout': {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        'paint': {
+                            'line-color': '#3cb2d0',
+                            'line-width': {
+                                'base': 0.5,
+                                'stops': [
+                                [1, 0.5],
+                                [3, 2],
+                                [4, 2.5],
+                                [8, 3],
+                                [15, 6],
+                                [22, 8]
+                                ]
+                            }
+                        }
+                    });
+
+                    map.loadImage(arrowImage, function(err, image2) {
+                        if(!map.hasImage('arrow')){
+                            if (err) {
+                                console.error('err image', err);
+                                return;
+                            }
+                            map.addImage('arrow', image2);
+                        }
+
+                        map.addLayer({
+                            'id': 'arrow-layer',
+                            'type': 'symbol',
+                            "icon-allow-overlap" : true,
+                            "text-allow-overlap": true,
+                            'source': 'route1',
+                            'minzoom': 5,
+                            'layout': {
+                            'symbol-placement': 'line',
+                            'symbol-spacing': 40,
+                            'icon-allow-overlap': true,
+                            'icon-image': 'arrow',
+                            'icon-size': 0.3,
+                            'visibility': 'visible'
+                            }
+                        });
+                    });
+
+                    if(markersWithNumbersGeoJson !== null){
+                        //layer with points and data as points
+                        map.addSource('route-points-data', {
+                            'type': 'geojson',
+                            'data': markersWithNumbersGeoJson,
+                            tolerance: 0
+                        });
+                        map.addLayer({
+                            id: "route-points-layer",
+                            source: "route-points-data",
+                            type: "symbol",
+                            layout: {
+                                "icon-image": "marker-blue",
+                                "icon-padding": 0,
+                                "icon-allow-overlap" : true,
+                                "text-allow-overlap": true,
+                                "icon-size": 0.8,
+                                'text-field': ['get', 'title'],
+                                'text-font': [
+                                'Open Sans Semibold',
+                                'Arial Unicode MS Bold'
+                                ],
+                                'text-offset': [0, 1.25],
+                                'text-anchor': 'top',
+                            },
+                            paint: {
+                                "text-color": "#313638",
+                                "text-halo-color": "#fff",
+                                "text-halo-width": 4
+                            }
+                    });
+                    }
+                }
+            }catch (e){}
+        });
+
+    });
+
     delay(1200).then(() => {
         getFriendsLocation();
 
@@ -882,6 +1015,9 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     });
     
 }
+    const sleep = (milliseconds) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds))
+    }
 
     async function getImage(wikidata){
         setImage("");
@@ -1259,7 +1395,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 }
                 setRouteNames(tempRoutes);
             }else{
-                console.log("err");
+                console.log("error");
             }
         })
         .catch(e =>  console.log(e));
@@ -1889,8 +2025,8 @@ export async function flyToLocation (coords, radius, newCoordinates = false, set
 //new Request has to be made
 export async function changedFilter(coords = false, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois){
     
-    clearTimeout(timerID)
-
+    clearTimeout(timerID);
+    
     //on filterchange call api only every 1 second 
     //(otherwise there would betoo many requests to the api if someone spams filter buttons)
     timerID = setTimeout(async () => {
@@ -1915,7 +2051,8 @@ export async function changedFilter(coords = false, setShowNoPoisFoundErrorSnack
             currentGlobalResults = {type: "FeatureCollection", features: []};
             return;
         }
-
+        if(coords[0] === 11.65598 && coords[1] === 46.71503)
+            return;
         const results = await getLocationData(coords[0], coords[1], lastRadius, filter, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois);
         currentGlobalResults = results;
         map.getSource("attraction-points-data").setData(results);

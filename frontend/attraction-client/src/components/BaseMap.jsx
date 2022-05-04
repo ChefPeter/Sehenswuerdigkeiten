@@ -57,6 +57,7 @@ let markersWithNumbersGeoJson = null;
 let timeoutForGpsLoading = null;
 let trackUserLocationEnd = false;
 let routeToDeleteName = "";
+let popupTimeout=null;
 
 export function setFilter(newFilter){
         filter = newFilter;
@@ -787,43 +788,52 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     map.doubleClickZoom.disable();    
     // change cursor to pointer when user hovers over a clickable feature
     map.on("mouseenter", "attraction-points-layer", async e => {
+   
+        if(e.features.length){
+            const feature = e.features[0];
+            setImage("");
+            try{
+                imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
+                if(imageSrc != undefined)
+                    setImage(imageSrc);
+            }catch(e){}
+            
+            delay(40).then(() => setShowLoadingInsteadPicture(false)); 
 
-        if (e.features.length) {
-            setShowLoadingInsteadPicture(true);
-            var UserAgent = navigator.userAgent.toLowerCase();
+            popupTimeout = setTimeout(async () => {
+    
+                setShowLoadingInsteadPicture(true);
+                var UserAgent = navigator.userAgent.toLowerCase();
 
-            // Nur beim Computer
-            if (UserAgent.search(/(iphone|ipod|opera mini|fennec|palm|blackberry|android|symbian|series60)/) < 0) {
+                // Nur beim Computer
+                if (UserAgent.search(/(iphone|ipod|opera mini|fennec|palm|blackberry|android|symbian|series60)/) < 0) {
 
-                const feature = e.features[0];
-                // create popup node
-               
-                setImage("");
-                try{
-                    imageSrc = `https://commons.wikimedia.org/wiki/Special:FilePath/${(await getDataFromURL(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${feature.properties.wikidata}&format=json&origin=*`)).claims.P18[0].mainsnak.datavalue.value.replace(/\s/g, "_")}?width=300`;
-                    if(imageSrc != undefined)
-                        setImage(imageSrc);
-                }catch(e){}
+                    
+                    // create popup node
                 
-                delay(40).then(() => setShowLoadingInsteadPicture(false)); 
-                const popupNode = document.createElement("div");
+                    const popupNode = document.createElement("div");
 
-                ReactDOM.render(<Popup feature={feature} />, popupNode);
-                ReactDOM.render(<div><img src={imageSrc} alt="" style={{ width: "100%", height: "50%" }}></img>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}><p style={{ color: 'black' }}>{feature.properties.name}</p>
-                    </div></div>, popupNode);
-                //popupNode  = document.createElement("div");
-                // set popup on map
-                popUpRef.current
-                    .setLngLat(feature.geometry.coordinates)
-                    .setDOMContent(popupNode)
-                    .addTo(map);
-            }
+                    ReactDOM.render(<Popup feature={feature} />, popupNode);
+                    ReactDOM.render(<div><img src={imageSrc} alt="" style={{ width: "100%", height: "50%" }}></img>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}><p style={{ color: 'black' }}>{feature.properties.name}</p>
+                        </div></div>, popupNode);
+                    //popupNode  = document.createElement("div");
+                    // set popup on map
+                    popUpRef.current
+                        .setLngLat(feature.geometry.coordinates)
+                        .setDOMContent(popupNode)
+                        .addTo(map);
+                }
+            
+            }, 150);
         }
+        
     });
     marker = new mapboxgl.Marker();
     // reset cursor to default when user is no longer hovering over a clickable feature
     map.on("mouseleave", "attraction-points-layer", () => {
+        clearTimeout(popupTimeout);
+        popupTimeout = null;
         //mapboxgl-popup-close-button
         popUpRef.current.remove();
     });
@@ -1664,6 +1674,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
       
 
         async function ratingChange(newRating, obj){
+            console.log("xxxxxx")
             setShowRatingErrorSnackbar(false);
             setShowRatingSuccessSnackbar(false);
             let formdata = new FormData();
@@ -1799,15 +1810,15 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 onClose={() => closeBottomDrawer()}>
                     <div style={{maxHeight:"60vh", minHeight:"200px"}}>
                         <div style={{width:"100%", maxHeight:"30%", maxWidth:"100%", marginTop:"20px", marginBottom:"10px", display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column"}}>
-                        <div>
-                            <div style={{display:"flex", flexDirection:"column"}}> 
-                                {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{languageTags.addButton}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{languageTags.removeButton}</Button>}
-                                <h2 id="nameField" style={{marginBottom:"1px"}}>{obj.properties.name}</h2>
+                            <div style={{maxWidth:"92%"}}>
+                                <div style={{display:"flex", flexDirection:"column"}}> 
+                                    {showAddButton ? <Button variant="contained" style={{marginBottom:"10px"}}  endIcon={<SendIcon />} onClick={() => addPointToRouteButtonClicked(obj)}>{languageTags.addButton}</Button> : <Button variant="contained" startIcon={<DeleteIcon />} style={{marginBottom:"10px"}} onClick={() => removePointFromRouteButtonClicked(obj)}>{languageTags.removeButton}</Button>}
+                                    <h2 id="nameField" style={{marginBottom:"1px"}}>{obj.properties.name}</h2>
+                                </div>
+                                {clickedFriends ? null :  <Box sx={{display: 'flex',alignItems: 'center',}}> <Rating sx={{mb:1}} name="rating-attractions" onChange={(event, newValue) => {ratingChange(newValue, obj)}} value={avgRating} precision={0.5} />  <Box sx={{ ml: 1, mb:1 }}>({howManyReviews})</Box> </Box> }
+                                {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"10px"}}></img>}</div>}
                             </div>
-                            {clickedFriends ? null :  <Box sx={{display: 'flex',alignItems: 'center',}}> <Rating sx={{mb:1}} name="rating-attractions" onChange={(event, newValue) => {ratingChange(newValue, obj)}} value={avgRating} precision={0.5} />  <Box sx={{ ml: 1, mb:1 }}>({howManyReviews})</Box> </Box> }
-                            {clickedFriends ? null : <div  style={{display:"flex", justifyContent:"center"}}> {showLoadingInsteadPicture ? <CircularProgress /> : <img src={image} alt="" style={{maxWidth:"100%", marginBottom:"10px"}}></img>}</div>}
-                        </div>
-                           {clickedFriends ? null : (!showLoadingInsteadPicture && <Button variant="contained" color="error" style={{marginBottom:"10px"}} onClick={() => removePoiFromMap(obj["properties"]["id"])} startIcon={<DeleteIcon />} >{languageTags.removePoiFromMap}</Button>)} 
+                           {clickedFriends ? null : (!showLoadingInsteadPicture && <Button variant="contained" color="error" style={{marginBottom:"18px"}} onClick={() => removePoiFromMap(obj["properties"]["id"])} startIcon={<DeleteIcon />} >{languageTags.removePoiFromMap}</Button>)} 
                         </div>                     
                     </div>
             </Drawer>
@@ -1835,7 +1846,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                     transitionDuration	= {280}
                     open={openPoiListDrawer}
                     onClose={() => closeBottomPoiListDrawer()}>
-                        <div style={{maxHeight:"67vh", minHeight:"67vh", paddingTop: "12px", paddingBottom: "30px"}}>
+                        <div style={{maxHeight:"67vh", minHeight:"67vh", paddingTop: "12px", paddingBottom: "60px"}}>
                             <Typography variant='h5' style={{paddingLeft:"30px"}} fontWeight={450} >{languageTags.poiListHeading}</Typography>
                             <Box style={{width:"60ch", maxWidth:"calc(100vw - 60px)", marginLeft:"30px"}}>
                                 <TextField
@@ -1856,10 +1867,11 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                                 />
                                 {filteredPoiList["features"].length > 0 ? 
                                     <Box sx={{mt:1.6}} style={{display:"flex", flexDirection:"column"}}>
-                                        <Button variant="contained" fullWidth onClick={() => addAllListedPoints(filteredPoiList)}> {languageTags.poiListAddAllPointsButton} <AddLocationAltIcon /> </Button>
-                                        <Button variant="contained" fullWidth sx={{mt:1.6}} color="error" onClick={() => removeAllListedPoints(filteredPoiList)}> {languageTags.poiListRemoveAllPointsButton} <DeleteIcon /> </Button>
+                                        <Button variant="contained" fullWidth onClick={() => addAllListedPoints(filteredPoiList)}> {languageTags.poiListAddAllPointsButton} ({filteredPoiList["features"].length}) <AddLocationAltIcon /> </Button>
+                                        <Button variant="contained" fullWidth sx={{mt:1.6}} color="error" onClick={() => removeAllListedPoints(filteredPoiList)}> {languageTags.poiListRemoveAllPointsButton} ({filteredPoiList["features"].length}) <DeleteIcon /> </Button>
                                     </Box>
                                 : null    }
+                                
                             </Box>
                             {   
                                 <FormGroup style={{paddingLeft:"30px"}} sx={{pt: 1.6}}>

@@ -42,7 +42,7 @@ async function getBestRoute(request, res) {
         }
     }
 ]*/
-    console.log("ROUTE");
+    console.log("CALCULATING ROUTE");
     // Adjazenzmatrix aufbauen
     const p = JSON.parse(request.body.points);
     const l = p.length;

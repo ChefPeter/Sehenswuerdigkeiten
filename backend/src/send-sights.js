@@ -18,7 +18,6 @@ async function sendSights(req, res) {
     }
     
     //FETCHING DATA HERE
-    console.log(url);
     let results = await getDataFromURL(url);
     try{
         results = results.filter((item, index, self) => index === self.findIndex((x) => (x.wikidata === item.wikidata)));

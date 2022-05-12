@@ -872,7 +872,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         }
     });
 
-    map.on("click", (e) => {
+    map.on("dblclick", (e) => {
         let coords = [e.lngLat.lng, e.lngLat.lat];
         let popupNode  = document.createElement("div");
         ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois)} >Search here?</Button><Button sx={{mt:1.5}} variant="contained" fullWidth onClick={() => handleStartPointClickedByUserPoint(coords)} >STARTPOINT</Button><Button sx={{mt:1.5, mb:0.5}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);

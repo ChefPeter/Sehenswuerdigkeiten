@@ -1,4 +1,4 @@
-import { Button, Card } from '@mui/material';
+import { Button, Card, Typography } from '@mui/material';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import React, { useEffect, useState } from "react";
@@ -124,7 +124,7 @@ const handleCloseSuccessSnackbar = (event, reason) => {
             <Sidebar t1={props.t1} t2={props.t2} l1={props.l1} l2={props.l2} />
             <div id="rand" style={{marginTop: "calc(16.5px + 3.2em)"}}>
               <div>
-                <h4>{languageTags.headText}</h4>
+                <Typography variant='h6'>{languageTags.headText}</Typography>
               </div>
             
                 <div>

@@ -1,21 +1,15 @@
-import { Button, Card, Switch, Toolbar, Box } from '@mui/material';
+import SaveIcon from '@mui/icons-material/Save';
+import { Box, Button, Card, Checkbox, CircularProgress, FormControlLabel, LinearProgress, Tooltip, Typography } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TextField from '@mui/material/TextField';
+import Zoom from '@mui/material/Zoom';
 import React, { useEffect, useState } from "react";
 import ErrorSnackbar from "../components/ErrorSnackbar";
 import Sidebar from "../components/Sidebar";
 import SuccessSnackbar from '../components/SuccessSnackbar';
-import "../routes/styles/profile.css";
-import { Checkbox, FormControlLabel } from '@mui/material';
-import { Tooltip } from '@mui/material';
-import Zoom from '@mui/material/Zoom';
-import SaveIcon from '@mui/icons-material/Save';
-import Save from '@mui/icons-material/Save';
-import { CircularProgress } from '@mui/material';
-import { Typography } from '@mui/material';
-import { LinearProgress } from '@mui/material';
 import { checkCurrentlyLoggedIn } from "../functions/checkLoggedIn";
+import "../routes/styles/profile.css";
 
 // Define theme settings
 const light = {
@@ -232,7 +226,7 @@ function Profile(props) {
                     </div>
                     <div id='unten'>
                         <div>
-                            <h2>{username}</h2>
+                          <Typography variant='h4' fontWeight={500}>{username}</Typography>
                         </div>
                         <div id='abstand'>
                             <TextField
@@ -254,7 +248,7 @@ function Profile(props) {
                         </div>
                         {visitedSights.length > 0 ?
                           <div>
-                            <Typography sx={{mt:2}} variant='h5'>{visitedPOIsTag}</Typography>
+                            <Typography sx={{mt:2, mb:0.2}} variant='h5'>{visitedPOIsTag}</Typography>
                             <VisitedSights></VisitedSights>
                           </div>
                         : null}

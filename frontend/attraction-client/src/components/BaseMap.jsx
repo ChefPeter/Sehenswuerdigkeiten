@@ -788,7 +788,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
     map.doubleClickZoom.disable();    
     // change cursor to pointer when user hovers over a clickable feature
     map.on("mouseenter", "attraction-points-layer", async e => {
-   
+
         if(e.features.length){
             const feature = e.features[0];
             setImage("");
@@ -825,17 +825,26 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                         .addTo(map);
                 }
             
-            }, 150);
+            }, 400);
         }
         
     });
     marker = new mapboxgl.Marker();
     // reset cursor to default when user is no longer hovering over a clickable feature
     map.on("mouseleave", "attraction-points-layer", () => {
-        clearTimeout(popupTimeout);
-        popupTimeout = null;
-        //mapboxgl-popup-close-button
-        popUpRef.current.remove();
+        delay(200).then(() => {
+            if(popupTimeout == null){
+                delay(300).then(() => {
+                    clearTimeout(popupTimeout);
+                    popupTimeout = null;
+                });
+            }else {
+                clearTimeout(popupTimeout);
+                popupTimeout = null;
+            }
+            //mapboxgl-popup-close-button
+            popUpRef.current.remove();
+        });
     });
     // add popup when user clicks a point
     map.on("click", "attraction-points-layer", e => {
@@ -851,7 +860,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                 setAvgRating(data.avg)
                 setHowManyReviews(data.count)
             });
-           
             setOpen(true);
         }
     });
@@ -864,7 +872,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
         }
     });
 
-    map.on("dblclick", (e) => {
+    map.on("click", (e) => {
         let coords = [e.lngLat.lng, e.lngLat.lat];
         let popupNode  = document.createElement("div");
         ReactDOM.render(<div><Button variant="contained" fullWidth onClick={() => handleSearchByMarkerButton(coords, radiusForPointerSearch, setShowNoPoisFoundErrorSnackbar, setCurrentlyLookingForPois)} >Search here?</Button><Button sx={{mt:1.5}} variant="contained" fullWidth onClick={() => handleStartPointClickedByUserPoint(coords)} >STARTPOINT</Button><Button sx={{mt:1.5, mb:0.5}} variant="contained" onClick={() => handleAddClickedByUserPointToRoute(coords)} >Add this point to route!</Button></div>, popupNode);
@@ -1551,7 +1559,7 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
                         <div>
                             <div style={{ display:"flex", alignItems:"center"}}>
                                 <img style={{height:"50px", marginLeft:"5px"}} src={`https://openweathermap.org/img/wn/${weatherData.icon}.png`} alt='weather' ></img>
-                                <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{Math.round(weatherData.temp - 273.15) + "°C"}</strong></Typography>
+                              
                             </div>
                             <Card sx={{ mb:3, ml:1, mr:1, pt:1, pb:0.5}} style={{borderRadius:"8px"}} elevation={4}>
                                 <Typography variant='body1' fontWeight={400} sx={{mt:1, mb:1}} style={{maxWidth:"90%", margin:"auto", marginLeft:"10px", marginBottom:"5px"}}><strong>{languageTags.currentRoute}:</strong> {currentDurationInMinutes} {timeInHours ? " h": languageTags.minutes}, {currentKilometers} km, {returnToStart ?  currentSortedPointsRouteOutput.length-1 : currentSortedPointsRouteOutput.length} POIs</Typography>
@@ -1674,7 +1682,6 @@ async function newMap(theme, setImage, imageSrc, setShowLoadingInsteadPicture, p
       
 
         async function ratingChange(newRating, obj){
-            console.log("xxxxxx")
             setShowRatingErrorSnackbar(false);
             setShowRatingSuccessSnackbar(false);
             let formdata = new FormData();
